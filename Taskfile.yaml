@@ -1,0 +1,276 @@
+version: '3'
+
+env:
+  ENV: local
+
+dotenv: ['.env.{{.ENV}}']
+
+tasks:
+  default:
+    cmds:
+      - task -l
+  init:
+    desc: 'Runs all init tasks'
+    silent: true
+    cmds:
+      - task init-env
+      - task init-tools
+      - task refresh
+
+  refresh:
+    desc: 'Refreshes the database and redis cache'
+    silent: true
+    cmds:
+      - task db-refresh
+      - task redis-refresh
+
+  init-env:
+    desc: 'Initialize .env.dev and .env.test'
+    silent: true
+    cmds:
+      - |
+        if [ ! -f .env.dev ]; then
+          cp .env.example .env.dev
+        fi
+      - |
+        if [ ! -f .env.test ]; then
+          cp .env.example .env.test
+        fi
+
+  init-tools:
+    desc: 'Initialize the tools used by the project (from tools.txt)'
+    silent: true
+    cmds:
+      - |
+        if [ ! -d bin ]; then
+          mkdir bin
+        fi
+      - |
+        export GOBIN=${PWD}/bin
+        while read -r line; do
+          exec=$(basename $line)
+          exec=${exec%%@*}
+          if [ ! -f ${GOBIN}/$exec ]; then
+            echo "Installing tool $exec"
+            go install $line
+          fi
+        done < tools.txt
+
+  update-tools:
+    desc: 'Update the tools used by the project (from tools.txt)'
+    silent: true
+    cmds:
+      - rm -rf bin
+      - task init-tools
+
+  db-init:
+    desc: 'Create a fresh database'
+    silent: false
+    cmds:
+      - psql "postgresql://"$(echo $DATABASE_URL | cut -d/ -f3) -c "DROP DATABASE IF EXISTS \"${DATABASE_NAME}\" WITH (FORCE);"
+      - psql "postgresql://"$(echo $DATABASE_URL | cut -d/ -f3) -c "CREATE DATABASE \"${DATABASE_NAME}\";"
+
+  db-refresh:
+    desc: 'Create a fresh database and run migrations'
+    silent: true
+    cmds:
+      - task db-init
+      - task db-migration-up
+
+  db-refresh-test:
+    desc: 'Create a fresh database and run migrations (for test environment))'
+    silent: true
+    env:
+      ENV: testing
+    dotenv: ['.env.test']
+    cmds:
+      - task db-init
+      - task db-migration-up
+
+  db-migration-up:
+    desc: 'Run database migrations'
+    silent: false
+    cmds:
+      - ./bin/goose -dir migrations postgres "$DATABASE_URL" up
+
+  db-migration-down:
+    desc: 'Run database migrations'
+    silent: false
+    cmds:
+      - ./bin/goose -dir migrations postgres "$DATABASE_URL" down
+
+  db-migration-down-step:
+    desc: 'Run database migrations'
+    silent: false
+    vars:
+      steps: 1
+    cmds:
+      - ./bin/goose -dir db/migrations postgres "$DATABASE_URL" down {{.steps}}
+
+  db-migration-status:
+    desc: 'Show database migration status'
+    silent: false
+    cmds:
+      - ./bin/goose -dir db/migrations postgres "$DATABASE_URL" status
+
+  db-migration-new:
+    desc: 'Create a new database migration'
+    silent: false
+    requires:
+      vars: [MIGRATION_NAME]
+    cmds:
+      - printf "-- +goose Up\n-- +goose StatementBegin\n\n\n\n-- +goose StatementEnd\n-- +goose Down\n-- +goose StatementBegin\n\n\n\n-- +goose StatementEnd\n" > db/migrations/$(printf "%05d" $(expr $(ls db/migrations | wc -l) + 1))_$(echo $MIGRATION_NAME).sql
+
+  codegen-db-models:
+    desc: 'Generate database models'
+    silent: true
+    cmds:
+      - ./bin/jet -dsn="$DATABASE_URL" -schema=public -path=./generated/db
+
+  codegen-openapi:
+    desc: 'Generate openapi spec'
+    silent: true
+    cmds:
+      - ./bin/oapi-codegen -config ./oapi-codegen.yaml $OPENAPI_SPEC
+
+  codegen:
+    desc: 'Update database models'
+    silent: true
+    cmds:
+      - task codegen-openapi
+      - task codegen-db-models
+      - task format
+      - task lint-fix
+
+  update-dependencies:
+    desc: 'Update dependencies'
+    silent: true
+    cmds:
+      - go get -u ./...
+      - go mod tidy
+
+  format:
+    desc: 'Format all files'
+    silent: false
+    cmds:
+      - ./bin/goimports -w .
+      - gofmt -w .
+      - ./bin/golines -w .
+
+  format-check:
+    desc: 'Check if all files are formatted'
+    silent: false
+    cmds:
+      - |
+        if [ -n "$(./bin/goimports -l .)" ]; then
+          echo "Go code is not goimports-ed:"
+          ./bin/goimports -l .
+          echo "Run 'task format' to fix"
+          exit 1
+        fi
+        if [ -n "$(gofmt -l .)" ]; then
+          echo "Go code is not gofmt-ed:"
+          gofmt -l .
+          echo "Run 'task format' to fix"
+          exit 1
+        fi
+        if [ -n "$(./bin/golines -l .)" ]; then
+          echo "Go code is not golines-ed:"
+          ./bin/golines -l .
+          echo "Run 'task format' to fix"
+          exit 1
+        fi
+        echo "All files are formatted correctly."
+
+  lint:
+    desc: 'Lint all files'
+    silent: false
+    cmds:
+      - ./bin/golangci-lint run -c .golangci.yml
+
+  lint-fix:
+    desc: 'Lint all files and fix issues'
+    silent: false
+    cmds:
+      - ./bin/golangci-lint run --fix -c .golangci.yml
+
+  test:
+    desc: 'Run all tests'
+    silent: false
+    env:
+      ENV: testing
+    dotenv: ['.env.test']
+    cmds:
+      - task db-refresh-test
+      - go test -v  ./test/...
+
+  test-coverage:
+    desc: 'Run all tests and generate coverage report'
+    silent: false
+    env:
+      ENV: testing
+    dotenv: ['.env.test']
+    cmds:
+      - task db-refresh-test
+      - go test --cover -covermode=count -coverpkg=./...  ./test/... -coverprofile=cover.out
+      - go tool cover -html=cover.out
+
+  redis-refresh:
+    desc: 'Refresh redis cache'
+    silent: false
+    cmds:
+      - redis-cli -h $(echo $REDIS_HOST) -p $(echo $REDIS_PORT) flushall
+
+  redis-refresh-test:
+    desc: 'Refresh redis cache (for test environment)'
+    silent: false
+    cmds:
+      - redis-cli -h $(echo $REDIS_HOST) -p $(echo $REDIS_PORT) flushall
+
+  routes:
+    desc: 'List all routes'
+    silent: false
+    cmds:
+      - go run ./cmd/server/main.go routes:list
+
+  run:
+    desc: 'Run the server'
+    silent: true
+    cmds:
+      - |
+        # echo "Starting server and worker, press Ctrl+C to stop..."
+        # trap 'kill 0' EXIT 
+        # MODE=default task run-worker & task run-server & MODE=low task run-worker
+        # wait
+        go run ./cmd/server/main.go
+
+  run-worker:
+    desc: 'Run the worker'
+    silent: true
+    cmds:
+      - go run ./cmd/worker/main.go {{.MODE}}
+
+  run-server:
+    desc: 'Run the server'
+    silent: true
+    cmds:
+      - go run ./cmd/server/main.go
+
+  run-fresh:
+    desc: 'Run the server and worker with a fresh database'
+    silent: true
+    cmds:
+      - task refresh
+      - task run
+
+  run-queue-monitor:
+    desc: 'Run the queue monitor'
+    silent: true
+    cmds:
+      - ./bin/asynqmon
+
+  run-cronjob:
+    desc: 'Run the cronjob'
+    silent: true
+    cmds:
+      - go run ./cmd/cronjob/main.go cronjob:every-five-minutes

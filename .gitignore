@@ -1,0 +1,53 @@
+# Go binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go workspace
+go.work
+vendor/
+
+# Build output
+bin/
+dist/
+build/
+main
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Test coverage
+coverage.out
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+*.tmp
+temp/
+
+# Generated code
+internal/generated/
