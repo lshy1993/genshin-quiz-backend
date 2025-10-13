@@ -1,53 +1,31 @@
-# Go binaries
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-*.test
-*.out
+# Go build output
+bin/
 
-# Go workspace
+# Go test/coverage
+*.test
+coverage.out
+
+# Go modules (可选)
 go.work
 vendor/
 
-# Build output
-bin/
-dist/
-build/
-main
-
-# Environment variables
+# 环境变量文件
 .env
 .env.*
 !.env.example
 
-# Logs
+# 日志
 *.log
 logs/
 
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-
-# Test coverage
-coverage.out
-
-# OS generated files
+# macOS 系统文件
 .DS_Store
-Thumbs.db
 
-# Editor directories
-.vscode/
+# IDE/编辑器
 .idea/
 *.swp
 *.swo
 
-# Temporary files
+# 临时文件
 tmp/
 *.tmp
-temp/
-
-# Generated code
-internal/generated/
