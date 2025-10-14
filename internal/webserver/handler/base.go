@@ -15,3 +15,7 @@ func NewHandler(app *config.App) *Handler {
 		app: app,
 	}
 }
+
+func ptr[T any](v T) *T {
+	return &v
+}
