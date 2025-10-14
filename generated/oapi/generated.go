@@ -20,121 +20,53 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-// Defines values for CreateQuestionRequestQuestionType.
+// Defines values for QuestionCategory.
 const (
-	CreateQuestionRequestQuestionTypeFillInBlank    CreateQuestionRequestQuestionType = "fill_in_blank"
-	CreateQuestionRequestQuestionTypeMultipleChoice CreateQuestionRequestQuestionType = "multiple_choice"
-	CreateQuestionRequestQuestionTypeTrueFalse      CreateQuestionRequestQuestionType = "true_false"
+	QuestionCategoryArtifact   QuestionCategory = "artifact"
+	QuestionCategoryCharacter  QuestionCategory = "character"
+	QuestionCategoryCombat     QuestionCategory = "combat"
+	QuestionCategoryFun        QuestionCategory = "fun"
+	QuestionCategoryGameplay   QuestionCategory = "gameplay"
+	QuestionCategoryLore       QuestionCategory = "lore"
+	QuestionCategoryMusic      QuestionCategory = "music"
+	QuestionCategoryOther      QuestionCategory = "other"
+	QuestionCategoryStatistics QuestionCategory = "statistics"
+	QuestionCategoryWeapon     QuestionCategory = "weapon"
+	QuestionCategoryWorld      QuestionCategory = "world"
 )
 
-// Defines values for CreateQuizRequestCategory.
+// Defines values for QuestionDifficulty.
 const (
-	CreateQuizRequestCategoryArtifacts  CreateQuizRequestCategory = "artifacts"
-	CreateQuizRequestCategoryCharacters CreateQuizRequestCategory = "characters"
-	CreateQuizRequestCategoryGameplay   CreateQuizRequestCategory = "gameplay"
-	CreateQuizRequestCategoryLore       CreateQuizRequestCategory = "lore"
-	CreateQuizRequestCategoryWeapons    CreateQuizRequestCategory = "weapons"
+	Easy   QuestionDifficulty = "easy"
+	Hard   QuestionDifficulty = "hard"
+	Medium QuestionDifficulty = "medium"
 )
 
-// Defines values for CreateQuizRequestDifficulty.
+// Defines values for QuestionOptionType.
 const (
-	CreateQuizRequestDifficultyEasy   CreateQuizRequestDifficulty = "easy"
-	CreateQuizRequestDifficultyHard   CreateQuizRequestDifficulty = "hard"
-	CreateQuizRequestDifficultyMedium CreateQuizRequestDifficulty = "medium"
+	Image QuestionOptionType = "image"
+	Text  QuestionOptionType = "text"
 )
 
-// Defines values for QuestionQuestionType.
+// Defines values for QuestionType.
 const (
-	QuestionQuestionTypeFillInBlank    QuestionQuestionType = "fill_in_blank"
-	QuestionQuestionTypeMultipleChoice QuestionQuestionType = "multiple_choice"
-	QuestionQuestionTypeTrueFalse      QuestionQuestionType = "true_false"
+	MultipleChoice QuestionType = "multiple_choice"
+	SingleChoice   QuestionType = "single_choice"
+	TrueFalse      QuestionType = "true_false"
 )
 
-// Defines values for QuizCategory.
+// Defines values for VoteOptionType.
 const (
-	QuizCategoryArtifacts  QuizCategory = "artifacts"
-	QuizCategoryCharacters QuizCategory = "characters"
-	QuizCategoryGameplay   QuizCategory = "gameplay"
-	QuizCategoryLore       QuizCategory = "lore"
-	QuizCategoryWeapons    QuizCategory = "weapons"
+	VoteOptionTypeImage VoteOptionType = "image"
+	VoteOptionTypeMusic VoteOptionType = "music"
+	VoteOptionTypeText  VoteOptionType = "text"
 )
 
-// Defines values for QuizDifficulty.
-const (
-	QuizDifficultyEasy   QuizDifficulty = "easy"
-	QuizDifficultyHard   QuizDifficulty = "hard"
-	QuizDifficultyMedium QuizDifficulty = "medium"
-)
-
-// Defines values for UpdateQuizRequestCategory.
-const (
-	UpdateQuizRequestCategoryArtifacts  UpdateQuizRequestCategory = "artifacts"
-	UpdateQuizRequestCategoryCharacters UpdateQuizRequestCategory = "characters"
-	UpdateQuizRequestCategoryGameplay   UpdateQuizRequestCategory = "gameplay"
-	UpdateQuizRequestCategoryLore       UpdateQuizRequestCategory = "lore"
-	UpdateQuizRequestCategoryWeapons    UpdateQuizRequestCategory = "weapons"
-)
-
-// Defines values for UpdateQuizRequestDifficulty.
-const (
-	UpdateQuizRequestDifficultyEasy   UpdateQuizRequestDifficulty = "easy"
-	UpdateQuizRequestDifficultyHard   UpdateQuizRequestDifficulty = "hard"
-	UpdateQuizRequestDifficultyMedium UpdateQuizRequestDifficulty = "medium"
-)
-
-// Defines values for GetQuizzesParamsCategory.
-const (
-	GetQuizzesParamsCategoryArtifacts  GetQuizzesParamsCategory = "artifacts"
-	GetQuizzesParamsCategoryCharacters GetQuizzesParamsCategory = "characters"
-	GetQuizzesParamsCategoryGameplay   GetQuizzesParamsCategory = "gameplay"
-	GetQuizzesParamsCategoryLore       GetQuizzesParamsCategory = "lore"
-	GetQuizzesParamsCategoryWeapons    GetQuizzesParamsCategory = "weapons"
-)
-
-// Defines values for GetQuizzesParamsDifficulty.
-const (
-	GetQuizzesParamsDifficultyEasy   GetQuizzesParamsDifficulty = "easy"
-	GetQuizzesParamsDifficultyHard   GetQuizzesParamsDifficulty = "hard"
-	GetQuizzesParamsDifficultyMedium GetQuizzesParamsDifficulty = "medium"
-)
-
-// CreateQuestionRequest defines model for CreateQuestionRequest.
-type CreateQuestionRequest struct {
-	CorrectAnswer string                            `json:"correct_answer"`
-	Explanation   *string                           `json:"explanation,omitempty"`
-	Options       *[]string                         `json:"options,omitempty"`
-	OrderIndex    int                               `json:"order_index"`
-	Points        int                               `json:"points"`
-	QuestionText  string                            `json:"question_text"`
-	QuestionType  CreateQuestionRequestQuestionType `json:"question_type"`
-}
-
-// CreateQuestionRequestQuestionType defines model for CreateQuestionRequest.QuestionType.
-type CreateQuestionRequestQuestionType string
-
-// CreateQuizRequest defines model for CreateQuizRequest.
-type CreateQuizRequest struct {
-	Category    CreateQuizRequestCategory   `json:"category"`
-	CreatedBy   int64                       `json:"created_by"`
-	Description *string                     `json:"description,omitempty"`
-	Difficulty  CreateQuizRequestDifficulty `json:"difficulty"`
-	Questions   []CreateQuestionRequest     `json:"questions"`
-	TimeLimit   *int                        `json:"time_limit,omitempty"`
-	Title       string                      `json:"title"`
-}
-
-// CreateQuizRequestCategory defines model for CreateQuizRequest.Category.
-type CreateQuizRequestCategory string
-
-// CreateQuizRequestDifficulty defines model for CreateQuizRequest.Difficulty.
-type CreateQuizRequestDifficulty string
-
-// CreateUserRequest defines model for CreateUserRequest.
-type CreateUserRequest struct {
-	AvatarUrl   *string             `json:"avatar_url,omitempty"`
-	DisplayName *string             `json:"display_name,omitempty"`
-	Email       openapi_types.Email `json:"email"`
-	Username    string              `json:"username"`
+// AuthResponse defines model for AuthResponse.
+type AuthResponse struct {
+	// Token JWT token
+	Token string             `json:"token"`
+	Uuid  openapi_types.UUID `json:"uuid"`
 }
 
 // Error defines model for Error.
@@ -144,30 +76,26 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-// Question defines model for Question.
-type Question struct {
-	CorrectAnswer string               `json:"correct_answer"`
-	Explanation   *string              `json:"explanation,omitempty"`
-	Id            int64                `json:"id"`
-	Options       *[]string            `json:"options,omitempty"`
-	OrderIndex    int                  `json:"order_index"`
-	Points        int                  `json:"points"`
-	QuestionText  string               `json:"question_text"`
-	QuestionType  QuestionQuestionType `json:"question_type"`
-}
+// Exam defines model for Exam.
+type Exam struct {
+	Categories  *[]QuestionCategory `json:"categories,omitempty"`
+	CreatedAt   time.Time           `json:"created_at"`
+	CreatedBy   openapi_types.UUID  `json:"created_by"`
+	Description *string             `json:"description,omitempty"`
 
-// QuestionQuestionType defines model for Question.QuestionType.
-type QuestionQuestionType string
+	// Difficulty 难度等级
+	Difficulty QuestionDifficulty `json:"difficulty"`
+	Id         openapi_types.UUID `json:"id"`
+	Questions  []struct {
+		// OrderIndex 在本测验中的顺序
+		OrderIndex *int `json:"order_index,omitempty"`
 
-// Quiz defines model for Quiz.
-type Quiz struct {
-	Category    QuizCategory   `json:"category"`
-	CreatedAt   time.Time      `json:"created_at"`
-	CreatedBy   int64          `json:"created_by"`
-	Description *string        `json:"description,omitempty"`
-	Difficulty  QuizDifficulty `json:"difficulty"`
-	Id          int64          `json:"id"`
-	Questions   []Question     `json:"questions"`
+		// Points 本题分值
+		Points *int `json:"points,omitempty"`
+
+		// QuestionId 题目ID
+		QuestionId openapi_types.UUID `json:"question_id"`
+	} `json:"questions"`
 
 	// TimeLimit Time limit in seconds
 	TimeLimit *int      `json:"time_limit,omitempty"`
@@ -175,48 +103,123 @@ type Quiz struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// QuizCategory defines model for Quiz.Category.
-type QuizCategory string
+// Question defines model for Question.
+type Question struct {
+	// AnswerCount 总答题人数
+	AnswerCount *int `json:"answer_count,omitempty"`
 
-// QuizDifficulty defines model for Quiz.Difficulty.
-type QuizDifficulty string
+	// Category 题目分类
+	Category QuestionCategory `json:"category"`
 
-// UpdateQuizRequest defines model for UpdateQuizRequest.
-type UpdateQuizRequest struct {
-	Category    *UpdateQuizRequestCategory   `json:"category,omitempty"`
-	Description *string                      `json:"description,omitempty"`
-	Difficulty  *UpdateQuizRequestDifficulty `json:"difficulty,omitempty"`
-	Questions   *[]CreateQuestionRequest     `json:"questions,omitempty"`
-	TimeLimit   *int                         `json:"time_limit,omitempty"`
-	Title       *string                      `json:"title,omitempty"`
+	// CorrectCount 总答对人数
+	CorrectCount *int               `json:"correct_count,omitempty"`
+	CreatedAt    time.Time          `json:"created_at"`
+	CreatedBy    openapi_types.UUID `json:"created_by"`
+
+	// Difficulty 难度等级
+	Difficulty   QuestionDifficulty `json:"difficulty"`
+	Explanation  *string            `json:"explanation,omitempty"`
+	Id           openapi_types.UUID `json:"id"`
+	Languages    []string           `json:"languages"`
+	Options      []QuestionOption   `json:"options"`
+	QuestionText string             `json:"question_text"`
+
+	// QuestionType 题目类型
+	QuestionType QuestionType `json:"question_type"`
 }
 
-// UpdateQuizRequestCategory defines model for UpdateQuizRequest.Category.
-type UpdateQuizRequestCategory string
+// QuestionCategory 题目分类
+type QuestionCategory string
 
-// UpdateQuizRequestDifficulty defines model for UpdateQuizRequest.Difficulty.
-type UpdateQuizRequestDifficulty string
+// QuestionDifficulty 难度等级
+type QuestionDifficulty string
 
-// UpdateUserRequest defines model for UpdateUserRequest.
-type UpdateUserRequest struct {
-	AvatarUrl   *string              `json:"avatar_url,omitempty"`
-	DisplayName *string              `json:"display_name,omitempty"`
-	Email       *openapi_types.Email `json:"email,omitempty"`
-	Username    *string              `json:"username,omitempty"`
+// QuestionOption defines model for QuestionOption.
+type QuestionOption struct {
+	Id openapi_types.UUID `json:"id"`
+
+	// Image 选项图片URL
+	Image *string `json:"image,omitempty"`
+
+	// Text 选项文本
+	Text *string `json:"text,omitempty"`
+
+	// Type 选项类型
+	Type QuestionOptionType `json:"type"`
+}
+
+// QuestionOptionType 选项类型
+type QuestionOptionType string
+
+// QuestionType 题目类型
+type QuestionType string
+
+// QuestionWithAnswer defines model for QuestionWithAnswer.
+type QuestionWithAnswer struct {
+	Answer []openapi_types.UUID `json:"answer"`
+
+	// AnswerCount 总答题人数
+	AnswerCount *int `json:"answer_count,omitempty"`
+
+	// Category 题目分类
+	Category QuestionCategory `json:"category"`
+
+	// CorrectCount 总答对人数
+	CorrectCount *int               `json:"correct_count,omitempty"`
+	CreatedAt    time.Time          `json:"created_at"`
+	CreatedBy    openapi_types.UUID `json:"created_by"`
+
+	// Difficulty 难度等级
+	Difficulty   QuestionDifficulty `json:"difficulty"`
+	Explanation  *string            `json:"explanation,omitempty"`
+	Id           openapi_types.UUID `json:"id"`
+	Languages    []string           `json:"languages"`
+	Options      []QuestionOption   `json:"options"`
+	QuestionText string             `json:"question_text"`
+
+	// QuestionType 题目类型
+	QuestionType QuestionType `json:"question_type"`
 }
 
 // User defines model for User.
 type User struct {
-	AvatarUrl        *string             `json:"avatar_url,omitempty"`
-	CreatedAt        time.Time           `json:"created_at"`
-	DisplayName      *string             `json:"display_name,omitempty"`
-	Email            openapi_types.Email `json:"email"`
-	Id               int64               `json:"id"`
-	QuizzesCompleted *int                `json:"quizzes_completed,omitempty"`
-	TotalScore       *int                `json:"total_score,omitempty"`
-	UpdatedAt        time.Time           `json:"updated_at"`
-	Username         string              `json:"username"`
+	AvatarUrl        string             `json:"avatar_url"`
+	CorrectAnswers   int                `json:"correct_answers"`
+	Country          string             `json:"country"`
+	Ip               string             `json:"ip"`
+	LastLoginAt      time.Time          `json:"last_login_at"`
+	Nickname         string             `json:"nickname"`
+	QuestionsCreated int                `json:"questions_created"`
+	RegisteredAt     time.Time          `json:"registered_at"`
+	TotalAnswers     int                `json:"total_answers"`
+	Uuid             openapi_types.UUID `json:"uuid"`
+	Votes            int                `json:"votes"`
 }
+
+// Vote defines model for Vote.
+type Vote struct {
+	CreatedAt    *time.Time         `json:"created_at,omitempty"`
+	CreatedBy    openapi_types.UUID `json:"created_by"`
+	Description  *string            `json:"description,omitempty"`
+	ExpiresAt    *time.Time         `json:"expires_at,omitempty"`
+	Id           openapi_types.UUID `json:"id"`
+	Options      []VoteOption       `json:"options"`
+	Title        string             `json:"title"`
+	VotesPerUser *int               `json:"votes_per_user,omitempty"`
+}
+
+// VoteOption defines model for VoteOption.
+type VoteOption struct {
+	Id       openapi_types.UUID `json:"id"`
+	ImageUrl *string            `json:"image_url,omitempty"`
+	MusicUrl *string            `json:"music_url,omitempty"`
+	Text     *string            `json:"text,omitempty"`
+	Type     VoteOptionType     `json:"type"`
+	Votes    *int               `json:"votes,omitempty"`
+}
+
+// VoteOptionType defines model for VoteOption.Type.
+type VoteOptionType string
 
 // BadRequest defines model for BadRequest.
 type BadRequest = Error
@@ -227,37 +230,93 @@ type InternalServerError = Error
 // NotFound defines model for NotFound.
 type NotFound = Error
 
-// GetQuizzesParams defines parameters for GetQuizzes.
-type GetQuizzesParams struct {
-	Limit      *int                        `form:"limit,omitempty" json:"limit,omitempty"`
-	Offset     *int                        `form:"offset,omitempty" json:"offset,omitempty"`
-	Category   *GetQuizzesParamsCategory   `form:"category,omitempty" json:"category,omitempty"`
-	Difficulty *GetQuizzesParamsDifficulty `form:"difficulty,omitempty" json:"difficulty,omitempty"`
+// Unauthorized defines model for Unauthorized.
+type Unauthorized = Error
+
+// PostForgotPasswordJSONBody defines parameters for PostForgotPassword.
+type PostForgotPasswordJSONBody struct {
+	Email openapi_types.Email `json:"email"`
 }
 
-// GetQuizzesParamsCategory defines parameters for GetQuizzes.
-type GetQuizzesParamsCategory string
+// PostLoginUserJSONBody defines parameters for PostLoginUser.
+type PostLoginUserJSONBody struct {
+	Email    openapi_types.Email `json:"email"`
+	Password string              `json:"password"`
+}
 
-// GetQuizzesParamsDifficulty defines parameters for GetQuizzes.
-type GetQuizzesParamsDifficulty string
+// PostRegisterUserJSONBody defines parameters for PostRegisterUser.
+type PostRegisterUserJSONBody struct {
+	Email    openapi_types.Email `json:"email"`
+	Password string              `json:"password"`
+}
+
+// GetExamsParams defines parameters for GetExams.
+type GetExamsParams struct {
+	Ids        *[]openapi_types.UUID `form:"ids,omitempty" json:"ids,omitempty"`
+	Limit      *int                  `form:"limit,omitempty" json:"limit,omitempty"`
+	Offset     *int                  `form:"offset,omitempty" json:"offset,omitempty"`
+	Category   *QuestionCategory     `form:"category,omitempty" json:"category,omitempty"`
+	Difficulty *QuestionDifficulty   `form:"difficulty,omitempty" json:"difficulty,omitempty"`
+}
+
+// GetQuestionsParams defines parameters for GetQuestions.
+type GetQuestionsParams struct {
+	Ids        *[]openapi_types.UUID `form:"ids,omitempty" json:"ids,omitempty"`
+	Limit      *int                  `form:"limit,omitempty" json:"limit,omitempty"`
+	Offset     *int                  `form:"offset,omitempty" json:"offset,omitempty"`
+	Category   *QuestionCategory     `form:"category,omitempty" json:"category,omitempty"`
+	Difficulty *QuestionDifficulty   `form:"difficulty,omitempty" json:"difficulty,omitempty"`
+}
 
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
+	Ids    *[]openapi_types.UUID `form:"ids,omitempty" json:"ids,omitempty"`
+	Limit  *int                  `form:"limit,omitempty" json:"limit,omitempty"`
+	Offset *int                  `form:"offset,omitempty" json:"offset,omitempty"`
+}
+
+// GetVotesParams defines parameters for GetVotes.
+type GetVotesParams struct {
 	Limit  *int `form:"limit,omitempty" json:"limit,omitempty"`
 	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
 }
 
-// CreateQuizJSONRequestBody defines body for CreateQuiz for application/json ContentType.
-type CreateQuizJSONRequestBody = CreateQuizRequest
+// PostVoteJSONBody defines parameters for PostVote.
+type PostVoteJSONBody struct {
+	// Anonymous 是否匿名投票
+	Anonymous *bool                `json:"anonymous,omitempty"`
+	OptionIds []openapi_types.UUID `json:"option_ids"`
+}
 
-// UpdateQuizJSONRequestBody defines body for UpdateQuiz for application/json ContentType.
-type UpdateQuizJSONRequestBody = UpdateQuizRequest
+// PostForgotPasswordJSONRequestBody defines body for PostForgotPassword for application/json ContentType.
+type PostForgotPasswordJSONRequestBody PostForgotPasswordJSONBody
 
-// CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
-type CreateUserJSONRequestBody = CreateUserRequest
+// PostLoginUserJSONRequestBody defines body for PostLoginUser for application/json ContentType.
+type PostLoginUserJSONRequestBody PostLoginUserJSONBody
+
+// PostRegisterUserJSONRequestBody defines body for PostRegisterUser for application/json ContentType.
+type PostRegisterUserJSONRequestBody PostRegisterUserJSONBody
+
+// PostCreateExamJSONRequestBody defines body for PostCreateExam for application/json ContentType.
+type PostCreateExamJSONRequestBody = Exam
+
+// UpdateExamJSONRequestBody defines body for UpdateExam for application/json ContentType.
+type UpdateExamJSONRequestBody = Exam
+
+// PostCreateQuestionJSONRequestBody defines body for PostCreateQuestion for application/json ContentType.
+type PostCreateQuestionJSONRequestBody = QuestionWithAnswer
+
+// UpdateQuestionJSONRequestBody defines body for UpdateQuestion for application/json ContentType.
+type UpdateQuestionJSONRequestBody = QuestionWithAnswer
 
 // UpdateUserJSONRequestBody defines body for UpdateUser for application/json ContentType.
-type UpdateUserJSONRequestBody = UpdateUserRequest
+type UpdateUserJSONRequestBody = User
+
+// PostCreateVoteJSONRequestBody defines body for PostCreateVote for application/json ContentType.
+type PostCreateVoteJSONRequestBody = Vote
+
+// PostVoteJSONRequestBody defines body for PostVote for application/json ContentType.
+type PostVoteJSONRequestBody PostVoteJSONBody
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -332,47 +391,92 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// GetQuizzes request
-	GetQuizzes(ctx context.Context, params *GetQuizzesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostForgotPasswordWithBody request with any body
+	PostForgotPasswordWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateQuizWithBody request with any body
-	CreateQuizWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostForgotPassword(ctx context.Context, body PostForgotPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateQuiz(ctx context.Context, body CreateQuizJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostLoginUserWithBody request with any body
+	PostLoginUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteQuiz request
-	DeleteQuiz(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostLoginUser(ctx context.Context, body PostLoginUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetQuiz request
-	GetQuiz(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostRegisterUserWithBody request with any body
+	PostRegisterUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// UpdateQuizWithBody request with any body
-	UpdateQuizWithBody(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostRegisterUser(ctx context.Context, body PostRegisterUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateQuiz(ctx context.Context, id int64, body UpdateQuizJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetExams request
+	GetExams(ctx context.Context, params *GetExamsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostCreateExamWithBody request with any body
+	PostCreateExamWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostCreateExam(ctx context.Context, body PostCreateExamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteExam request
+	DeleteExam(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetExam request
+	GetExam(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateExamWithBody request with any body
+	UpdateExamWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateExam(ctx context.Context, id openapi_types.UUID, body UpdateExamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetQuestions request
+	GetQuestions(ctx context.Context, params *GetQuestionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostCreateQuestionWithBody request with any body
+	PostCreateQuestionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostCreateQuestion(ctx context.Context, body PostCreateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteQuestion request
+	DeleteQuestion(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetQuestion request
+	GetQuestion(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateQuestionWithBody request with any body
+	UpdateQuestionWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateQuestion(ctx context.Context, id openapi_types.UUID, body UpdateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetUsers request
 	GetUsers(ctx context.Context, params *GetUsersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateUserWithBody request with any body
-	CreateUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	CreateUser(ctx context.Context, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// DeleteUser request
-	DeleteUser(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteUser(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetUser request
-	GetUser(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetUser(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateUserWithBody request with any body
-	UpdateUserWithBody(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateUserWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateUser(ctx context.Context, id int64, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateUser(ctx context.Context, id openapi_types.UUID, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetVotes request
+	GetVotes(ctx context.Context, params *GetVotesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostCreateVoteWithBody request with any body
+	PostCreateVoteWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostCreateVote(ctx context.Context, body PostCreateVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetVote request
+	GetVote(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostVoteWithBody request with any body
+	PostVoteWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostVote(ctx context.Context, id openapi_types.UUID, body PostVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) GetQuizzes(ctx context.Context, params *GetQuizzesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetQuizzesRequest(c.Server, params)
+func (c *Client) PostForgotPasswordWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostForgotPasswordRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -383,8 +487,8 @@ func (c *Client) GetQuizzes(ctx context.Context, params *GetQuizzesParams, reqEd
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateQuizWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateQuizRequestWithBody(c.Server, contentType, body)
+func (c *Client) PostForgotPassword(ctx context.Context, body PostForgotPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostForgotPasswordRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -395,8 +499,8 @@ func (c *Client) CreateQuizWithBody(ctx context.Context, contentType string, bod
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateQuiz(ctx context.Context, body CreateQuizJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateQuizRequest(c.Server, body)
+func (c *Client) PostLoginUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostLoginUserRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -407,8 +511,8 @@ func (c *Client) CreateQuiz(ctx context.Context, body CreateQuizJSONRequestBody,
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteQuiz(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteQuizRequest(c.Server, id)
+func (c *Client) PostLoginUser(ctx context.Context, body PostLoginUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostLoginUserRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -419,8 +523,8 @@ func (c *Client) DeleteQuiz(ctx context.Context, id int64, reqEditors ...Request
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetQuiz(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetQuizRequest(c.Server, id)
+func (c *Client) PostRegisterUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostRegisterUserRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -431,8 +535,8 @@ func (c *Client) GetQuiz(ctx context.Context, id int64, reqEditors ...RequestEdi
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateQuizWithBody(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateQuizRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) PostRegisterUser(ctx context.Context, body PostRegisterUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostRegisterUserRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -443,8 +547,164 @@ func (c *Client) UpdateQuizWithBody(ctx context.Context, id int64, contentType s
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateQuiz(ctx context.Context, id int64, body UpdateQuizJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateQuizRequest(c.Server, id, body)
+func (c *Client) GetExams(ctx context.Context, params *GetExamsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetExamsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostCreateExamWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCreateExamRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostCreateExam(ctx context.Context, body PostCreateExamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCreateExamRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteExam(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteExamRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetExam(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetExamRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateExamWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateExamRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateExam(ctx context.Context, id openapi_types.UUID, body UpdateExamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateExamRequest(c.Server, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetQuestions(ctx context.Context, params *GetQuestionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetQuestionsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostCreateQuestionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCreateQuestionRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostCreateQuestion(ctx context.Context, body PostCreateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCreateQuestionRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteQuestion(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteQuestionRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetQuestion(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetQuestionRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateQuestionWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateQuestionRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateQuestion(ctx context.Context, id openapi_types.UUID, body UpdateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateQuestionRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -467,31 +727,7 @@ func (c *Client) GetUsers(ctx context.Context, params *GetUsersParams, reqEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateUserRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateUser(ctx context.Context, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateUserRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteUser(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteUser(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteUserRequest(c.Server, id)
 	if err != nil {
 		return nil, err
@@ -503,7 +739,7 @@ func (c *Client) DeleteUser(ctx context.Context, id int64, reqEditors ...Request
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetUser(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetUser(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetUserRequest(c.Server, id)
 	if err != nil {
 		return nil, err
@@ -515,7 +751,7 @@ func (c *Client) GetUser(ctx context.Context, id int64, reqEditors ...RequestEdi
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateUserWithBody(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateUserWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateUserRequestWithBody(c.Server, id, contentType, body)
 	if err != nil {
 		return nil, err
@@ -527,7 +763,7 @@ func (c *Client) UpdateUserWithBody(ctx context.Context, id int64, contentType s
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateUser(ctx context.Context, id int64, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateUser(ctx context.Context, id openapi_types.UUID, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateUserRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
@@ -539,8 +775,91 @@ func (c *Client) UpdateUser(ctx context.Context, id int64, body UpdateUserJSONRe
 	return c.Client.Do(req)
 }
 
-// NewGetQuizzesRequest generates requests for GetQuizzes
-func NewGetQuizzesRequest(server string, params *GetQuizzesParams) (*http.Request, error) {
+func (c *Client) GetVotes(ctx context.Context, params *GetVotesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetVotesRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostCreateVoteWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCreateVoteRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostCreateVote(ctx context.Context, body PostCreateVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCreateVoteRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetVote(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetVoteRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostVoteWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostVoteRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostVote(ctx context.Context, id openapi_types.UUID, body PostVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostVoteRequest(c.Server, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// NewPostForgotPasswordRequest calls the generic PostForgotPassword builder with application/json body
+func NewPostForgotPasswordRequest(server string, body PostForgotPasswordJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostForgotPasswordRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostForgotPasswordRequestWithBody generates requests for PostForgotPassword with any type of body
+func NewPostForgotPasswordRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -548,7 +867,116 @@ func NewGetQuizzesRequest(server string, params *GetQuizzesParams) (*http.Reques
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/quizzes")
+	operationPath := fmt.Sprintf("/auth/forgot-password")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostLoginUserRequest calls the generic PostLoginUser builder with application/json body
+func NewPostLoginUserRequest(server string, body PostLoginUserJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostLoginUserRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostLoginUserRequestWithBody generates requests for PostLoginUser with any type of body
+func NewPostLoginUserRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/login")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostRegisterUserRequest calls the generic PostRegisterUser builder with application/json body
+func NewPostRegisterUserRequest(server string, body PostRegisterUserJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostRegisterUserRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostRegisterUserRequestWithBody generates requests for PostRegisterUser with any type of body
+func NewPostRegisterUserRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/register")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetExamsRequest generates requests for GetExams
+func NewGetExamsRequest(server string, params *GetExamsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/exams")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -560,6 +988,22 @@ func NewGetQuizzesRequest(server string, params *GetQuizzesParams) (*http.Reques
 
 	if params != nil {
 		queryValues := queryURL.Query()
+
+		if params.Ids != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
 
 		if params.Limit != nil {
 
@@ -636,19 +1080,19 @@ func NewGetQuizzesRequest(server string, params *GetQuizzesParams) (*http.Reques
 	return req, nil
 }
 
-// NewCreateQuizRequest calls the generic CreateQuiz builder with application/json body
-func NewCreateQuizRequest(server string, body CreateQuizJSONRequestBody) (*http.Request, error) {
+// NewPostCreateExamRequest calls the generic PostCreateExam builder with application/json body
+func NewPostCreateExamRequest(server string, body PostCreateExamJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateQuizRequestWithBody(server, "application/json", bodyReader)
+	return NewPostCreateExamRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewCreateQuizRequestWithBody generates requests for CreateQuiz with any type of body
-func NewCreateQuizRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostCreateExamRequestWithBody generates requests for PostCreateExam with any type of body
+func NewPostCreateExamRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -656,7 +1100,7 @@ func NewCreateQuizRequestWithBody(server string, contentType string, body io.Rea
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/quizzes")
+	operationPath := fmt.Sprintf("/exams")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -676,8 +1120,8 @@ func NewCreateQuizRequestWithBody(server string, contentType string, body io.Rea
 	return req, nil
 }
 
-// NewDeleteQuizRequest generates requests for DeleteQuiz
-func NewDeleteQuizRequest(server string, id int64) (*http.Request, error) {
+// NewDeleteExamRequest generates requests for DeleteExam
+func NewDeleteExamRequest(server string, id openapi_types.UUID) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -692,7 +1136,7 @@ func NewDeleteQuizRequest(server string, id int64) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/quizzes/%s", pathParam0)
+	operationPath := fmt.Sprintf("/exams/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -710,8 +1154,8 @@ func NewDeleteQuizRequest(server string, id int64) (*http.Request, error) {
 	return req, nil
 }
 
-// NewGetQuizRequest generates requests for GetQuiz
-func NewGetQuizRequest(server string, id int64) (*http.Request, error) {
+// NewGetExamRequest generates requests for GetExam
+func NewGetExamRequest(server string, id openapi_types.UUID) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -726,7 +1170,7 @@ func NewGetQuizRequest(server string, id int64) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/quizzes/%s", pathParam0)
+	operationPath := fmt.Sprintf("/exams/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -744,19 +1188,19 @@ func NewGetQuizRequest(server string, id int64) (*http.Request, error) {
 	return req, nil
 }
 
-// NewUpdateQuizRequest calls the generic UpdateQuiz builder with application/json body
-func NewUpdateQuizRequest(server string, id int64, body UpdateQuizJSONRequestBody) (*http.Request, error) {
+// NewUpdateExamRequest calls the generic UpdateExam builder with application/json body
+func NewUpdateExamRequest(server string, id openapi_types.UUID, body UpdateExamJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateQuizRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateExamRequestWithBody(server, id, "application/json", bodyReader)
 }
 
-// NewUpdateQuizRequestWithBody generates requests for UpdateQuiz with any type of body
-func NewUpdateQuizRequestWithBody(server string, id int64, contentType string, body io.Reader) (*http.Request, error) {
+// NewUpdateExamRequestWithBody generates requests for UpdateExam with any type of body
+func NewUpdateExamRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -771,7 +1215,275 @@ func NewUpdateQuizRequestWithBody(server string, id int64, contentType string, b
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/quizzes/%s", pathParam0)
+	operationPath := fmt.Sprintf("/exams/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetQuestionsRequest generates requests for GetQuestions
+func NewGetQuestionsRequest(server string, params *GetQuestionsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/questions")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Ids != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Offset != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Category != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "category", runtime.ParamLocationQuery, *params.Category); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Difficulty != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "difficulty", runtime.ParamLocationQuery, *params.Difficulty); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostCreateQuestionRequest calls the generic PostCreateQuestion builder with application/json body
+func NewPostCreateQuestionRequest(server string, body PostCreateQuestionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostCreateQuestionRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostCreateQuestionRequestWithBody generates requests for PostCreateQuestion with any type of body
+func NewPostCreateQuestionRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/questions")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteQuestionRequest generates requests for DeleteQuestion
+func NewDeleteQuestionRequest(server string, id openapi_types.UUID) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/questions/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetQuestionRequest generates requests for GetQuestion
+func NewGetQuestionRequest(server string, id openapi_types.UUID) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/questions/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateQuestionRequest calls the generic UpdateQuestion builder with application/json body
+func NewUpdateQuestionRequest(server string, id openapi_types.UUID, body UpdateQuestionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateQuestionRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewUpdateQuestionRequestWithBody generates requests for UpdateQuestion with any type of body
+func NewUpdateQuestionRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/questions/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -801,6 +1513,202 @@ func NewGetUsersRequest(server string, params *GetUsersParams) (*http.Request, e
 	}
 
 	operationPath := fmt.Sprintf("/users")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Ids != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Offset != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteUserRequest generates requests for DeleteUser
+func NewDeleteUserRequest(server string, id openapi_types.UUID) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/users/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetUserRequest generates requests for GetUser
+func NewGetUserRequest(server string, id openapi_types.UUID) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/users/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateUserRequest calls the generic UpdateUser builder with application/json body
+func NewUpdateUserRequest(server string, id openapi_types.UUID, body UpdateUserJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateUserRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewUpdateUserRequestWithBody generates requests for UpdateUser with any type of body
+func NewUpdateUserRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/users/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetVotesRequest generates requests for GetVotes
+func NewGetVotesRequest(server string, params *GetVotesParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/votes")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -856,19 +1764,19 @@ func NewGetUsersRequest(server string, params *GetUsersParams) (*http.Request, e
 	return req, nil
 }
 
-// NewCreateUserRequest calls the generic CreateUser builder with application/json body
-func NewCreateUserRequest(server string, body CreateUserJSONRequestBody) (*http.Request, error) {
+// NewPostCreateVoteRequest calls the generic PostCreateVote builder with application/json body
+func NewPostCreateVoteRequest(server string, body PostCreateVoteJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateUserRequestWithBody(server, "application/json", bodyReader)
+	return NewPostCreateVoteRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewCreateUserRequestWithBody generates requests for CreateUser with any type of body
-func NewCreateUserRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostCreateVoteRequestWithBody generates requests for PostCreateVote with any type of body
+func NewPostCreateVoteRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -876,7 +1784,7 @@ func NewCreateUserRequestWithBody(server string, contentType string, body io.Rea
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/users")
+	operationPath := fmt.Sprintf("/votes")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -896,8 +1804,8 @@ func NewCreateUserRequestWithBody(server string, contentType string, body io.Rea
 	return req, nil
 }
 
-// NewDeleteUserRequest generates requests for DeleteUser
-func NewDeleteUserRequest(server string, id int64) (*http.Request, error) {
+// NewGetVoteRequest generates requests for GetVote
+func NewGetVoteRequest(server string, id openapi_types.UUID) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -912,41 +1820,7 @@ func NewDeleteUserRequest(server string, id int64) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/users/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetUserRequest generates requests for GetUser
-func NewGetUserRequest(server string, id int64) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/users/%s", pathParam0)
+	operationPath := fmt.Sprintf("/votes/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -964,19 +1838,19 @@ func NewGetUserRequest(server string, id int64) (*http.Request, error) {
 	return req, nil
 }
 
-// NewUpdateUserRequest calls the generic UpdateUser builder with application/json body
-func NewUpdateUserRequest(server string, id int64, body UpdateUserJSONRequestBody) (*http.Request, error) {
+// NewPostVoteRequest calls the generic PostVote builder with application/json body
+func NewPostVoteRequest(server string, id openapi_types.UUID, body PostVoteJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateUserRequestWithBody(server, id, "application/json", bodyReader)
+	return NewPostVoteRequestWithBody(server, id, "application/json", bodyReader)
 }
 
-// NewUpdateUserRequestWithBody generates requests for UpdateUser with any type of body
-func NewUpdateUserRequestWithBody(server string, id int64, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostVoteRequestWithBody generates requests for PostVote with any type of body
+func NewPostVoteRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -991,7 +1865,7 @@ func NewUpdateUserRequestWithBody(server string, id int64, contentType string, b
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/users/%s", pathParam0)
+	operationPath := fmt.Sprintf("/votes/%s/vote", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1001,7 +1875,7 @@ func NewUpdateUserRequestWithBody(server string, id int64, contentType string, b
 		return nil, err
 	}
 
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -1054,59 +1928,175 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// GetQuizzesWithResponse request
-	GetQuizzesWithResponse(ctx context.Context, params *GetQuizzesParams, reqEditors ...RequestEditorFn) (*GetQuizzesResponse, error)
+	// PostForgotPasswordWithBodyWithResponse request with any body
+	PostForgotPasswordWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostForgotPasswordResponse, error)
 
-	// CreateQuizWithBodyWithResponse request with any body
-	CreateQuizWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateQuizResponse, error)
+	PostForgotPasswordWithResponse(ctx context.Context, body PostForgotPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*PostForgotPasswordResponse, error)
 
-	CreateQuizWithResponse(ctx context.Context, body CreateQuizJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateQuizResponse, error)
+	// PostLoginUserWithBodyWithResponse request with any body
+	PostLoginUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostLoginUserResponse, error)
 
-	// DeleteQuizWithResponse request
-	DeleteQuizWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*DeleteQuizResponse, error)
+	PostLoginUserWithResponse(ctx context.Context, body PostLoginUserJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLoginUserResponse, error)
 
-	// GetQuizWithResponse request
-	GetQuizWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*GetQuizResponse, error)
+	// PostRegisterUserWithBodyWithResponse request with any body
+	PostRegisterUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostRegisterUserResponse, error)
 
-	// UpdateQuizWithBodyWithResponse request with any body
-	UpdateQuizWithBodyWithResponse(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateQuizResponse, error)
+	PostRegisterUserWithResponse(ctx context.Context, body PostRegisterUserJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRegisterUserResponse, error)
 
-	UpdateQuizWithResponse(ctx context.Context, id int64, body UpdateQuizJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateQuizResponse, error)
+	// GetExamsWithResponse request
+	GetExamsWithResponse(ctx context.Context, params *GetExamsParams, reqEditors ...RequestEditorFn) (*GetExamsResponse, error)
+
+	// PostCreateExamWithBodyWithResponse request with any body
+	PostCreateExamWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreateExamResponse, error)
+
+	PostCreateExamWithResponse(ctx context.Context, body PostCreateExamJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreateExamResponse, error)
+
+	// DeleteExamWithResponse request
+	DeleteExamWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteExamResponse, error)
+
+	// GetExamWithResponse request
+	GetExamWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetExamResponse, error)
+
+	// UpdateExamWithBodyWithResponse request with any body
+	UpdateExamWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateExamResponse, error)
+
+	UpdateExamWithResponse(ctx context.Context, id openapi_types.UUID, body UpdateExamJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateExamResponse, error)
+
+	// GetQuestionsWithResponse request
+	GetQuestionsWithResponse(ctx context.Context, params *GetQuestionsParams, reqEditors ...RequestEditorFn) (*GetQuestionsResponse, error)
+
+	// PostCreateQuestionWithBodyWithResponse request with any body
+	PostCreateQuestionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreateQuestionResponse, error)
+
+	PostCreateQuestionWithResponse(ctx context.Context, body PostCreateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreateQuestionResponse, error)
+
+	// DeleteQuestionWithResponse request
+	DeleteQuestionWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteQuestionResponse, error)
+
+	// GetQuestionWithResponse request
+	GetQuestionWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetQuestionResponse, error)
+
+	// UpdateQuestionWithBodyWithResponse request with any body
+	UpdateQuestionWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateQuestionResponse, error)
+
+	UpdateQuestionWithResponse(ctx context.Context, id openapi_types.UUID, body UpdateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateQuestionResponse, error)
 
 	// GetUsersWithResponse request
 	GetUsersWithResponse(ctx context.Context, params *GetUsersParams, reqEditors ...RequestEditorFn) (*GetUsersResponse, error)
 
-	// CreateUserWithBodyWithResponse request with any body
-	CreateUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUserResponse, error)
-
-	CreateUserWithResponse(ctx context.Context, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateUserResponse, error)
-
 	// DeleteUserWithResponse request
-	DeleteUserWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*DeleteUserResponse, error)
+	DeleteUserWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteUserResponse, error)
 
 	// GetUserWithResponse request
-	GetUserWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*GetUserResponse, error)
+	GetUserWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetUserResponse, error)
 
 	// UpdateUserWithBodyWithResponse request with any body
-	UpdateUserWithBodyWithResponse(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error)
+	UpdateUserWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error)
 
-	UpdateUserWithResponse(ctx context.Context, id int64, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error)
+	UpdateUserWithResponse(ctx context.Context, id openapi_types.UUID, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error)
+
+	// GetVotesWithResponse request
+	GetVotesWithResponse(ctx context.Context, params *GetVotesParams, reqEditors ...RequestEditorFn) (*GetVotesResponse, error)
+
+	// PostCreateVoteWithBodyWithResponse request with any body
+	PostCreateVoteWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreateVoteResponse, error)
+
+	PostCreateVoteWithResponse(ctx context.Context, body PostCreateVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreateVoteResponse, error)
+
+	// GetVoteWithResponse request
+	GetVoteWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetVoteResponse, error)
+
+	// PostVoteWithBodyWithResponse request with any body
+	PostVoteWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostVoteResponse, error)
+
+	PostVoteWithResponse(ctx context.Context, id openapi_types.UUID, body PostVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostVoteResponse, error)
 }
 
-type GetQuizzesResponse struct {
+type PostForgotPasswordResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostForgotPasswordResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostForgotPasswordResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostLoginUserResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthResponse
+	JSON400      *BadRequest
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostLoginUserResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostLoginUserResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostRegisterUserResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *AuthResponse
+	JSON400      *BadRequest
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostRegisterUserResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostRegisterUserResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetExamsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Limit   *int    `json:"limit,omitempty"`
-		Offset  *int    `json:"offset,omitempty"`
-		Quizzes *[]Quiz `json:"quizzes,omitempty"`
-		Total   *int    `json:"total,omitempty"`
+		Exams  *[]Exam `json:"exams,omitempty"`
+		Limit  *int    `json:"limit,omitempty"`
+		Offset *int    `json:"offset,omitempty"`
+		Total  *int    `json:"total,omitempty"`
 	}
 	JSON500 *InternalServerError
 }
 
 // Status returns HTTPResponse.Status
-func (r GetQuizzesResponse) Status() string {
+func (r GetExamsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1114,23 +2104,24 @@ func (r GetQuizzesResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetQuizzesResponse) StatusCode() int {
+func (r GetExamsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type CreateQuizResponse struct {
+type PostCreateExamResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *Quiz
+	JSON201      *Exam
 	JSON400      *BadRequest
+	JSON401      *Unauthorized
 	JSON500      *InternalServerError
 }
 
 // Status returns HTTPResponse.Status
-func (r CreateQuizResponse) Status() string {
+func (r PostCreateExamResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1138,22 +2129,24 @@ func (r CreateQuizResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CreateQuizResponse) StatusCode() int {
+func (r PostCreateExamResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type DeleteQuizResponse struct {
+type DeleteExamResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
 	JSON404      *NotFound
 	JSON500      *InternalServerError
 }
 
 // Status returns HTTPResponse.Status
-func (r DeleteQuizResponse) Status() string {
+func (r DeleteExamResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1161,48 +2154,24 @@ func (r DeleteQuizResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r DeleteQuizResponse) StatusCode() int {
+func (r DeleteExamResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetQuizResponse struct {
+type GetExamResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *Quiz
-	JSON404      *NotFound
-	JSON500      *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetQuizResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetQuizResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type UpdateQuizResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *Quiz
+	JSON200      *Exam
 	JSON400      *BadRequest
 	JSON404      *NotFound
 	JSON500      *InternalServerError
 }
 
 // Status returns HTTPResponse.Status
-func (r UpdateQuizResponse) Status() string {
+func (r GetExamResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1210,7 +2179,162 @@ func (r UpdateQuizResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r UpdateQuizResponse) StatusCode() int {
+func (r GetExamResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateExamResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Exam
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateExamResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateExamResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetQuestionsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Limit     *int        `json:"limit,omitempty"`
+		Offset    *int        `json:"offset,omitempty"`
+		Questions *[]Question `json:"questions,omitempty"`
+		Total     *int        `json:"total,omitempty"`
+	}
+	JSON500 *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetQuestionsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetQuestionsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostCreateQuestionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *QuestionWithAnswer
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostCreateQuestionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostCreateQuestionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteQuestionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteQuestionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteQuestionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetQuestionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Question
+	JSON400      *BadRequest
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetQuestionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetQuestionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateQuestionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *QuestionWithAnswer
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateQuestionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateQuestionResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1226,6 +2350,8 @@ type GetUsersResponse struct {
 		Total  *int    `json:"total,omitempty"`
 		Users  *[]User `json:"users,omitempty"`
 	}
+	JSON400 *BadRequest
+	JSON401 *Unauthorized
 	JSON500 *InternalServerError
 }
 
@@ -1245,33 +2371,11 @@ func (r GetUsersResponse) StatusCode() int {
 	return 0
 }
 
-type CreateUserResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON201      *User
-	JSON400      *BadRequest
-	JSON500      *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r CreateUserResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r CreateUserResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type DeleteUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
 	JSON404      *NotFound
 	JSON500      *InternalServerError
 }
@@ -1321,6 +2425,7 @@ type UpdateUserResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *User
 	JSON400      *BadRequest
+	JSON401      *Unauthorized
 	JSON404      *NotFound
 	JSON500      *InternalServerError
 }
@@ -1341,65 +2446,280 @@ func (r UpdateUserResponse) StatusCode() int {
 	return 0
 }
 
-// GetQuizzesWithResponse request returning *GetQuizzesResponse
-func (c *ClientWithResponses) GetQuizzesWithResponse(ctx context.Context, params *GetQuizzesParams, reqEditors ...RequestEditorFn) (*GetQuizzesResponse, error) {
-	rsp, err := c.GetQuizzes(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
+type GetVotesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Limit  *int    `json:"limit,omitempty"`
+		Offset *int    `json:"offset,omitempty"`
+		Total  *int    `json:"total,omitempty"`
+		Votes  *[]Vote `json:"votes,omitempty"`
 	}
-	return ParseGetQuizzesResponse(rsp)
+	JSON500 *InternalServerError
 }
 
-// CreateQuizWithBodyWithResponse request with arbitrary body returning *CreateQuizResponse
-func (c *ClientWithResponses) CreateQuizWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateQuizResponse, error) {
-	rsp, err := c.CreateQuizWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
+// Status returns HTTPResponse.Status
+func (r GetVotesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
 	}
-	return ParseCreateQuizResponse(rsp)
+	return http.StatusText(0)
 }
 
-func (c *ClientWithResponses) CreateQuizWithResponse(ctx context.Context, body CreateQuizJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateQuizResponse, error) {
-	rsp, err := c.CreateQuiz(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetVotesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
 	}
-	return ParseCreateQuizResponse(rsp)
+	return 0
 }
 
-// DeleteQuizWithResponse request returning *DeleteQuizResponse
-func (c *ClientWithResponses) DeleteQuizWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*DeleteQuizResponse, error) {
-	rsp, err := c.DeleteQuiz(ctx, id, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteQuizResponse(rsp)
+type PostCreateVoteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *Vote
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON500      *InternalServerError
 }
 
-// GetQuizWithResponse request returning *GetQuizResponse
-func (c *ClientWithResponses) GetQuizWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*GetQuizResponse, error) {
-	rsp, err := c.GetQuiz(ctx, id, reqEditors...)
-	if err != nil {
-		return nil, err
+// Status returns HTTPResponse.Status
+func (r PostCreateVoteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
 	}
-	return ParseGetQuizResponse(rsp)
+	return http.StatusText(0)
 }
 
-// UpdateQuizWithBodyWithResponse request with arbitrary body returning *UpdateQuizResponse
-func (c *ClientWithResponses) UpdateQuizWithBodyWithResponse(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateQuizResponse, error) {
-	rsp, err := c.UpdateQuizWithBody(ctx, id, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostCreateVoteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
 	}
-	return ParseUpdateQuizResponse(rsp)
+	return 0
 }
 
-func (c *ClientWithResponses) UpdateQuizWithResponse(ctx context.Context, id int64, body UpdateQuizJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateQuizResponse, error) {
-	rsp, err := c.UpdateQuiz(ctx, id, body, reqEditors...)
+type GetVoteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Vote
+	JSON400      *BadRequest
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetVoteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetVoteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostVoteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostVoteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostVoteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// PostForgotPasswordWithBodyWithResponse request with arbitrary body returning *PostForgotPasswordResponse
+func (c *ClientWithResponses) PostForgotPasswordWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostForgotPasswordResponse, error) {
+	rsp, err := c.PostForgotPasswordWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseUpdateQuizResponse(rsp)
+	return ParsePostForgotPasswordResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostForgotPasswordWithResponse(ctx context.Context, body PostForgotPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*PostForgotPasswordResponse, error) {
+	rsp, err := c.PostForgotPassword(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostForgotPasswordResponse(rsp)
+}
+
+// PostLoginUserWithBodyWithResponse request with arbitrary body returning *PostLoginUserResponse
+func (c *ClientWithResponses) PostLoginUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostLoginUserResponse, error) {
+	rsp, err := c.PostLoginUserWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostLoginUserResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostLoginUserWithResponse(ctx context.Context, body PostLoginUserJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLoginUserResponse, error) {
+	rsp, err := c.PostLoginUser(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostLoginUserResponse(rsp)
+}
+
+// PostRegisterUserWithBodyWithResponse request with arbitrary body returning *PostRegisterUserResponse
+func (c *ClientWithResponses) PostRegisterUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostRegisterUserResponse, error) {
+	rsp, err := c.PostRegisterUserWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostRegisterUserResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostRegisterUserWithResponse(ctx context.Context, body PostRegisterUserJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRegisterUserResponse, error) {
+	rsp, err := c.PostRegisterUser(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostRegisterUserResponse(rsp)
+}
+
+// GetExamsWithResponse request returning *GetExamsResponse
+func (c *ClientWithResponses) GetExamsWithResponse(ctx context.Context, params *GetExamsParams, reqEditors ...RequestEditorFn) (*GetExamsResponse, error) {
+	rsp, err := c.GetExams(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetExamsResponse(rsp)
+}
+
+// PostCreateExamWithBodyWithResponse request with arbitrary body returning *PostCreateExamResponse
+func (c *ClientWithResponses) PostCreateExamWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreateExamResponse, error) {
+	rsp, err := c.PostCreateExamWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostCreateExamResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostCreateExamWithResponse(ctx context.Context, body PostCreateExamJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreateExamResponse, error) {
+	rsp, err := c.PostCreateExam(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostCreateExamResponse(rsp)
+}
+
+// DeleteExamWithResponse request returning *DeleteExamResponse
+func (c *ClientWithResponses) DeleteExamWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteExamResponse, error) {
+	rsp, err := c.DeleteExam(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteExamResponse(rsp)
+}
+
+// GetExamWithResponse request returning *GetExamResponse
+func (c *ClientWithResponses) GetExamWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetExamResponse, error) {
+	rsp, err := c.GetExam(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetExamResponse(rsp)
+}
+
+// UpdateExamWithBodyWithResponse request with arbitrary body returning *UpdateExamResponse
+func (c *ClientWithResponses) UpdateExamWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateExamResponse, error) {
+	rsp, err := c.UpdateExamWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateExamResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateExamWithResponse(ctx context.Context, id openapi_types.UUID, body UpdateExamJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateExamResponse, error) {
+	rsp, err := c.UpdateExam(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateExamResponse(rsp)
+}
+
+// GetQuestionsWithResponse request returning *GetQuestionsResponse
+func (c *ClientWithResponses) GetQuestionsWithResponse(ctx context.Context, params *GetQuestionsParams, reqEditors ...RequestEditorFn) (*GetQuestionsResponse, error) {
+	rsp, err := c.GetQuestions(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetQuestionsResponse(rsp)
+}
+
+// PostCreateQuestionWithBodyWithResponse request with arbitrary body returning *PostCreateQuestionResponse
+func (c *ClientWithResponses) PostCreateQuestionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreateQuestionResponse, error) {
+	rsp, err := c.PostCreateQuestionWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostCreateQuestionResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostCreateQuestionWithResponse(ctx context.Context, body PostCreateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreateQuestionResponse, error) {
+	rsp, err := c.PostCreateQuestion(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostCreateQuestionResponse(rsp)
+}
+
+// DeleteQuestionWithResponse request returning *DeleteQuestionResponse
+func (c *ClientWithResponses) DeleteQuestionWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteQuestionResponse, error) {
+	rsp, err := c.DeleteQuestion(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteQuestionResponse(rsp)
+}
+
+// GetQuestionWithResponse request returning *GetQuestionResponse
+func (c *ClientWithResponses) GetQuestionWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetQuestionResponse, error) {
+	rsp, err := c.GetQuestion(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetQuestionResponse(rsp)
+}
+
+// UpdateQuestionWithBodyWithResponse request with arbitrary body returning *UpdateQuestionResponse
+func (c *ClientWithResponses) UpdateQuestionWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateQuestionResponse, error) {
+	rsp, err := c.UpdateQuestionWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateQuestionResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateQuestionWithResponse(ctx context.Context, id openapi_types.UUID, body UpdateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateQuestionResponse, error) {
+	rsp, err := c.UpdateQuestion(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateQuestionResponse(rsp)
 }
 
 // GetUsersWithResponse request returning *GetUsersResponse
@@ -1411,25 +2731,8 @@ func (c *ClientWithResponses) GetUsersWithResponse(ctx context.Context, params *
 	return ParseGetUsersResponse(rsp)
 }
 
-// CreateUserWithBodyWithResponse request with arbitrary body returning *CreateUserResponse
-func (c *ClientWithResponses) CreateUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUserResponse, error) {
-	rsp, err := c.CreateUserWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateUserResponse(rsp)
-}
-
-func (c *ClientWithResponses) CreateUserWithResponse(ctx context.Context, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateUserResponse, error) {
-	rsp, err := c.CreateUser(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateUserResponse(rsp)
-}
-
 // DeleteUserWithResponse request returning *DeleteUserResponse
-func (c *ClientWithResponses) DeleteUserWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*DeleteUserResponse, error) {
+func (c *ClientWithResponses) DeleteUserWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteUserResponse, error) {
 	rsp, err := c.DeleteUser(ctx, id, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1438,7 +2741,7 @@ func (c *ClientWithResponses) DeleteUserWithResponse(ctx context.Context, id int
 }
 
 // GetUserWithResponse request returning *GetUserResponse
-func (c *ClientWithResponses) GetUserWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*GetUserResponse, error) {
+func (c *ClientWithResponses) GetUserWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetUserResponse, error) {
 	rsp, err := c.GetUser(ctx, id, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1447,7 +2750,7 @@ func (c *ClientWithResponses) GetUserWithResponse(ctx context.Context, id int64,
 }
 
 // UpdateUserWithBodyWithResponse request with arbitrary body returning *UpdateUserResponse
-func (c *ClientWithResponses) UpdateUserWithBodyWithResponse(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error) {
+func (c *ClientWithResponses) UpdateUserWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error) {
 	rsp, err := c.UpdateUserWithBody(ctx, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1455,7 +2758,7 @@ func (c *ClientWithResponses) UpdateUserWithBodyWithResponse(ctx context.Context
 	return ParseUpdateUserResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateUserWithResponse(ctx context.Context, id int64, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error) {
+func (c *ClientWithResponses) UpdateUserWithResponse(ctx context.Context, id openapi_types.UUID, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error) {
 	rsp, err := c.UpdateUser(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1463,31 +2766,78 @@ func (c *ClientWithResponses) UpdateUserWithResponse(ctx context.Context, id int
 	return ParseUpdateUserResponse(rsp)
 }
 
-// ParseGetQuizzesResponse parses an HTTP response from a GetQuizzesWithResponse call
-func ParseGetQuizzesResponse(rsp *http.Response) (*GetQuizzesResponse, error) {
+// GetVotesWithResponse request returning *GetVotesResponse
+func (c *ClientWithResponses) GetVotesWithResponse(ctx context.Context, params *GetVotesParams, reqEditors ...RequestEditorFn) (*GetVotesResponse, error) {
+	rsp, err := c.GetVotes(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetVotesResponse(rsp)
+}
+
+// PostCreateVoteWithBodyWithResponse request with arbitrary body returning *PostCreateVoteResponse
+func (c *ClientWithResponses) PostCreateVoteWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreateVoteResponse, error) {
+	rsp, err := c.PostCreateVoteWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostCreateVoteResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostCreateVoteWithResponse(ctx context.Context, body PostCreateVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreateVoteResponse, error) {
+	rsp, err := c.PostCreateVote(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostCreateVoteResponse(rsp)
+}
+
+// GetVoteWithResponse request returning *GetVoteResponse
+func (c *ClientWithResponses) GetVoteWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetVoteResponse, error) {
+	rsp, err := c.GetVote(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetVoteResponse(rsp)
+}
+
+// PostVoteWithBodyWithResponse request with arbitrary body returning *PostVoteResponse
+func (c *ClientWithResponses) PostVoteWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostVoteResponse, error) {
+	rsp, err := c.PostVoteWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostVoteResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostVoteWithResponse(ctx context.Context, id openapi_types.UUID, body PostVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostVoteResponse, error) {
+	rsp, err := c.PostVote(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostVoteResponse(rsp)
+}
+
+// ParsePostForgotPasswordResponse parses an HTTP response from a PostForgotPasswordWithResponse call
+func ParsePostForgotPasswordResponse(rsp *http.Response) (*PostForgotPasswordResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetQuizzesResponse{
+	response := &PostForgotPasswordResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Limit   *int    `json:"limit,omitempty"`
-			Offset  *int    `json:"offset,omitempty"`
-			Quizzes *[]Quiz `json:"quizzes,omitempty"`
-			Total   *int    `json:"total,omitempty"`
-		}
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON200 = &dest
+		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest InternalServerError
@@ -1501,22 +2851,62 @@ func ParseGetQuizzesResponse(rsp *http.Response) (*GetQuizzesResponse, error) {
 	return response, nil
 }
 
-// ParseCreateQuizResponse parses an HTTP response from a CreateQuizWithResponse call
-func ParseCreateQuizResponse(rsp *http.Response) (*CreateQuizResponse, error) {
+// ParsePostLoginUserResponse parses an HTTP response from a PostLoginUserWithResponse call
+func ParsePostLoginUserResponse(rsp *http.Response) (*PostLoginUserResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CreateQuizResponse{
+	response := &PostLoginUserResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostRegisterUserResponse parses an HTTP response from a PostRegisterUserWithResponse call
+func ParsePostRegisterUserResponse(rsp *http.Response) (*PostRegisterUserResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostRegisterUserResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest Quiz
+		var dest AuthResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -1541,60 +2931,119 @@ func ParseCreateQuizResponse(rsp *http.Response) (*CreateQuizResponse, error) {
 	return response, nil
 }
 
-// ParseDeleteQuizResponse parses an HTTP response from a DeleteQuizWithResponse call
-func ParseDeleteQuizResponse(rsp *http.Response) (*DeleteQuizResponse, error) {
+// ParseGetExamsResponse parses an HTTP response from a GetExamsWithResponse call
+func ParseGetExamsResponse(rsp *http.Response) (*GetExamsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &DeleteQuizResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest NotFound
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetQuizResponse parses an HTTP response from a GetQuizWithResponse call
-func ParseGetQuizResponse(rsp *http.Response) (*GetQuizResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetQuizResponse{
+	response := &GetExamsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Quiz
+		var dest struct {
+			Exams  *[]Exam `json:"exams,omitempty"`
+			Limit  *int    `json:"limit,omitempty"`
+			Offset *int    `json:"offset,omitempty"`
+			Total  *int    `json:"total,omitempty"`
+		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostCreateExamResponse parses an HTTP response from a PostCreateExamWithResponse call
+func ParsePostCreateExamResponse(rsp *http.Response) (*PostCreateExamResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostCreateExamResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest Exam
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteExamResponse parses an HTTP response from a DeleteExamWithResponse call
+func ParseDeleteExamResponse(rsp *http.Response) (*DeleteExamResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteExamResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest NotFound
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -1614,22 +3063,22 @@ func ParseGetQuizResponse(rsp *http.Response) (*GetQuizResponse, error) {
 	return response, nil
 }
 
-// ParseUpdateQuizResponse parses an HTTP response from a UpdateQuizWithResponse call
-func ParseUpdateQuizResponse(rsp *http.Response) (*UpdateQuizResponse, error) {
+// ParseGetExamResponse parses an HTTP response from a GetExamWithResponse call
+func ParseGetExamResponse(rsp *http.Response) (*GetExamResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &UpdateQuizResponse{
+	response := &GetExamResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Quiz
+		var dest Exam
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -1641,6 +3090,293 @@ func ParseUpdateQuizResponse(rsp *http.Response) (*UpdateQuizResponse, error) {
 			return nil, err
 		}
 		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateExamResponse parses an HTTP response from a UpdateExamWithResponse call
+func ParseUpdateExamResponse(rsp *http.Response) (*UpdateExamResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateExamResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Exam
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetQuestionsResponse parses an HTTP response from a GetQuestionsWithResponse call
+func ParseGetQuestionsResponse(rsp *http.Response) (*GetQuestionsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetQuestionsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Limit     *int        `json:"limit,omitempty"`
+			Offset    *int        `json:"offset,omitempty"`
+			Questions *[]Question `json:"questions,omitempty"`
+			Total     *int        `json:"total,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostCreateQuestionResponse parses an HTTP response from a PostCreateQuestionWithResponse call
+func ParsePostCreateQuestionResponse(rsp *http.Response) (*PostCreateQuestionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostCreateQuestionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest QuestionWithAnswer
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteQuestionResponse parses an HTTP response from a DeleteQuestionWithResponse call
+func ParseDeleteQuestionResponse(rsp *http.Response) (*DeleteQuestionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteQuestionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetQuestionResponse parses an HTTP response from a GetQuestionWithResponse call
+func ParseGetQuestionResponse(rsp *http.Response) (*GetQuestionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetQuestionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Question
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateQuestionResponse parses an HTTP response from a UpdateQuestionWithResponse call
+func ParseUpdateQuestionResponse(rsp *http.Response) (*UpdateQuestionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateQuestionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest QuestionWithAnswer
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest NotFound
@@ -1687,45 +3423,19 @@ func ParseGetUsersResponse(rsp *http.Response) (*GetUsersResponse, error) {
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseCreateUserResponse parses an HTTP response from a CreateUserWithResponse call
-func ParseCreateUserResponse(rsp *http.Response) (*CreateUserResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &CreateUserResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest User
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON201 = &dest
-
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest BadRequest
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest InternalServerError
@@ -1753,6 +3463,20 @@ func ParseDeleteUserResponse(rsp *http.Response) (*DeleteUserResponse, error) {
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest NotFound
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -1840,6 +3564,192 @@ func ParseUpdateUserResponse(rsp *http.Response) (*UpdateUserResponse, error) {
 		}
 		response.JSON400 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetVotesResponse parses an HTTP response from a GetVotesWithResponse call
+func ParseGetVotesResponse(rsp *http.Response) (*GetVotesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetVotesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Limit  *int    `json:"limit,omitempty"`
+			Offset *int    `json:"offset,omitempty"`
+			Total  *int    `json:"total,omitempty"`
+			Votes  *[]Vote `json:"votes,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostCreateVoteResponse parses an HTTP response from a PostCreateVoteWithResponse call
+func ParsePostCreateVoteResponse(rsp *http.Response) (*PostCreateVoteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostCreateVoteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest Vote
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetVoteResponse parses an HTTP response from a GetVoteWithResponse call
+func ParseGetVoteResponse(rsp *http.Response) (*GetVoteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetVoteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Vote
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostVoteResponse parses an HTTP response from a PostVoteWithResponse call
+func ParsePostVoteResponse(rsp *http.Response) (*PostVoteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostVoteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest NotFound
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -1861,69 +3771,150 @@ func ParseUpdateUserResponse(rsp *http.Response) (*UpdateUserResponse, error) {
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Get all quizzes
-	// (GET /quizzes)
-	GetQuizzes(w http.ResponseWriter, r *http.Request, params GetQuizzesParams)
-	// Create a new quiz
-	// (POST /quizzes)
-	CreateQuiz(w http.ResponseWriter, r *http.Request)
-	// Delete quiz
-	// (DELETE /quizzes/{id})
-	DeleteQuiz(w http.ResponseWriter, r *http.Request, id int64)
-	// Get quiz by ID
-	// (GET /quizzes/{id})
-	GetQuiz(w http.ResponseWriter, r *http.Request, id int64)
-	// Update quiz
-	// (PUT /quizzes/{id})
-	UpdateQuiz(w http.ResponseWriter, r *http.Request, id int64)
+	// Request password reset
+	// (POST /auth/forgot-password)
+	PostForgotPassword(w http.ResponseWriter, r *http.Request)
+	// Login user
+	// (POST /auth/login)
+	PostLoginUser(w http.ResponseWriter, r *http.Request)
+	// Register a new user
+	// (POST /auth/register)
+	PostRegisterUser(w http.ResponseWriter, r *http.Request)
+	// Get all exams
+	// (GET /exams)
+	GetExams(w http.ResponseWriter, r *http.Request, params GetExamsParams)
+	// Create a new exam
+	// (POST /exams)
+	PostCreateExam(w http.ResponseWriter, r *http.Request)
+	// Delete exam
+	// (DELETE /exams/{id})
+	DeleteExam(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Get exam by ID
+	// (GET /exams/{id})
+	GetExam(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Update exam
+	// (PUT /exams/{id})
+	UpdateExam(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Get all questions
+	// (GET /questions)
+	GetQuestions(w http.ResponseWriter, r *http.Request, params GetQuestionsParams)
+	// Create a new question
+	// (POST /questions)
+	PostCreateQuestion(w http.ResponseWriter, r *http.Request)
+	// Delete question
+	// (DELETE /questions/{id})
+	DeleteQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Get question by ID
+	// (GET /questions/{id})
+	GetQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Update question
+	// (PUT /questions/{id})
+	UpdateQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Get all users
 	// (GET /users)
 	GetUsers(w http.ResponseWriter, r *http.Request, params GetUsersParams)
-	// Create a new user
-	// (POST /users)
-	CreateUser(w http.ResponseWriter, r *http.Request)
 	// Delete user
 	// (DELETE /users/{id})
-	DeleteUser(w http.ResponseWriter, r *http.Request, id int64)
+	DeleteUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Get user by ID
 	// (GET /users/{id})
-	GetUser(w http.ResponseWriter, r *http.Request, id int64)
+	GetUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Update user
 	// (PUT /users/{id})
-	UpdateUser(w http.ResponseWriter, r *http.Request, id int64)
+	UpdateUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// 获取投票列表
+	// (GET /votes)
+	GetVotes(w http.ResponseWriter, r *http.Request, params GetVotesParams)
+	// 创建投票
+	// (POST /votes)
+	PostCreateVote(w http.ResponseWriter, r *http.Request)
+	// 获取投票详情（含当前结果）
+	// (GET /votes/{id})
+	GetVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// 投票
+	// (POST /votes/{id}/vote)
+	PostVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
 
-// Get all quizzes
-// (GET /quizzes)
-func (_ Unimplemented) GetQuizzes(w http.ResponseWriter, r *http.Request, params GetQuizzesParams) {
+// Request password reset
+// (POST /auth/forgot-password)
+func (_ Unimplemented) PostForgotPassword(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Create a new quiz
-// (POST /quizzes)
-func (_ Unimplemented) CreateQuiz(w http.ResponseWriter, r *http.Request) {
+// Login user
+// (POST /auth/login)
+func (_ Unimplemented) PostLoginUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Delete quiz
-// (DELETE /quizzes/{id})
-func (_ Unimplemented) DeleteQuiz(w http.ResponseWriter, r *http.Request, id int64) {
+// Register a new user
+// (POST /auth/register)
+func (_ Unimplemented) PostRegisterUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Get quiz by ID
-// (GET /quizzes/{id})
-func (_ Unimplemented) GetQuiz(w http.ResponseWriter, r *http.Request, id int64) {
+// Get all exams
+// (GET /exams)
+func (_ Unimplemented) GetExams(w http.ResponseWriter, r *http.Request, params GetExamsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Update quiz
-// (PUT /quizzes/{id})
-func (_ Unimplemented) UpdateQuiz(w http.ResponseWriter, r *http.Request, id int64) {
+// Create a new exam
+// (POST /exams)
+func (_ Unimplemented) PostCreateExam(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Delete exam
+// (DELETE /exams/{id})
+func (_ Unimplemented) DeleteExam(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get exam by ID
+// (GET /exams/{id})
+func (_ Unimplemented) GetExam(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Update exam
+// (PUT /exams/{id})
+func (_ Unimplemented) UpdateExam(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get all questions
+// (GET /questions)
+func (_ Unimplemented) GetQuestions(w http.ResponseWriter, r *http.Request, params GetQuestionsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Create a new question
+// (POST /questions)
+func (_ Unimplemented) PostCreateQuestion(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Delete question
+// (DELETE /questions/{id})
+func (_ Unimplemented) DeleteQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get question by ID
+// (GET /questions/{id})
+func (_ Unimplemented) GetQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Update question
+// (PUT /questions/{id})
+func (_ Unimplemented) UpdateQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1933,27 +3924,45 @@ func (_ Unimplemented) GetUsers(w http.ResponseWriter, r *http.Request, params G
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Create a new user
-// (POST /users)
-func (_ Unimplemented) CreateUser(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
 // Delete user
 // (DELETE /users/{id})
-func (_ Unimplemented) DeleteUser(w http.ResponseWriter, r *http.Request, id int64) {
+func (_ Unimplemented) DeleteUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
 // Get user by ID
 // (GET /users/{id})
-func (_ Unimplemented) GetUser(w http.ResponseWriter, r *http.Request, id int64) {
+func (_ Unimplemented) GetUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
 // Update user
 // (PUT /users/{id})
-func (_ Unimplemented) UpdateUser(w http.ResponseWriter, r *http.Request, id int64) {
+func (_ Unimplemented) UpdateUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// 获取投票列表
+// (GET /votes)
+func (_ Unimplemented) GetVotes(w http.ResponseWriter, r *http.Request, params GetVotesParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// 创建投票
+// (POST /votes)
+func (_ Unimplemented) PostCreateVote(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// 获取投票详情（含当前结果）
+// (GET /votes/{id})
+func (_ Unimplemented) GetVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// 投票
+// (POST /votes/{id}/vote)
+func (_ Unimplemented) PostVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1966,13 +3975,63 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
-// GetQuizzes operation middleware
-func (siw *ServerInterfaceWrapper) GetQuizzes(w http.ResponseWriter, r *http.Request) {
+// PostForgotPassword operation middleware
+func (siw *ServerInterfaceWrapper) PostForgotPassword(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostForgotPassword(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostLoginUser operation middleware
+func (siw *ServerInterfaceWrapper) PostLoginUser(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostLoginUser(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostRegisterUser operation middleware
+func (siw *ServerInterfaceWrapper) PostRegisterUser(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostRegisterUser(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetExams operation middleware
+func (siw *ServerInterfaceWrapper) GetExams(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params GetQuizzesParams
+	var params GetExamsParams
+
+	// ------------- Optional query parameter "ids" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "ids", r.URL.Query(), &params.Ids)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "ids", Err: err})
+		return
+	}
 
 	// ------------- Optional query parameter "limit" -------------
 
@@ -2007,7 +4066,7 @@ func (siw *ServerInterfaceWrapper) GetQuizzes(w http.ResponseWriter, r *http.Req
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetQuizzes(w, r, params)
+		siw.Handler.GetExams(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2017,11 +4076,11 @@ func (siw *ServerInterfaceWrapper) GetQuizzes(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(w, r)
 }
 
-// CreateQuiz operation middleware
-func (siw *ServerInterfaceWrapper) CreateQuiz(w http.ResponseWriter, r *http.Request) {
+// PostCreateExam operation middleware
+func (siw *ServerInterfaceWrapper) PostCreateExam(w http.ResponseWriter, r *http.Request) {
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateQuiz(w, r)
+		siw.Handler.PostCreateExam(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2031,13 +4090,13 @@ func (siw *ServerInterfaceWrapper) CreateQuiz(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(w, r)
 }
 
-// DeleteQuiz operation middleware
-func (siw *ServerInterfaceWrapper) DeleteQuiz(w http.ResponseWriter, r *http.Request) {
+// DeleteExam operation middleware
+func (siw *ServerInterfaceWrapper) DeleteExam(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id openapi_types.UUID
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -2046,7 +4105,7 @@ func (siw *ServerInterfaceWrapper) DeleteQuiz(w http.ResponseWriter, r *http.Req
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteQuiz(w, r, id)
+		siw.Handler.DeleteExam(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2056,13 +4115,13 @@ func (siw *ServerInterfaceWrapper) DeleteQuiz(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(w, r)
 }
 
-// GetQuiz operation middleware
-func (siw *ServerInterfaceWrapper) GetQuiz(w http.ResponseWriter, r *http.Request) {
+// GetExam operation middleware
+func (siw *ServerInterfaceWrapper) GetExam(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id openapi_types.UUID
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -2071,7 +4130,7 @@ func (siw *ServerInterfaceWrapper) GetQuiz(w http.ResponseWriter, r *http.Reques
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetQuiz(w, r, id)
+		siw.Handler.GetExam(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2081,13 +4140,13 @@ func (siw *ServerInterfaceWrapper) GetQuiz(w http.ResponseWriter, r *http.Reques
 	handler.ServeHTTP(w, r)
 }
 
-// UpdateQuiz operation middleware
-func (siw *ServerInterfaceWrapper) UpdateQuiz(w http.ResponseWriter, r *http.Request) {
+// UpdateExam operation middleware
+func (siw *ServerInterfaceWrapper) UpdateExam(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id openapi_types.UUID
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -2096,7 +4155,155 @@ func (siw *ServerInterfaceWrapper) UpdateQuiz(w http.ResponseWriter, r *http.Req
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.UpdateQuiz(w, r, id)
+		siw.Handler.UpdateExam(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetQuestions operation middleware
+func (siw *ServerInterfaceWrapper) GetQuestions(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetQuestionsParams
+
+	// ------------- Optional query parameter "ids" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "ids", r.URL.Query(), &params.Ids)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "ids", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "offset", r.URL.Query(), &params.Offset)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "offset", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "category" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "category", r.URL.Query(), &params.Category)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "category", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "difficulty" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "difficulty", r.URL.Query(), &params.Difficulty)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "difficulty", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetQuestions(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostCreateQuestion operation middleware
+func (siw *ServerInterfaceWrapper) PostCreateQuestion(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostCreateQuestion(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteQuestion operation middleware
+func (siw *ServerInterfaceWrapper) DeleteQuestion(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteQuestion(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetQuestion operation middleware
+func (siw *ServerInterfaceWrapper) GetQuestion(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetQuestion(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateQuestion operation middleware
+func (siw *ServerInterfaceWrapper) UpdateQuestion(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateQuestion(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2113,6 +4320,14 @@ func (siw *ServerInterfaceWrapper) GetUsers(w http.ResponseWriter, r *http.Reque
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetUsersParams
+
+	// ------------- Optional query parameter "ids" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "ids", r.URL.Query(), &params.Ids)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "ids", Err: err})
+		return
+	}
 
 	// ------------- Optional query parameter "limit" -------------
 
@@ -2141,27 +4356,13 @@ func (siw *ServerInterfaceWrapper) GetUsers(w http.ResponseWriter, r *http.Reque
 	handler.ServeHTTP(w, r)
 }
 
-// CreateUser operation middleware
-func (siw *ServerInterfaceWrapper) CreateUser(w http.ResponseWriter, r *http.Request) {
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateUser(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
 // DeleteUser operation middleware
 func (siw *ServerInterfaceWrapper) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id openapi_types.UUID
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -2186,7 +4387,7 @@ func (siw *ServerInterfaceWrapper) GetUser(w http.ResponseWriter, r *http.Reques
 	var err error
 
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id openapi_types.UUID
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -2211,7 +4412,7 @@ func (siw *ServerInterfaceWrapper) UpdateUser(w http.ResponseWriter, r *http.Req
 	var err error
 
 	// ------------- Path parameter "id" -------------
-	var id int64
+	var id openapi_types.UUID
 
 	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -2221,6 +4422,105 @@ func (siw *ServerInterfaceWrapper) UpdateUser(w http.ResponseWriter, r *http.Req
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateUser(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetVotes operation middleware
+func (siw *ServerInterfaceWrapper) GetVotes(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetVotesParams
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "offset", r.URL.Query(), &params.Offset)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "offset", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetVotes(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostCreateVote operation middleware
+func (siw *ServerInterfaceWrapper) PostCreateVote(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostCreateVote(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetVote operation middleware
+func (siw *ServerInterfaceWrapper) GetVote(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetVote(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostVote operation middleware
+func (siw *ServerInterfaceWrapper) PostVote(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostVote(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2344,25 +4644,46 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/quizzes", wrapper.GetQuizzes)
+		r.Post(options.BaseURL+"/auth/forgot-password", wrapper.PostForgotPassword)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/quizzes", wrapper.CreateQuiz)
+		r.Post(options.BaseURL+"/auth/login", wrapper.PostLoginUser)
 	})
 	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/quizzes/{id}", wrapper.DeleteQuiz)
+		r.Post(options.BaseURL+"/auth/register", wrapper.PostRegisterUser)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/quizzes/{id}", wrapper.GetQuiz)
+		r.Get(options.BaseURL+"/exams", wrapper.GetExams)
 	})
 	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/quizzes/{id}", wrapper.UpdateQuiz)
+		r.Post(options.BaseURL+"/exams", wrapper.PostCreateExam)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/exams/{id}", wrapper.DeleteExam)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/exams/{id}", wrapper.GetExam)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/exams/{id}", wrapper.UpdateExam)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/questions", wrapper.GetQuestions)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/questions", wrapper.PostCreateQuestion)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/questions/{id}", wrapper.DeleteQuestion)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/questions/{id}", wrapper.GetQuestion)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/questions/{id}", wrapper.UpdateQuestion)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/users", wrapper.GetUsers)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/users", wrapper.CreateUser)
 	})
 	r.Group(func(r chi.Router) {
 		r.Delete(options.BaseURL+"/users/{id}", wrapper.DeleteUser)
@@ -2372,6 +4693,18 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Put(options.BaseURL+"/users/{id}", wrapper.UpdateUser)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/votes", wrapper.GetVotes)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/votes", wrapper.PostCreateVote)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/votes/{id}", wrapper.GetVote)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/votes/{id}/vote", wrapper.PostVote)
 	})
 
 	return r
@@ -2383,190 +4716,590 @@ type InternalServerErrorJSONResponse Error
 
 type NotFoundJSONResponse Error
 
-type GetQuizzesRequestObject struct {
-	Params GetQuizzesParams
+type UnauthorizedJSONResponse Error
+
+type PostForgotPasswordRequestObject struct {
+	Body *PostForgotPasswordJSONRequestBody
 }
 
-type GetQuizzesResponseObject interface {
-	VisitGetQuizzesResponse(w http.ResponseWriter) error
+type PostForgotPasswordResponseObject interface {
+	VisitPostForgotPasswordResponse(w http.ResponseWriter) error
 }
 
-type GetQuizzes200JSONResponse struct {
-	Limit   *int    `json:"limit,omitempty"`
-	Offset  *int    `json:"offset,omitempty"`
-	Quizzes *[]Quiz `json:"quizzes,omitempty"`
-	Total   *int    `json:"total,omitempty"`
+type PostForgotPassword200Response struct {
 }
 
-func (response GetQuizzes200JSONResponse) VisitGetQuizzesResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
+func (response PostForgotPassword200Response) VisitPostForgotPasswordResponse(w http.ResponseWriter) error {
 	w.WriteHeader(200)
+	return nil
+}
+
+type PostForgotPassword400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostForgotPassword400JSONResponse) VisitPostForgotPasswordResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetQuizzes500JSONResponse struct {
+type PostForgotPassword500JSONResponse struct {
 	InternalServerErrorJSONResponse
 }
 
-func (response GetQuizzes500JSONResponse) VisitGetQuizzesResponse(w http.ResponseWriter) error {
+func (response PostForgotPassword500JSONResponse) VisitPostForgotPasswordResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateQuizRequestObject struct {
-	Body *CreateQuizJSONRequestBody
+type PostLoginUserRequestObject struct {
+	Body *PostLoginUserJSONRequestBody
 }
 
-type CreateQuizResponseObject interface {
-	VisitCreateQuizResponse(w http.ResponseWriter) error
+type PostLoginUserResponseObject interface {
+	VisitPostLoginUserResponse(w http.ResponseWriter) error
 }
 
-type CreateQuiz201JSONResponse Quiz
+type PostLoginUser200JSONResponse AuthResponse
 
-func (response CreateQuiz201JSONResponse) VisitCreateQuizResponse(w http.ResponseWriter) error {
+func (response PostLoginUser200JSONResponse) VisitPostLoginUserResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostLoginUser400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostLoginUser400JSONResponse) VisitPostLoginUserResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostLoginUser401Response struct {
+}
+
+func (response PostLoginUser401Response) VisitPostLoginUserResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type PostLoginUser500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostLoginUser500JSONResponse) VisitPostLoginUserResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostRegisterUserRequestObject struct {
+	Body *PostRegisterUserJSONRequestBody
+}
+
+type PostRegisterUserResponseObject interface {
+	VisitPostRegisterUserResponse(w http.ResponseWriter) error
+}
+
+type PostRegisterUser201JSONResponse AuthResponse
+
+func (response PostRegisterUser201JSONResponse) VisitPostRegisterUserResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateQuiz400JSONResponse struct{ BadRequestJSONResponse }
+type PostRegisterUser400JSONResponse struct{ BadRequestJSONResponse }
 
-func (response CreateQuiz400JSONResponse) VisitCreateQuizResponse(w http.ResponseWriter) error {
+func (response PostRegisterUser400JSONResponse) VisitPostRegisterUserResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateQuiz500JSONResponse struct {
+type PostRegisterUser500JSONResponse struct {
 	InternalServerErrorJSONResponse
 }
 
-func (response CreateQuiz500JSONResponse) VisitCreateQuizResponse(w http.ResponseWriter) error {
+func (response PostRegisterUser500JSONResponse) VisitPostRegisterUserResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteQuizRequestObject struct {
-	Id int64 `json:"id"`
+type GetExamsRequestObject struct {
+	Params GetExamsParams
 }
 
-type DeleteQuizResponseObject interface {
-	VisitDeleteQuizResponse(w http.ResponseWriter) error
+type GetExamsResponseObject interface {
+	VisitGetExamsResponse(w http.ResponseWriter) error
 }
 
-type DeleteQuiz204Response struct {
+type GetExams200JSONResponse struct {
+	Exams  *[]Exam `json:"exams,omitempty"`
+	Limit  *int    `json:"limit,omitempty"`
+	Offset *int    `json:"offset,omitempty"`
+	Total  *int    `json:"total,omitempty"`
 }
 
-func (response DeleteQuiz204Response) VisitDeleteQuizResponse(w http.ResponseWriter) error {
+func (response GetExams200JSONResponse) VisitGetExamsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetExams500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetExams500JSONResponse) VisitGetExamsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateExamRequestObject struct {
+	Body *PostCreateExamJSONRequestBody
+}
+
+type PostCreateExamResponseObject interface {
+	VisitPostCreateExamResponse(w http.ResponseWriter) error
+}
+
+type PostCreateExam201JSONResponse Exam
+
+func (response PostCreateExam201JSONResponse) VisitPostCreateExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateExam400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostCreateExam400JSONResponse) VisitPostCreateExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateExam401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response PostCreateExam401JSONResponse) VisitPostCreateExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateExam500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostCreateExam500JSONResponse) VisitPostCreateExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteExamRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type DeleteExamResponseObject interface {
+	VisitDeleteExamResponse(w http.ResponseWriter) error
+}
+
+type DeleteExam204Response struct {
+}
+
+func (response DeleteExam204Response) VisitDeleteExamResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
-type DeleteQuiz404JSONResponse struct{ NotFoundJSONResponse }
+type DeleteExam400JSONResponse struct{ BadRequestJSONResponse }
 
-func (response DeleteQuiz404JSONResponse) VisitDeleteQuizResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DeleteQuiz500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response DeleteQuiz500JSONResponse) VisitDeleteQuizResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetQuizRequestObject struct {
-	Id int64 `json:"id"`
-}
-
-type GetQuizResponseObject interface {
-	VisitGetQuizResponse(w http.ResponseWriter) error
-}
-
-type GetQuiz200JSONResponse Quiz
-
-func (response GetQuiz200JSONResponse) VisitGetQuizResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetQuiz404JSONResponse struct{ NotFoundJSONResponse }
-
-func (response GetQuiz404JSONResponse) VisitGetQuizResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetQuiz500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response GetQuiz500JSONResponse) VisitGetQuizResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type UpdateQuizRequestObject struct {
-	Id   int64 `json:"id"`
-	Body *UpdateQuizJSONRequestBody
-}
-
-type UpdateQuizResponseObject interface {
-	VisitUpdateQuizResponse(w http.ResponseWriter) error
-}
-
-type UpdateQuiz200JSONResponse Quiz
-
-func (response UpdateQuiz200JSONResponse) VisitUpdateQuizResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type UpdateQuiz400JSONResponse struct{ BadRequestJSONResponse }
-
-func (response UpdateQuiz400JSONResponse) VisitUpdateQuizResponse(w http.ResponseWriter) error {
+func (response DeleteExam400JSONResponse) VisitDeleteExamResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateQuiz404JSONResponse struct{ NotFoundJSONResponse }
+type DeleteExam401JSONResponse struct{ UnauthorizedJSONResponse }
 
-func (response UpdateQuiz404JSONResponse) VisitUpdateQuizResponse(w http.ResponseWriter) error {
+func (response DeleteExam401JSONResponse) VisitDeleteExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteExam404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response DeleteExam404JSONResponse) VisitDeleteExamResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateQuiz500JSONResponse struct {
+type DeleteExam500JSONResponse struct {
 	InternalServerErrorJSONResponse
 }
 
-func (response UpdateQuiz500JSONResponse) VisitUpdateQuizResponse(w http.ResponseWriter) error {
+func (response DeleteExam500JSONResponse) VisitDeleteExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetExamRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type GetExamResponseObject interface {
+	VisitGetExamResponse(w http.ResponseWriter) error
+}
+
+type GetExam200JSONResponse Exam
+
+func (response GetExam200JSONResponse) VisitGetExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetExam400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response GetExam400JSONResponse) VisitGetExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetExam404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response GetExam404JSONResponse) VisitGetExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetExam500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetExam500JSONResponse) VisitGetExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateExamRequestObject struct {
+	Id   openapi_types.UUID `json:"id"`
+	Body *UpdateExamJSONRequestBody
+}
+
+type UpdateExamResponseObject interface {
+	VisitUpdateExamResponse(w http.ResponseWriter) error
+}
+
+type UpdateExam200JSONResponse Exam
+
+func (response UpdateExam200JSONResponse) VisitUpdateExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateExam400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response UpdateExam400JSONResponse) VisitUpdateExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateExam401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response UpdateExam401JSONResponse) VisitUpdateExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateExam404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response UpdateExam404JSONResponse) VisitUpdateExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateExam500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response UpdateExam500JSONResponse) VisitUpdateExamResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestionsRequestObject struct {
+	Params GetQuestionsParams
+}
+
+type GetQuestionsResponseObject interface {
+	VisitGetQuestionsResponse(w http.ResponseWriter) error
+}
+
+type GetQuestions200JSONResponse struct {
+	Limit     *int        `json:"limit,omitempty"`
+	Offset    *int        `json:"offset,omitempty"`
+	Questions *[]Question `json:"questions,omitempty"`
+	Total     *int        `json:"total,omitempty"`
+}
+
+func (response GetQuestions200JSONResponse) VisitGetQuestionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestions500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetQuestions500JSONResponse) VisitGetQuestionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateQuestionRequestObject struct {
+	Body *PostCreateQuestionJSONRequestBody
+}
+
+type PostCreateQuestionResponseObject interface {
+	VisitPostCreateQuestionResponse(w http.ResponseWriter) error
+}
+
+type PostCreateQuestion201JSONResponse QuestionWithAnswer
+
+func (response PostCreateQuestion201JSONResponse) VisitPostCreateQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateQuestion400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostCreateQuestion400JSONResponse) VisitPostCreateQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateQuestion401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response PostCreateQuestion401JSONResponse) VisitPostCreateQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateQuestion500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostCreateQuestion500JSONResponse) VisitPostCreateQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteQuestionRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type DeleteQuestionResponseObject interface {
+	VisitDeleteQuestionResponse(w http.ResponseWriter) error
+}
+
+type DeleteQuestion204Response struct {
+}
+
+func (response DeleteQuestion204Response) VisitDeleteQuestionResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteQuestion400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response DeleteQuestion400JSONResponse) VisitDeleteQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteQuestion401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response DeleteQuestion401JSONResponse) VisitDeleteQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteQuestion404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response DeleteQuestion404JSONResponse) VisitDeleteQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteQuestion500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response DeleteQuestion500JSONResponse) VisitDeleteQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestionRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type GetQuestionResponseObject interface {
+	VisitGetQuestionResponse(w http.ResponseWriter) error
+}
+
+type GetQuestion200JSONResponse Question
+
+func (response GetQuestion200JSONResponse) VisitGetQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestion400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response GetQuestion400JSONResponse) VisitGetQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestion404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response GetQuestion404JSONResponse) VisitGetQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestion500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetQuestion500JSONResponse) VisitGetQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateQuestionRequestObject struct {
+	Id   openapi_types.UUID `json:"id"`
+	Body *UpdateQuestionJSONRequestBody
+}
+
+type UpdateQuestionResponseObject interface {
+	VisitUpdateQuestionResponse(w http.ResponseWriter) error
+}
+
+type UpdateQuestion200JSONResponse QuestionWithAnswer
+
+func (response UpdateQuestion200JSONResponse) VisitUpdateQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateQuestion400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response UpdateQuestion400JSONResponse) VisitUpdateQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateQuestion401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response UpdateQuestion401JSONResponse) VisitUpdateQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateQuestion404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response UpdateQuestion404JSONResponse) VisitUpdateQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateQuestion500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response UpdateQuestion500JSONResponse) VisitUpdateQuestionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -2595,6 +5328,24 @@ func (response GetUsers200JSONResponse) VisitGetUsersResponse(w http.ResponseWri
 	return json.NewEncoder(w).Encode(response)
 }
 
+type GetUsers400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response GetUsers400JSONResponse) VisitGetUsersResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetUsers401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response GetUsers401JSONResponse) VisitGetUsersResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type GetUsers500JSONResponse struct {
 	InternalServerErrorJSONResponse
 }
@@ -2606,45 +5357,8 @@ func (response GetUsers500JSONResponse) VisitGetUsersResponse(w http.ResponseWri
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateUserRequestObject struct {
-	Body *CreateUserJSONRequestBody
-}
-
-type CreateUserResponseObject interface {
-	VisitCreateUserResponse(w http.ResponseWriter) error
-}
-
-type CreateUser201JSONResponse User
-
-func (response CreateUser201JSONResponse) VisitCreateUserResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type CreateUser400JSONResponse struct{ BadRequestJSONResponse }
-
-func (response CreateUser400JSONResponse) VisitCreateUserResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type CreateUser500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response CreateUser500JSONResponse) VisitCreateUserResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
 type DeleteUserRequestObject struct {
-	Id int64 `json:"id"`
+	Id openapi_types.UUID `json:"id"`
 }
 
 type DeleteUserResponseObject interface {
@@ -2657,6 +5371,24 @@ type DeleteUser204Response struct {
 func (response DeleteUser204Response) VisitDeleteUserResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
+}
+
+type DeleteUser400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response DeleteUser400JSONResponse) VisitDeleteUserResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteUser401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response DeleteUser401JSONResponse) VisitDeleteUserResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type DeleteUser404JSONResponse struct{ NotFoundJSONResponse }
@@ -2680,7 +5412,7 @@ func (response DeleteUser500JSONResponse) VisitDeleteUserResponse(w http.Respons
 }
 
 type GetUserRequestObject struct {
-	Id int64 `json:"id"`
+	Id openapi_types.UUID `json:"id"`
 }
 
 type GetUserResponseObject interface {
@@ -2717,7 +5449,7 @@ func (response GetUser500JSONResponse) VisitGetUserResponse(w http.ResponseWrite
 }
 
 type UpdateUserRequestObject struct {
-	Id   int64 `json:"id"`
+	Id   openapi_types.UUID `json:"id"`
 	Body *UpdateUserJSONRequestBody
 }
 
@@ -2743,6 +5475,15 @@ func (response UpdateUser400JSONResponse) VisitUpdateUserResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
+type UpdateUser401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response UpdateUser401JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type UpdateUser404JSONResponse struct{ NotFoundJSONResponse }
 
 func (response UpdateUser404JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
@@ -2763,29 +5504,230 @@ func (response UpdateUser500JSONResponse) VisitUpdateUserResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
+type GetVotesRequestObject struct {
+	Params GetVotesParams
+}
+
+type GetVotesResponseObject interface {
+	VisitGetVotesResponse(w http.ResponseWriter) error
+}
+
+type GetVotes200JSONResponse struct {
+	Limit  *int    `json:"limit,omitempty"`
+	Offset *int    `json:"offset,omitempty"`
+	Total  *int    `json:"total,omitempty"`
+	Votes  *[]Vote `json:"votes,omitempty"`
+}
+
+func (response GetVotes200JSONResponse) VisitGetVotesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetVotes500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetVotes500JSONResponse) VisitGetVotesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateVoteRequestObject struct {
+	Body *PostCreateVoteJSONRequestBody
+}
+
+type PostCreateVoteResponseObject interface {
+	VisitPostCreateVoteResponse(w http.ResponseWriter) error
+}
+
+type PostCreateVote201JSONResponse Vote
+
+func (response PostCreateVote201JSONResponse) VisitPostCreateVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateVote400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostCreateVote400JSONResponse) VisitPostCreateVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateVote401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response PostCreateVote401JSONResponse) VisitPostCreateVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostCreateVote500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostCreateVote500JSONResponse) VisitPostCreateVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetVoteRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type GetVoteResponseObject interface {
+	VisitGetVoteResponse(w http.ResponseWriter) error
+}
+
+type GetVote200JSONResponse Vote
+
+func (response GetVote200JSONResponse) VisitGetVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetVote400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response GetVote400JSONResponse) VisitGetVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetVote404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response GetVote404JSONResponse) VisitGetVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetVote500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetVote500JSONResponse) VisitGetVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostVoteRequestObject struct {
+	Id   openapi_types.UUID `json:"id"`
+	Body *PostVoteJSONRequestBody
+}
+
+type PostVoteResponseObject interface {
+	VisitPostVoteResponse(w http.ResponseWriter) error
+}
+
+type PostVote200Response struct {
+}
+
+func (response PostVote200Response) VisitPostVoteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type PostVote400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostVote400JSONResponse) VisitPostVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostVote401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response PostVote401JSONResponse) VisitPostVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostVote404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response PostVote404JSONResponse) VisitPostVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostVote500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostVote500JSONResponse) VisitPostVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
-	// Get all quizzes
-	// (GET /quizzes)
-	GetQuizzes(ctx context.Context, request GetQuizzesRequestObject) (GetQuizzesResponseObject, error)
-	// Create a new quiz
-	// (POST /quizzes)
-	CreateQuiz(ctx context.Context, request CreateQuizRequestObject) (CreateQuizResponseObject, error)
-	// Delete quiz
-	// (DELETE /quizzes/{id})
-	DeleteQuiz(ctx context.Context, request DeleteQuizRequestObject) (DeleteQuizResponseObject, error)
-	// Get quiz by ID
-	// (GET /quizzes/{id})
-	GetQuiz(ctx context.Context, request GetQuizRequestObject) (GetQuizResponseObject, error)
-	// Update quiz
-	// (PUT /quizzes/{id})
-	UpdateQuiz(ctx context.Context, request UpdateQuizRequestObject) (UpdateQuizResponseObject, error)
+	// Request password reset
+	// (POST /auth/forgot-password)
+	PostForgotPassword(ctx context.Context, request PostForgotPasswordRequestObject) (PostForgotPasswordResponseObject, error)
+	// Login user
+	// (POST /auth/login)
+	PostLoginUser(ctx context.Context, request PostLoginUserRequestObject) (PostLoginUserResponseObject, error)
+	// Register a new user
+	// (POST /auth/register)
+	PostRegisterUser(ctx context.Context, request PostRegisterUserRequestObject) (PostRegisterUserResponseObject, error)
+	// Get all exams
+	// (GET /exams)
+	GetExams(ctx context.Context, request GetExamsRequestObject) (GetExamsResponseObject, error)
+	// Create a new exam
+	// (POST /exams)
+	PostCreateExam(ctx context.Context, request PostCreateExamRequestObject) (PostCreateExamResponseObject, error)
+	// Delete exam
+	// (DELETE /exams/{id})
+	DeleteExam(ctx context.Context, request DeleteExamRequestObject) (DeleteExamResponseObject, error)
+	// Get exam by ID
+	// (GET /exams/{id})
+	GetExam(ctx context.Context, request GetExamRequestObject) (GetExamResponseObject, error)
+	// Update exam
+	// (PUT /exams/{id})
+	UpdateExam(ctx context.Context, request UpdateExamRequestObject) (UpdateExamResponseObject, error)
+	// Get all questions
+	// (GET /questions)
+	GetQuestions(ctx context.Context, request GetQuestionsRequestObject) (GetQuestionsResponseObject, error)
+	// Create a new question
+	// (POST /questions)
+	PostCreateQuestion(ctx context.Context, request PostCreateQuestionRequestObject) (PostCreateQuestionResponseObject, error)
+	// Delete question
+	// (DELETE /questions/{id})
+	DeleteQuestion(ctx context.Context, request DeleteQuestionRequestObject) (DeleteQuestionResponseObject, error)
+	// Get question by ID
+	// (GET /questions/{id})
+	GetQuestion(ctx context.Context, request GetQuestionRequestObject) (GetQuestionResponseObject, error)
+	// Update question
+	// (PUT /questions/{id})
+	UpdateQuestion(ctx context.Context, request UpdateQuestionRequestObject) (UpdateQuestionResponseObject, error)
 	// Get all users
 	// (GET /users)
 	GetUsers(ctx context.Context, request GetUsersRequestObject) (GetUsersResponseObject, error)
-	// Create a new user
-	// (POST /users)
-	CreateUser(ctx context.Context, request CreateUserRequestObject) (CreateUserResponseObject, error)
 	// Delete user
 	// (DELETE /users/{id})
 	DeleteUser(ctx context.Context, request DeleteUserRequestObject) (DeleteUserResponseObject, error)
@@ -2795,6 +5737,18 @@ type StrictServerInterface interface {
 	// Update user
 	// (PUT /users/{id})
 	UpdateUser(ctx context.Context, request UpdateUserRequestObject) (UpdateUserResponseObject, error)
+	// 获取投票列表
+	// (GET /votes)
+	GetVotes(ctx context.Context, request GetVotesRequestObject) (GetVotesResponseObject, error)
+	// 创建投票
+	// (POST /votes)
+	PostCreateVote(ctx context.Context, request PostCreateVoteRequestObject) (PostCreateVoteResponseObject, error)
+	// 获取投票详情（含当前结果）
+	// (GET /votes/{id})
+	GetVote(ctx context.Context, request GetVoteRequestObject) (GetVoteResponseObject, error)
+	// 投票
+	// (POST /votes/{id}/vote)
+	PostVote(ctx context.Context, request PostVoteRequestObject) (PostVoteResponseObject, error)
 }
 
 type StrictHandlerFunc = strictnethttp.StrictHTTPHandlerFunc
@@ -2826,25 +5780,118 @@ type strictHandler struct {
 	options     StrictHTTPServerOptions
 }
 
-// GetQuizzes operation middleware
-func (sh *strictHandler) GetQuizzes(w http.ResponseWriter, r *http.Request, params GetQuizzesParams) {
-	var request GetQuizzesRequestObject
+// PostForgotPassword operation middleware
+func (sh *strictHandler) PostForgotPassword(w http.ResponseWriter, r *http.Request) {
+	var request PostForgotPasswordRequestObject
+
+	var body PostForgotPasswordJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostForgotPassword(ctx, request.(PostForgotPasswordRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostForgotPassword")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostForgotPasswordResponseObject); ok {
+		if err := validResponse.VisitPostForgotPasswordResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostLoginUser operation middleware
+func (sh *strictHandler) PostLoginUser(w http.ResponseWriter, r *http.Request) {
+	var request PostLoginUserRequestObject
+
+	var body PostLoginUserJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostLoginUser(ctx, request.(PostLoginUserRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostLoginUser")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostLoginUserResponseObject); ok {
+		if err := validResponse.VisitPostLoginUserResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostRegisterUser operation middleware
+func (sh *strictHandler) PostRegisterUser(w http.ResponseWriter, r *http.Request) {
+	var request PostRegisterUserRequestObject
+
+	var body PostRegisterUserJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostRegisterUser(ctx, request.(PostRegisterUserRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostRegisterUser")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostRegisterUserResponseObject); ok {
+		if err := validResponse.VisitPostRegisterUserResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetExams operation middleware
+func (sh *strictHandler) GetExams(w http.ResponseWriter, r *http.Request, params GetExamsParams) {
+	var request GetExamsRequestObject
 
 	request.Params = params
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.GetQuizzes(ctx, request.(GetQuizzesRequestObject))
+		return sh.ssi.GetExams(ctx, request.(GetExamsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetQuizzes")
+		handler = middleware(handler, "GetExams")
 	}
 
 	response, err := handler(r.Context(), w, r, request)
 
 	if err != nil {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(GetQuizzesResponseObject); ok {
-		if err := validResponse.VisitGetQuizzesResponse(w); err != nil {
+	} else if validResponse, ok := response.(GetExamsResponseObject); ok {
+		if err := validResponse.VisitGetExamsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -2852,11 +5899,11 @@ func (sh *strictHandler) GetQuizzes(w http.ResponseWriter, r *http.Request, para
 	}
 }
 
-// CreateQuiz operation middleware
-func (sh *strictHandler) CreateQuiz(w http.ResponseWriter, r *http.Request) {
-	var request CreateQuizRequestObject
+// PostCreateExam operation middleware
+func (sh *strictHandler) PostCreateExam(w http.ResponseWriter, r *http.Request) {
+	var request PostCreateExamRequestObject
 
-	var body CreateQuizJSONRequestBody
+	var body PostCreateExamJSONRequestBody
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
 		return
@@ -2864,18 +5911,18 @@ func (sh *strictHandler) CreateQuiz(w http.ResponseWriter, r *http.Request) {
 	request.Body = &body
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.CreateQuiz(ctx, request.(CreateQuizRequestObject))
+		return sh.ssi.PostCreateExam(ctx, request.(PostCreateExamRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "CreateQuiz")
+		handler = middleware(handler, "PostCreateExam")
 	}
 
 	response, err := handler(r.Context(), w, r, request)
 
 	if err != nil {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(CreateQuizResponseObject); ok {
-		if err := validResponse.VisitCreateQuizResponse(w); err != nil {
+	} else if validResponse, ok := response.(PostCreateExamResponseObject); ok {
+		if err := validResponse.VisitPostCreateExamResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -2883,25 +5930,25 @@ func (sh *strictHandler) CreateQuiz(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// DeleteQuiz operation middleware
-func (sh *strictHandler) DeleteQuiz(w http.ResponseWriter, r *http.Request, id int64) {
-	var request DeleteQuizRequestObject
+// DeleteExam operation middleware
+func (sh *strictHandler) DeleteExam(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request DeleteExamRequestObject
 
 	request.Id = id
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.DeleteQuiz(ctx, request.(DeleteQuizRequestObject))
+		return sh.ssi.DeleteExam(ctx, request.(DeleteExamRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "DeleteQuiz")
+		handler = middleware(handler, "DeleteExam")
 	}
 
 	response, err := handler(r.Context(), w, r, request)
 
 	if err != nil {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(DeleteQuizResponseObject); ok {
-		if err := validResponse.VisitDeleteQuizResponse(w); err != nil {
+	} else if validResponse, ok := response.(DeleteExamResponseObject); ok {
+		if err := validResponse.VisitDeleteExamResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -2909,25 +5956,25 @@ func (sh *strictHandler) DeleteQuiz(w http.ResponseWriter, r *http.Request, id i
 	}
 }
 
-// GetQuiz operation middleware
-func (sh *strictHandler) GetQuiz(w http.ResponseWriter, r *http.Request, id int64) {
-	var request GetQuizRequestObject
+// GetExam operation middleware
+func (sh *strictHandler) GetExam(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request GetExamRequestObject
 
 	request.Id = id
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.GetQuiz(ctx, request.(GetQuizRequestObject))
+		return sh.ssi.GetExam(ctx, request.(GetExamRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetQuiz")
+		handler = middleware(handler, "GetExam")
 	}
 
 	response, err := handler(r.Context(), w, r, request)
 
 	if err != nil {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(GetQuizResponseObject); ok {
-		if err := validResponse.VisitGetQuizResponse(w); err != nil {
+	} else if validResponse, ok := response.(GetExamResponseObject); ok {
+		if err := validResponse.VisitGetExamResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -2935,13 +5982,13 @@ func (sh *strictHandler) GetQuiz(w http.ResponseWriter, r *http.Request, id int6
 	}
 }
 
-// UpdateQuiz operation middleware
-func (sh *strictHandler) UpdateQuiz(w http.ResponseWriter, r *http.Request, id int64) {
-	var request UpdateQuizRequestObject
+// UpdateExam operation middleware
+func (sh *strictHandler) UpdateExam(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request UpdateExamRequestObject
 
 	request.Id = id
 
-	var body UpdateQuizJSONRequestBody
+	var body UpdateExamJSONRequestBody
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
 		return
@@ -2949,18 +5996,160 @@ func (sh *strictHandler) UpdateQuiz(w http.ResponseWriter, r *http.Request, id i
 	request.Body = &body
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.UpdateQuiz(ctx, request.(UpdateQuizRequestObject))
+		return sh.ssi.UpdateExam(ctx, request.(UpdateExamRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "UpdateQuiz")
+		handler = middleware(handler, "UpdateExam")
 	}
 
 	response, err := handler(r.Context(), w, r, request)
 
 	if err != nil {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(UpdateQuizResponseObject); ok {
-		if err := validResponse.VisitUpdateQuizResponse(w); err != nil {
+	} else if validResponse, ok := response.(UpdateExamResponseObject); ok {
+		if err := validResponse.VisitUpdateExamResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetQuestions operation middleware
+func (sh *strictHandler) GetQuestions(w http.ResponseWriter, r *http.Request, params GetQuestionsParams) {
+	var request GetQuestionsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetQuestions(ctx, request.(GetQuestionsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetQuestions")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetQuestionsResponseObject); ok {
+		if err := validResponse.VisitGetQuestionsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostCreateQuestion operation middleware
+func (sh *strictHandler) PostCreateQuestion(w http.ResponseWriter, r *http.Request) {
+	var request PostCreateQuestionRequestObject
+
+	var body PostCreateQuestionJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostCreateQuestion(ctx, request.(PostCreateQuestionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostCreateQuestion")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostCreateQuestionResponseObject); ok {
+		if err := validResponse.VisitPostCreateQuestionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteQuestion operation middleware
+func (sh *strictHandler) DeleteQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request DeleteQuestionRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteQuestion(ctx, request.(DeleteQuestionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteQuestion")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteQuestionResponseObject); ok {
+		if err := validResponse.VisitDeleteQuestionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetQuestion operation middleware
+func (sh *strictHandler) GetQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request GetQuestionRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetQuestion(ctx, request.(GetQuestionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetQuestion")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetQuestionResponseObject); ok {
+		if err := validResponse.VisitGetQuestionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateQuestion operation middleware
+func (sh *strictHandler) UpdateQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request UpdateQuestionRequestObject
+
+	request.Id = id
+
+	var body UpdateQuestionJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateQuestion(ctx, request.(UpdateQuestionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateQuestion")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateQuestionResponseObject); ok {
+		if err := validResponse.VisitUpdateQuestionResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -2994,39 +6183,8 @@ func (sh *strictHandler) GetUsers(w http.ResponseWriter, r *http.Request, params
 	}
 }
 
-// CreateUser operation middleware
-func (sh *strictHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var request CreateUserRequestObject
-
-	var body CreateUserJSONRequestBody
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.CreateUser(ctx, request.(CreateUserRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "CreateUser")
-	}
-
-	response, err := handler(r.Context(), w, r, request)
-
-	if err != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(CreateUserResponseObject); ok {
-		if err := validResponse.VisitCreateUserResponse(w); err != nil {
-			sh.options.ResponseErrorHandlerFunc(w, r, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
 // DeleteUser operation middleware
-func (sh *strictHandler) DeleteUser(w http.ResponseWriter, r *http.Request, id int64) {
+func (sh *strictHandler) DeleteUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	var request DeleteUserRequestObject
 
 	request.Id = id
@@ -3052,7 +6210,7 @@ func (sh *strictHandler) DeleteUser(w http.ResponseWriter, r *http.Request, id i
 }
 
 // GetUser operation middleware
-func (sh *strictHandler) GetUser(w http.ResponseWriter, r *http.Request, id int64) {
+func (sh *strictHandler) GetUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	var request GetUserRequestObject
 
 	request.Id = id
@@ -3078,7 +6236,7 @@ func (sh *strictHandler) GetUser(w http.ResponseWriter, r *http.Request, id int6
 }
 
 // UpdateUser operation middleware
-func (sh *strictHandler) UpdateUser(w http.ResponseWriter, r *http.Request, id int64) {
+func (sh *strictHandler) UpdateUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	var request UpdateUserRequestObject
 
 	request.Id = id
@@ -3103,6 +6261,122 @@ func (sh *strictHandler) UpdateUser(w http.ResponseWriter, r *http.Request, id i
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(UpdateUserResponseObject); ok {
 		if err := validResponse.VisitUpdateUserResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetVotes operation middleware
+func (sh *strictHandler) GetVotes(w http.ResponseWriter, r *http.Request, params GetVotesParams) {
+	var request GetVotesRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetVotes(ctx, request.(GetVotesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetVotes")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetVotesResponseObject); ok {
+		if err := validResponse.VisitGetVotesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostCreateVote operation middleware
+func (sh *strictHandler) PostCreateVote(w http.ResponseWriter, r *http.Request) {
+	var request PostCreateVoteRequestObject
+
+	var body PostCreateVoteJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostCreateVote(ctx, request.(PostCreateVoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostCreateVote")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostCreateVoteResponseObject); ok {
+		if err := validResponse.VisitPostCreateVoteResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetVote operation middleware
+func (sh *strictHandler) GetVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request GetVoteRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetVote(ctx, request.(GetVoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetVote")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetVoteResponseObject); ok {
+		if err := validResponse.VisitGetVoteResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostVote operation middleware
+func (sh *strictHandler) PostVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request PostVoteRequestObject
+
+	request.Id = id
+
+	var body PostVoteJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostVote(ctx, request.(PostVoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostVote")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostVoteResponseObject); ok {
+		if err := validResponse.VisitPostVoteResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

@@ -7,10 +7,10 @@ import (
 	"genshin-quiz/generated/oapi"
 )
 
-func GetQuizzes(
+func GetVotes(
 	ctx context.Context,
 	app *config.App,
-	req oapi.GetQuizzesRequestObject,
+	req oapi.GetVotesRequestObject,
 ) error {
 	return nil
 }
