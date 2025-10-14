@@ -5,6 +5,6 @@ import (
 	"genshin-quiz/generated/oapi"
 )
 
-func GetVotes(ctx context.Context, req oapi.GetVotesRequestObject) (oapi.GetVotesResponseObject, error) {
+func (*Handler) GetVotes(ctx context.Context, req oapi.GetVotesRequestObject) (oapi.GetVotesResponseObject, error) {
 	return (oapi.GetVotes200JSONResponse{}), nil
 }
