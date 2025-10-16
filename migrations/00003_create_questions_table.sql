@@ -52,7 +52,7 @@ CREATE TABLE question_translations(
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(question_id, language)
-)
+);
 
 -- Create question option translations table
 CREATE TABLE option_translations (
@@ -106,7 +106,7 @@ CREATE INDEX idx_questions_category_difficulty ON questions(category, difficulty
 
 -- 索引：options（按 question 快速查、按是否为正确项过滤）
 CREATE INDEX idx_question_options_question_id ON question_options(question_id);
-CREATE INDEX idx_question_options_question_is_answer ON question_options(question_id, is_answer);
+CREATE INDEX idx_question_options_question_is_answer ON question_options(question_id, is_answered);
 
 -- 索引：翻译表按语言和 question/option 快速查
 CREATE INDEX idx_question_translations_question_language ON question_translations(question_id, language);

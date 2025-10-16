@@ -1,7 +1,8 @@
 -- +goose Up
--- Create user_profile table
-CREATE TABLE user_profile (
-    id BIGSERIAL PRIMARY KEY,
+-- Create users table
+CREATE TABLE users (
+    id BIGSERIAL PRIMARY KEY, -- internal identifier
+    user_uuid UUID NOT NULL DEFAULT gen_random_uuid(), -- public identifier
     email VARCHAR(255) UNIQUE NOT NULL,
     display_name VARCHAR(100),
     avatar_url TEXT,
@@ -14,8 +15,10 @@ CREATE TABLE user_profile (
 );
 
 -- Create index on email for faster lookups
-CREATE INDEX idx_user_profile_email ON user_profile(email);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_uuid ON users(user_uuid);
 
 -- +goose Down
-DROP INDEX IF EXISTS idx_user_profile_email;
-DROP TABLE user_profile;
+DROP INDEX IF EXISTS idx_users_email;
+DROP INDEX IF EXISTS idx_users_uuid;
+DROP TABLE IF EXISTS users;

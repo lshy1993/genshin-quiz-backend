@@ -216,14 +216,14 @@ func NewApp() *App {
 		},
 
 		Database: DatabaseConfig{
-			Host:            getEnv("DB_HOST", "localhost"),
-			Port:            getEnv("DB_PORT", "5432"),
-			User:            getEnv("DB_USER", "user"),
-			Password:        getEnv("DB_PASSWORD", "password"),
-			Name:            getEnv("DB_NAME", "genshin_quiz"),
-			MaxOpenConns:    getEnvAsInt("DB_MAX_OPEN_CONNS", 25),
-			MaxIdleConns:    getEnvAsInt("DB_MAX_IDLE_CONNS", 25),
-			ConnMaxLifetime: getEnvAsDuration("DB_CONN_MAX_LIFETIME", "5m"),
+			Host:            getEnv("DATABASE_HOST", "localhost"),
+			Port:            getEnv("DATABASE_PORT", "5432"),
+			User:            getEnv("DATABASE_USER", "user"),
+			Password:        getEnv("DATABASE_PASSWORD", "password"),
+			Name:            getEnv("DATABASE_NAME", "genshin_quiz"),
+			MaxOpenConns:    getEnvAsInt("DATABASE_MAX_OPEN_CONNS", 25),
+			MaxIdleConns:    getEnvAsInt("DATABASE_MAX_IDLE_CONNS", 25),
+			ConnMaxLifetime: getEnvAsDuration("DATABASE_CONN_MAX_LIFETIME", "5m"),
 		},
 
 		Azure: AzureConfig{
