@@ -20,6 +20,13 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for QuestionLikeStatus.
+const (
+	QuestionLikeStatusMinus1 QuestionLikeStatus = -1
+	QuestionLikeStatusN0     QuestionLikeStatus = 0
+	QuestionLikeStatusN1     QuestionLikeStatus = 1
+)
+
 // Defines values for QuestionCategory.
 const (
 	QuestionCategoryArtifact   QuestionCategory = "artifact"
@@ -55,6 +62,13 @@ const (
 	TrueFalse      QuestionType = "true_false"
 )
 
+// Defines values for QuestionWithAnswerLikeStatus.
+const (
+	QuestionWithAnswerLikeStatusMinus1 QuestionWithAnswerLikeStatus = -1
+	QuestionWithAnswerLikeStatusN0     QuestionWithAnswerLikeStatus = 0
+	QuestionWithAnswerLikeStatusN1     QuestionWithAnswerLikeStatus = 1
+)
+
 // Defines values for VoteOptionType.
 const (
 	VoteOptionTypeImage VoteOptionType = "image"
@@ -69,8 +83,8 @@ type AuthResponse struct {
 	Uuid  openapi_types.UUID `json:"uuid"`
 }
 
-// Error defines model for Error.
-type Error struct {
+// CommonError defines model for CommonError.
+type CommonError struct {
 	Code    int    `json:"code"`
 	Error   string `json:"error"`
 	Message string `json:"message"`
@@ -86,6 +100,7 @@ type Exam struct {
 	// Difficulty 难度等级
 	Difficulty QuestionDifficulty `json:"difficulty"`
 	Id         openapi_types.UUID `json:"id"`
+	Public     bool               `json:"public"`
 	Questions  []struct {
 		// OrderIndex 在本测验中的顺序
 		OrderIndex *int `json:"order_index,omitempty"`
@@ -108,6 +123,9 @@ type Question struct {
 	// AnswerCount 总答题人数
 	AnswerCount *int `json:"answer_count,omitempty"`
 
+	// Answers 正确选项ID
+	Answers *[]openapi_types.UUID `json:"answers,omitempty"`
+
 	// Category 题目分类
 	Category QuestionCategory `json:"category"`
 
@@ -117,16 +135,33 @@ type Question struct {
 	CreatedBy    openapi_types.UUID `json:"created_by"`
 
 	// Difficulty 难度等级
-	Difficulty   QuestionDifficulty `json:"difficulty"`
-	Explanation  *string            `json:"explanation,omitempty"`
-	Id           openapi_types.UUID `json:"id"`
-	Languages    []string           `json:"languages"`
-	Options      []QuestionOption   `json:"options"`
-	QuestionText string             `json:"question_text"`
+	Difficulty  QuestionDifficulty `json:"difficulty"`
+	Explanation *string            `json:"explanation,omitempty"`
+	Id          openapi_types.UUID `json:"id"`
+
+	// Languages 支持的多语言列表
+	Languages []string `json:"languages"`
+
+	// LikeStatus 点赞状态，1=已点赞，-1=已点踩，0=未操作
+	LikeStatus *QuestionLikeStatus `json:"likeStatus,omitempty"`
+
+	// Likes 点赞数
+	Likes   *int             `json:"likes,omitempty"`
+	Options []QuestionOption `json:"options"`
+
+	// Public 是否公开可见
+	Public       bool   `json:"public"`
+	QuestionText string `json:"question_text"`
 
 	// QuestionType 题目类型
 	QuestionType QuestionType `json:"question_type"`
+
+	// Solved 是否已经通过了
+	Solved *bool `json:"solved,omitempty"`
 }
+
+// QuestionLikeStatus 点赞状态，1=已点赞，-1=已点踩，0=未操作
+type QuestionLikeStatus int
 
 // QuestionCategory 题目分类
 type QuestionCategory string
@@ -136,7 +171,9 @@ type QuestionDifficulty string
 
 // QuestionOption defines model for QuestionOption.
 type QuestionOption struct {
-	Id openapi_types.UUID `json:"id"`
+	// Count 选中次数
+	Count *float32           `json:"count,omitempty"`
+	Id    openapi_types.UUID `json:"id"`
 
 	// Image 选项图片URL
 	Image *string `json:"image,omitempty"`
@@ -156,10 +193,11 @@ type QuestionType string
 
 // QuestionWithAnswer defines model for QuestionWithAnswer.
 type QuestionWithAnswer struct {
-	Answer []openapi_types.UUID `json:"answer"`
-
 	// AnswerCount 总答题人数
 	AnswerCount *int `json:"answer_count,omitempty"`
+
+	// Answers 正确选项ID
+	Answers []openapi_types.UUID `json:"answers"`
 
 	// Category 题目分类
 	Category QuestionCategory `json:"category"`
@@ -170,16 +208,33 @@ type QuestionWithAnswer struct {
 	CreatedBy    openapi_types.UUID `json:"created_by"`
 
 	// Difficulty 难度等级
-	Difficulty   QuestionDifficulty `json:"difficulty"`
-	Explanation  *string            `json:"explanation,omitempty"`
-	Id           openapi_types.UUID `json:"id"`
-	Languages    []string           `json:"languages"`
-	Options      []QuestionOption   `json:"options"`
-	QuestionText string             `json:"question_text"`
+	Difficulty  QuestionDifficulty `json:"difficulty"`
+	Explanation *string            `json:"explanation,omitempty"`
+	Id          openapi_types.UUID `json:"id"`
+
+	// Languages 支持的多语言列表
+	Languages []string `json:"languages"`
+
+	// LikeStatus 点赞状态，1=已点赞，-1=已点踩，0=未操作
+	LikeStatus *QuestionWithAnswerLikeStatus `json:"likeStatus,omitempty"`
+
+	// Likes 点赞数
+	Likes   *int             `json:"likes,omitempty"`
+	Options []QuestionOption `json:"options"`
+
+	// Public 是否公开可见
+	Public       bool   `json:"public"`
+	QuestionText string `json:"question_text"`
 
 	// QuestionType 题目类型
 	QuestionType QuestionType `json:"question_type"`
+
+	// Solved 是否已经通过了
+	Solved *bool `json:"solved,omitempty"`
 }
+
+// QuestionWithAnswerLikeStatus 点赞状态，1=已点赞，-1=已点踩，0=未操作
+type QuestionWithAnswerLikeStatus int
 
 // User defines model for User.
 type User struct {
@@ -198,40 +253,73 @@ type User struct {
 
 // Vote defines model for Vote.
 type Vote struct {
-	CreatedAt    *time.Time         `json:"created_at,omitempty"`
-	CreatedBy    openapi_types.UUID `json:"created_by"`
-	Description  *string            `json:"description,omitempty"`
-	ExpiresAt    *time.Time         `json:"expires_at,omitempty"`
-	Id           openapi_types.UUID `json:"id"`
-	Options      []VoteOption       `json:"options"`
-	Title        string             `json:"title"`
-	VotesPerUser *int               `json:"votes_per_user,omitempty"`
+	// Category 题目分类
+	Category    QuestionCategory   `json:"category"`
+	CreatedAt   time.Time          `json:"created_at"`
+	CreatedBy   openapi_types.UUID `json:"created_by"`
+	Description *string            `json:"description,omitempty"`
+
+	// Expired 投票是否已过期
+	Expired   bool               `json:"expired"`
+	ExpiresAt *time.Time         `json:"expires_at,omitempty"`
+	Id        openapi_types.UUID `json:"id"`
+	Likes     *int               `json:"likes,omitempty"`
+	Options   []VoteOption       `json:"options"`
+
+	// Participants 参与投票的用户数
+	Participants *int      `json:"participants,omitempty"`
+	Public       bool      `json:"public"`
+	StartAt      time.Time `json:"start_at"`
+	Tags         *[]string `json:"tags,omitempty"`
+	Title        string    `json:"title"`
+
+	// TotalVotes 总投票数
+	TotalVotes *int `json:"total_votes,omitempty"`
+
+	// VotedOptions 当前用户已投票的选项及票数，key为选项ID
+	VotedOptions map[string]int `json:"voted_options"`
+
+	// VotesPerOption 每个选项的最大可投票数，0表示无限制
+	VotesPerOption *int `json:"votes_per_option,omitempty"`
+
+	// VotesPerUser 每个用户最多可投票数
+	VotesPerUser int `json:"votes_per_user"`
 }
 
 // VoteOption defines model for VoteOption.
 type VoteOption struct {
-	Id       openapi_types.UUID `json:"id"`
-	ImageUrl *string            `json:"image_url,omitempty"`
-	MusicUrl *string            `json:"music_url,omitempty"`
-	Text     *string            `json:"text,omitempty"`
-	Type     VoteOptionType     `json:"type"`
-	Votes    *int               `json:"votes,omitempty"`
+	// Description 选项描述
+	Description *string            `json:"description,omitempty"`
+	Id          openapi_types.UUID `json:"id"`
+
+	// ImageUrl 选项图片URL
+	ImageUrl *string `json:"image_url,omitempty"`
+
+	// MusicUrl 选项音乐URL
+	MusicUrl *string `json:"music_url,omitempty"`
+
+	// Text 选项文本
+	Text *string `json:"text,omitempty"`
+
+	// Type 选项类型（文本、图片、音乐）
+	Type  VoteOptionType `json:"type"`
+	Votes *int           `json:"votes,omitempty"`
 }
 
-// VoteOptionType defines model for VoteOption.Type.
+// VoteOptionType 选项类型（文本、图片、音乐）
 type VoteOptionType string
 
 // BadRequest defines model for BadRequest.
-type BadRequest = Error
+type BadRequest = CommonError
 
 // InternalServerError defines model for InternalServerError.
-type InternalServerError = Error
+type InternalServerError = CommonError
 
 // NotFound defines model for NotFound.
-type NotFound = Error
+type NotFound = CommonError
 
 // Unauthorized defines model for Unauthorized.
-type Unauthorized = Error
+type Unauthorized = CommonError
 
 // PostForgotPasswordJSONBody defines parameters for PostForgotPassword.
 type PostForgotPasswordJSONBody struct {
@@ -4710,13 +4798,13 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	return r
 }
 
-type BadRequestJSONResponse Error
+type BadRequestJSONResponse CommonError
 
-type InternalServerErrorJSONResponse Error
+type InternalServerErrorJSONResponse CommonError
 
-type NotFoundJSONResponse Error
+type NotFoundJSONResponse CommonError
 
-type UnauthorizedJSONResponse Error
+type UnauthorizedJSONResponse CommonError
 
 type PostForgotPasswordRequestObject struct {
 	Body *PostForgotPasswordJSONRequestBody
