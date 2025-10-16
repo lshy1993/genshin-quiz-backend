@@ -13,14 +13,14 @@ type QuestionType string
 
 const (
 	QuestionType_MultipleChoice QuestionType = "multiple_choice"
+	QuestionType_SingleChoice   QuestionType = "single_choice"
 	QuestionType_TrueFalse      QuestionType = "true_false"
-	QuestionType_FillInBlank    QuestionType = "fill_in_blank"
 )
 
 var QuestionTypeAllValues = []QuestionType{
 	QuestionType_MultipleChoice,
+	QuestionType_SingleChoice,
 	QuestionType_TrueFalse,
-	QuestionType_FillInBlank,
 }
 
 func (e *QuestionType) Scan(value interface{}) error {
@@ -37,10 +37,10 @@ func (e *QuestionType) Scan(value interface{}) error {
 	switch enumValue {
 	case "multiple_choice":
 		*e = QuestionType_MultipleChoice
+	case "single_choice":
+		*e = QuestionType_SingleChoice
 	case "true_false":
 		*e = QuestionType_TrueFalse
-	case "fill_in_blank":
-		*e = QuestionType_FillInBlank
 	default:
 		return errors.New("jet: Invalid scan value '" + enumValue + "' for QuestionType enum")
 	}

@@ -11,10 +11,10 @@ import "github.com/go-jet/jet/v2/postgres"
 
 var QuestionType = &struct {
 	MultipleChoice postgres.StringExpression
+	SingleChoice   postgres.StringExpression
 	TrueFalse      postgres.StringExpression
-	FillInBlank    postgres.StringExpression
 }{
 	MultipleChoice: postgres.NewEnumValue("multiple_choice"),
+	SingleChoice:   postgres.NewEnumValue("single_choice"),
 	TrueFalse:      postgres.NewEnumValue("true_false"),
-	FillInBlank:    postgres.NewEnumValue("fill_in_blank"),
 }

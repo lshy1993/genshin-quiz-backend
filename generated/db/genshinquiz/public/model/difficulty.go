@@ -9,21 +9,21 @@ package model
 
 import "errors"
 
-type QuizDifficulty string
+type Difficulty string
 
 const (
-	QuizDifficulty_Easy   QuizDifficulty = "easy"
-	QuizDifficulty_Medium QuizDifficulty = "medium"
-	QuizDifficulty_Hard   QuizDifficulty = "hard"
+	Difficulty_Easy   Difficulty = "easy"
+	Difficulty_Medium Difficulty = "medium"
+	Difficulty_Hard   Difficulty = "hard"
 )
 
-var QuizDifficultyAllValues = []QuizDifficulty{
-	QuizDifficulty_Easy,
-	QuizDifficulty_Medium,
-	QuizDifficulty_Hard,
+var DifficultyAllValues = []Difficulty{
+	Difficulty_Easy,
+	Difficulty_Medium,
+	Difficulty_Hard,
 }
 
-func (e *QuizDifficulty) Scan(value interface{}) error {
+func (e *Difficulty) Scan(value interface{}) error {
 	var enumValue string
 	switch val := value.(type) {
 	case string:
@@ -36,18 +36,18 @@ func (e *QuizDifficulty) Scan(value interface{}) error {
 
 	switch enumValue {
 	case "easy":
-		*e = QuizDifficulty_Easy
+		*e = Difficulty_Easy
 	case "medium":
-		*e = QuizDifficulty_Medium
+		*e = Difficulty_Medium
 	case "hard":
-		*e = QuizDifficulty_Hard
+		*e = Difficulty_Hard
 	default:
-		return errors.New("jet: Invalid scan value '" + enumValue + "' for QuizDifficulty enum")
+		return errors.New("jet: Invalid scan value '" + enumValue + "' for Difficulty enum")
 	}
 
 	return nil
 }
 
-func (e QuizDifficulty) String() string {
+func (e Difficulty) String() string {
 	return string(e)
 }

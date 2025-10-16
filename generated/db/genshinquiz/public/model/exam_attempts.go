@@ -12,16 +12,13 @@ import (
 	"time"
 )
 
-type Users struct {
+type ExamAttempts struct {
 	ID          int64 `sql:"primary_key"`
-	UserUUID    uuid.UUID
-	Email       string
-	DisplayName *string
-	AvatarURL   *string
-	Location    *string
-	Timezone    *string
-	Language    *string
-	ShowEmail   *bool
+	AttemptUUID uuid.UUID
+	ExamID      int64
+	UserID      int64
+	TimeTaken   int32
+	TotalScore  int32
+	MaxScore    int32
 	CreatedAt   time.Time
-	UpdatedAt   time.Time
 }

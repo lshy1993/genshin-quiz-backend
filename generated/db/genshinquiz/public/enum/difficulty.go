@@ -9,7 +9,7 @@ package enum
 
 import "github.com/go-jet/jet/v2/postgres"
 
-var QuizDifficulty = &struct {
+var Difficulty = &struct {
 	Easy   postgres.StringExpression
 	Medium postgres.StringExpression
 	Hard   postgres.StringExpression

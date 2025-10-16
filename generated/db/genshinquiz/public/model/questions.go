@@ -8,19 +8,21 @@
 package model
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
 type Questions struct {
-	ID            int64 `sql:"primary_key"`
-	QuizID        int64
-	QuestionText  string
-	QuestionType  QuestionType
-	Options       *string
-	CorrectAnswer string
-	Explanation   *string
-	Points        int32
-	OrderIndex    int32
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	ID           int64 `sql:"primary_key"`
+	QuestionUUID uuid.UUID
+	Public       bool
+	QuestionType QuestionType
+	Category     Category
+	Difficulty   Difficulty
+	IsPublished  bool
+	PublishedAt  *time.Time
+	CreatedAt    time.Time
+	SubmitCount  int64
+	CorrectCount int64
+	Likes        int64
 }

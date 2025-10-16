@@ -17,15 +17,17 @@ type usersTable struct {
 	postgres.Table
 
 	// Columns
-	ID               postgres.ColumnInteger
-	Username         postgres.ColumnString
-	Email            postgres.ColumnString
-	DisplayName      postgres.ColumnString
-	AvatarURL        postgres.ColumnString
-	TotalScore       postgres.ColumnInteger
-	QuizzesCompleted postgres.ColumnInteger
-	CreatedAt        postgres.ColumnTimestampz
-	UpdatedAt        postgres.ColumnTimestampz
+	ID          postgres.ColumnInteger
+	UserUUID    postgres.ColumnString
+	Email       postgres.ColumnString
+	DisplayName postgres.ColumnString
+	AvatarURL   postgres.ColumnString
+	Location    postgres.ColumnString
+	Timezone    postgres.ColumnString
+	Language    postgres.ColumnString
+	ShowEmail   postgres.ColumnBool
+	CreatedAt   postgres.ColumnTimestampz
+	UpdatedAt   postgres.ColumnTimestampz
 
 	AllColumns     postgres.ColumnList
 	MutableColumns postgres.ColumnList
@@ -67,33 +69,37 @@ func newUsersTable(schemaName, tableName, alias string) *UsersTable {
 
 func newUsersTableImpl(schemaName, tableName, alias string) usersTable {
 	var (
-		IDColumn               = postgres.IntegerColumn("id")
-		UsernameColumn         = postgres.StringColumn("username")
-		EmailColumn            = postgres.StringColumn("email")
-		DisplayNameColumn      = postgres.StringColumn("display_name")
-		AvatarURLColumn        = postgres.StringColumn("avatar_url")
-		TotalScoreColumn       = postgres.IntegerColumn("total_score")
-		QuizzesCompletedColumn = postgres.IntegerColumn("quizzes_completed")
-		CreatedAtColumn        = postgres.TimestampzColumn("created_at")
-		UpdatedAtColumn        = postgres.TimestampzColumn("updated_at")
-		allColumns             = postgres.ColumnList{IDColumn, UsernameColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, TotalScoreColumn, QuizzesCompletedColumn, CreatedAtColumn, UpdatedAtColumn}
-		mutableColumns         = postgres.ColumnList{UsernameColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, TotalScoreColumn, QuizzesCompletedColumn, CreatedAtColumn, UpdatedAtColumn}
-		defaultColumns         = postgres.ColumnList{IDColumn, TotalScoreColumn, QuizzesCompletedColumn, CreatedAtColumn, UpdatedAtColumn}
+		IDColumn          = postgres.IntegerColumn("id")
+		UserUUIDColumn    = postgres.StringColumn("user_uuid")
+		EmailColumn       = postgres.StringColumn("email")
+		DisplayNameColumn = postgres.StringColumn("display_name")
+		AvatarURLColumn   = postgres.StringColumn("avatar_url")
+		LocationColumn    = postgres.StringColumn("location")
+		TimezoneColumn    = postgres.StringColumn("timezone")
+		LanguageColumn    = postgres.StringColumn("language")
+		ShowEmailColumn   = postgres.BoolColumn("show_email")
+		CreatedAtColumn   = postgres.TimestampzColumn("created_at")
+		UpdatedAtColumn   = postgres.TimestampzColumn("updated_at")
+		allColumns        = postgres.ColumnList{IDColumn, UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, LocationColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn}
+		mutableColumns    = postgres.ColumnList{UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, LocationColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn}
+		defaultColumns    = postgres.ColumnList{IDColumn, UserUUIDColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn}
 	)
 
 	return usersTable{
 		Table: postgres.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:               IDColumn,
-		Username:         UsernameColumn,
-		Email:            EmailColumn,
-		DisplayName:      DisplayNameColumn,
-		AvatarURL:        AvatarURLColumn,
-		TotalScore:       TotalScoreColumn,
-		QuizzesCompleted: QuizzesCompletedColumn,
-		CreatedAt:        CreatedAtColumn,
-		UpdatedAt:        UpdatedAtColumn,
+		ID:          IDColumn,
+		UserUUID:    UserUUIDColumn,
+		Email:       EmailColumn,
+		DisplayName: DisplayNameColumn,
+		AvatarURL:   AvatarURLColumn,
+		Location:    LocationColumn,
+		Timezone:    TimezoneColumn,
+		Language:    LanguageColumn,
+		ShowEmail:   ShowEmailColumn,
+		CreatedAt:   CreatedAtColumn,
+		UpdatedAt:   UpdatedAtColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

@@ -17,17 +17,18 @@ type questionsTable struct {
 	postgres.Table
 
 	// Columns
-	ID            postgres.ColumnInteger
-	QuizID        postgres.ColumnInteger
-	QuestionText  postgres.ColumnString
-	QuestionType  postgres.ColumnString
-	Options       postgres.ColumnString
-	CorrectAnswer postgres.ColumnString
-	Explanation   postgres.ColumnString
-	Points        postgres.ColumnInteger
-	OrderIndex    postgres.ColumnInteger
-	CreatedAt     postgres.ColumnTimestampz
-	UpdatedAt     postgres.ColumnTimestampz
+	ID           postgres.ColumnInteger
+	QuestionUUID postgres.ColumnString
+	Public       postgres.ColumnBool
+	QuestionType postgres.ColumnString
+	Category     postgres.ColumnString
+	Difficulty   postgres.ColumnString
+	IsPublished  postgres.ColumnBool
+	PublishedAt  postgres.ColumnTimestampz
+	CreatedAt    postgres.ColumnTimestampz
+	SubmitCount  postgres.ColumnInteger
+	CorrectCount postgres.ColumnInteger
+	Likes        postgres.ColumnInteger
 
 	AllColumns     postgres.ColumnList
 	MutableColumns postgres.ColumnList
@@ -69,37 +70,39 @@ func newQuestionsTable(schemaName, tableName, alias string) *QuestionsTable {
 
 func newQuestionsTableImpl(schemaName, tableName, alias string) questionsTable {
 	var (
-		IDColumn            = postgres.IntegerColumn("id")
-		QuizIDColumn        = postgres.IntegerColumn("quiz_id")
-		QuestionTextColumn  = postgres.StringColumn("question_text")
-		QuestionTypeColumn  = postgres.StringColumn("question_type")
-		OptionsColumn       = postgres.StringColumn("options")
-		CorrectAnswerColumn = postgres.StringColumn("correct_answer")
-		ExplanationColumn   = postgres.StringColumn("explanation")
-		PointsColumn        = postgres.IntegerColumn("points")
-		OrderIndexColumn    = postgres.IntegerColumn("order_index")
-		CreatedAtColumn     = postgres.TimestampzColumn("created_at")
-		UpdatedAtColumn     = postgres.TimestampzColumn("updated_at")
-		allColumns          = postgres.ColumnList{IDColumn, QuizIDColumn, QuestionTextColumn, QuestionTypeColumn, OptionsColumn, CorrectAnswerColumn, ExplanationColumn, PointsColumn, OrderIndexColumn, CreatedAtColumn, UpdatedAtColumn}
-		mutableColumns      = postgres.ColumnList{QuizIDColumn, QuestionTextColumn, QuestionTypeColumn, OptionsColumn, CorrectAnswerColumn, ExplanationColumn, PointsColumn, OrderIndexColumn, CreatedAtColumn, UpdatedAtColumn}
-		defaultColumns      = postgres.ColumnList{IDColumn, PointsColumn, CreatedAtColumn, UpdatedAtColumn}
+		IDColumn           = postgres.IntegerColumn("id")
+		QuestionUUIDColumn = postgres.StringColumn("question_uuid")
+		PublicColumn       = postgres.BoolColumn("public")
+		QuestionTypeColumn = postgres.StringColumn("question_type")
+		CategoryColumn     = postgres.StringColumn("category")
+		DifficultyColumn   = postgres.StringColumn("difficulty")
+		IsPublishedColumn  = postgres.BoolColumn("is_published")
+		PublishedAtColumn  = postgres.TimestampzColumn("published_at")
+		CreatedAtColumn    = postgres.TimestampzColumn("created_at")
+		SubmitCountColumn  = postgres.IntegerColumn("submit_count")
+		CorrectCountColumn = postgres.IntegerColumn("correct_count")
+		LikesColumn        = postgres.IntegerColumn("likes")
+		allColumns         = postgres.ColumnList{IDColumn, QuestionUUIDColumn, PublicColumn, QuestionTypeColumn, CategoryColumn, DifficultyColumn, IsPublishedColumn, PublishedAtColumn, CreatedAtColumn, SubmitCountColumn, CorrectCountColumn, LikesColumn}
+		mutableColumns     = postgres.ColumnList{QuestionUUIDColumn, PublicColumn, QuestionTypeColumn, CategoryColumn, DifficultyColumn, IsPublishedColumn, PublishedAtColumn, CreatedAtColumn, SubmitCountColumn, CorrectCountColumn, LikesColumn}
+		defaultColumns     = postgres.ColumnList{IDColumn, QuestionUUIDColumn, PublicColumn, IsPublishedColumn, CreatedAtColumn, SubmitCountColumn, CorrectCountColumn, LikesColumn}
 	)
 
 	return questionsTable{
 		Table: postgres.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:            IDColumn,
-		QuizID:        QuizIDColumn,
-		QuestionText:  QuestionTextColumn,
-		QuestionType:  QuestionTypeColumn,
-		Options:       OptionsColumn,
-		CorrectAnswer: CorrectAnswerColumn,
-		Explanation:   ExplanationColumn,
-		Points:        PointsColumn,
-		OrderIndex:    OrderIndexColumn,
-		CreatedAt:     CreatedAtColumn,
-		UpdatedAt:     UpdatedAtColumn,
+		ID:           IDColumn,
+		QuestionUUID: QuestionUUIDColumn,
+		Public:       PublicColumn,
+		QuestionType: QuestionTypeColumn,
+		Category:     CategoryColumn,
+		Difficulty:   DifficultyColumn,
+		IsPublished:  IsPublishedColumn,
+		PublishedAt:  PublishedAtColumn,
+		CreatedAt:    CreatedAtColumn,
+		SubmitCount:  SubmitCountColumn,
+		CorrectCount: CorrectCountColumn,
+		Likes:        LikesColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

@@ -11,12 +11,11 @@ import (
 	"time"
 )
 
-type UserAnswers struct {
-	ID           int64 `sql:"primary_key"`
-	AttemptID    int64
-	QuestionID   int64
-	UserAnswer   string
-	IsCorrect    bool
-	PointsEarned int32
-	AnsweredAt   time.Time
+type ExamQuestions struct {
+	ID            int64 `sql:"primary_key"`
+	ExamID        int64
+	QuestionID    int64
+	QuestionOrder int32
+	Points        int32
+	CreatedAt     time.Time
 }

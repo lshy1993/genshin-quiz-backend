@@ -11,13 +11,12 @@ import (
 	"time"
 )
 
-type QuizAttempts struct {
+type ExamTranslations struct {
 	ID          int64 `sql:"primary_key"`
-	UserID      int64
-	QuizID      int64
-	Score       int32
-	MaxScore    int32
-	TimeTaken   *int32
-	CompletedAt time.Time
+	ExamID      int64
+	Language    string
+	Title       string
+	Description *string
 	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
