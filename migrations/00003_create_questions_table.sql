@@ -33,13 +33,15 @@ CREATE TABLE IF NOT EXISTS question_options (
     id BIGSERIAL PRIMARY KEY,
     question_id BIGINT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
     option_type question_option_type NOT NULL DEFAULT 'text',
-    option_text TEXT NOT NULL,
     img_url TEXT, -- optional image URL
     is_answer BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        -- 快速读取用的冗余统计（可选）
+    selected_count BIGINT NOT NULL DEFAULT 0,
+    likes BIGINT NOT NULL DEFAULT 0
 );
 
+-- Create question translations table
 CREATE TABLE question_translations(
     id BIGSERIAL PRIMARY KEY,
     question_id BIGINT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
@@ -52,6 +54,17 @@ CREATE TABLE question_translations(
     UNIQUE(question_id, language)
 )
 
+-- Create question option translations table
+CREATE TABLE option_translations (
+    id BIGSERIAL PRIMARY KEY,
+    option_id BIGINT NOT NULL REFERENCES question_options(id) ON DELETE CASCADE,
+    language VARCHAR(10) NOT NULL,
+    option_text TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(option_id, language)
+);
+
 -- Create question submissions table to track user question solve attempts
 CREATE TABLE question_submissions (
     id BIGSERIAL PRIMARY KEY,
@@ -62,6 +75,18 @@ CREATE TABLE question_submissions (
     time_taken INTEGER, -- seconds
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE question_likes (
+  id BIGSERIAL PRIMARY KEY,
+  question_id BIGINT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+  user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  value SMALLINT NOT NULL, -- 1 = like, -1 = dislike
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(question_id, user_id)
+);
+CREATE INDEX idx_qlikes_question ON question_likes(question_id);
+
+
 
 -- Create indexes for better performance
 CREATE INDEX idx_quizzes_category ON quizzes(category);
