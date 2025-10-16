@@ -79,8 +79,8 @@ const (
 // AuthResponse defines model for AuthResponse.
 type AuthResponse struct {
 	// Token JWT token
-	Token string             `json:"token"`
-	Uuid  openapi_types.UUID `json:"uuid"`
+	Token string `json:"token"`
+	User  User   `json:"user"`
 }
 
 // CommonError defines model for CommonError.

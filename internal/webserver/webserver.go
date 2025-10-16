@@ -12,7 +12,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 
-	// "github.com/go-chi/jwtauth/v5" // 暂时注释掉，测试时不需要
 	"go.uber.org/zap"
 
 	"genshin-quiz/config"
@@ -63,7 +62,9 @@ func NewServer(app *config.App) *Server {
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			_, err := w.Write([]byte(`{"status":"ok","timestamp":"` + time.Now().Format(time.RFC3339) + `"}`))
+			_, err := w.Write(
+				[]byte(`{"status":"ok","timestamp":"` + time.Now().Format(time.RFC3339) + `"}`),
+			)
 			if err != nil {
 				app.Logger.Error("Failed to write health check response", zap.Error(err))
 			}

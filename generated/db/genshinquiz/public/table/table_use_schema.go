@@ -23,6 +23,7 @@ func UseSchema(schema string) {
 	QuestionSubmissions = QuestionSubmissions.FromSchema(schema)
 	QuestionTranslations = QuestionTranslations.FromSchema(schema)
 	Questions = Questions.FromSchema(schema)
+	UserLoginLogs = UserLoginLogs.FromSchema(schema)
 	UserPasswords = UserPasswords.FromSchema(schema)
 	UserVotes = UserVotes.FromSchema(schema)
 	Users = Users.FromSchema(schema)

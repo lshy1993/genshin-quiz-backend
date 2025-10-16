@@ -71,6 +71,8 @@ type ServerConfig struct {
 	WriteTimeout time.Duration
 }
 
+const PROD = "production"
+
 func getEnv(key, defaultValue string) string {
 	value := os.Getenv(key)
 	if value == "" {
@@ -101,7 +103,7 @@ func getEnvAsDuration(key string, defaultValue string) time.Duration {
 func (app *App) initializeLogger() (*zap.Logger, error) {
 	var config zap.Config
 
-	if app.Config.Environment == "production" {
+	if app.Config.Environment == PROD {
 		config = zap.NewProductionConfig()
 		config.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
 		// 生产环境不使用彩色输出
@@ -117,7 +119,7 @@ func (app *App) initializeLogger() (*zap.Logger, error) {
 	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 
 	// 设置更友好的时间格式和颜色编码
-	if app.Config.Environment != "production" {
+	if app.Config.Environment != PROD {
 		config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("15:04:05.000")
 		// 使用短路径显示 caller 信息
 		config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
@@ -191,7 +193,7 @@ func (app *App) initializeSentry() error {
 		Debug:            app.Config.Environment == "development",
 		SampleRate:       1.0, // 在生产环境中可能需要调整采样率
 		TracesSampleRate: 1.0, // 可选，开启 tracing
-		EnableTracing:    app.Config.Environment == "production",
+		EnableTracing:    app.Config.Environment == PROD,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to initialize Sentry: %w", err)
@@ -207,8 +209,11 @@ func (app *App) initializeSentry() error {
 func NewApp() *App {
 	app := &App{
 		Config: AppConfig{
-			Port:        getEnv("PORT", "8080"),
-			DatabaseURL: getEnv("DATABASE_URL", "postgres://user:password@localhost/genshin_quiz?sslmode=disable"),
+			Port: getEnv("PORT", "8080"),
+			DatabaseURL: getEnv(
+				"DATABASE_URL",
+				"postgres://user:password@localhost/genshin_quiz?sslmode=disable",
+			),
 			JWTSecret:   getEnv("JWT_SECRET", "your-secret-key"),
 			Environment: getEnv("ENVIRONMENT", "development"),
 			Version:     getEnv("VERSION", "dev"),

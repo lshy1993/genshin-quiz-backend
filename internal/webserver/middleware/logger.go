@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// HTTP状态码颜色映射
+// HTTP状态码颜色映射.
 func getStatusColor(status int) string {
 	switch {
 	case status >= 200 && status < 300:
@@ -25,7 +25,7 @@ func getStatusColor(status int) string {
 	}
 }
 
-// HTTP方法颜色映射
+// HTTP方法颜色映射.
 func getMethodColor(method string) string {
 	switch method {
 	case "GET":
@@ -47,7 +47,7 @@ func getMethodColor(method string) string {
 
 const resetColor = "\033[0m"
 
-// formatHTTPRequest 创建带颜色的HTTP请求日志消息
+// formatHTTPRequest 创建带颜色的HTTP请求日志消息.
 func formatHTTPRequest(method, url string, status int, duration time.Duration) string {
 	methodColor := getMethodColor(method)
 	statusColor := getStatusColor(status)

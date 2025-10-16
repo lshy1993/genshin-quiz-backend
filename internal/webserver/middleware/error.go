@@ -42,7 +42,13 @@ func Handler(logger *zap.Logger) func(next http.Handler) http.Handler {
 						zap.String("request_id", r.Header.Get("X-Request-ID")),
 					)
 
-					writeErrorResponse(w, http.StatusInternalServerError, "Internal server error", "", "")
+					writeErrorResponse(
+						w,
+						http.StatusInternalServerError,
+						"Internal server error",
+						"",
+						"",
+					)
 				}
 			}()
 
@@ -74,7 +80,9 @@ func writeErrorResponse(w http.ResponseWriter, statusCode int, message, code, de
 	}
 }
 
-func HandleBadRequestError(app *config.App) func(w http.ResponseWriter, r *http.Request, err error) {
+func HandleBadRequestError(
+	app *config.App,
+) func(w http.ResponseWriter, r *http.Request, err error) {
 	return func(w http.ResponseWriter, r *http.Request, err error) {
 		app.Logger.Error("Bad request error",
 			zap.String("method", r.Method),
@@ -87,7 +95,9 @@ func HandleBadRequestError(app *config.App) func(w http.ResponseWriter, r *http.
 	}
 }
 
-func HandleResponseErrorWithLog(app *config.App) func(w http.ResponseWriter, r *http.Request, err error) {
+func HandleResponseErrorWithLog(
+	app *config.App,
+) func(w http.ResponseWriter, r *http.Request, err error) {
 	return func(w http.ResponseWriter, r *http.Request, err error) {
 		// 手动捕获错误到Sentry (如果已初始化)
 		sentry.WithScope(func(scope *sentry.Scope) {
@@ -109,6 +119,12 @@ func HandleResponseErrorWithLog(app *config.App) func(w http.ResponseWriter, r *
 			zap.String("request_id", r.Header.Get("X-Request-ID")),
 		)
 
-		writeErrorResponse(w, http.StatusInternalServerError, "Internal server error", "INTERNAL_ERROR", err.Error())
+		writeErrorResponse(
+			w,
+			http.StatusInternalServerError,
+			"Internal server error",
+			"INTERNAL_ERROR",
+			err.Error(),
+		)
 	}
 }
