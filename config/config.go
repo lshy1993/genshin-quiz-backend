@@ -125,7 +125,7 @@ func (app *App) initializeLogger() (*zap.Logger, error) {
 		config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 	}
 
-	logger, _ := config.Build()
+	logger, _ := config.Build(zap.AddStacktrace(zapcore.ErrorLevel))
 	// Set up defer immediately after logger is created
 	defer func() {
 		err := logger.Sync()

@@ -9,6 +9,10 @@ import (
 	"genshin-quiz/internal/transformer"
 	"time"
 
+	api_error "genshin-quiz/internal/errors"
+
+	"github.com/go-errors/errors"
+	"github.com/go-jet/jet/v2/qrm"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -20,18 +24,42 @@ func RegisterUser(
 	email := req.Body.Email
 	pwd := req.Body.Password
 
-	// 先创建profile
-	res, err := user_repo.Insert(ctx, app.DB, string(email))
+	// 检测用户是否存在
+	user, err := user_repo.GetUserByEmail(ctx, app.DB, string(email))
 	if err != nil {
 		return nil, err
 	}
-	// 创建用户密码
-	err = user_repo.InsertAuth(ctx, app.DB, res.ID, pwd)
+	if user != nil {
+		return nil, api_error.ErrUserAlreadyExists
+	}
+
+	// 创建用户
+	tx, err := app.DB.BeginTx(ctx, nil)
 	if err != nil {
+		return nil, errors.WrapPrefix(err, "failed to begin transaction", 0)
+	}
+	res, err := user_repo.InsertUser(ctx, tx, string(email))
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	err = user_repo.InsertUserAuth(ctx, tx, res.ID, pwd)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	response, err := realLogin(ctx, tx, app.Config.JWTSecret, res)
+	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
-	return realLogin(ctx, app, res)
+	err = tx.Commit()
+	if err != nil {
+		return nil, errors.WrapPrefix(err, "failed to commit transaction", 0)
+	}
+
+	return response, nil
 }
 
 func LoginUser(
@@ -41,18 +69,27 @@ func LoginUser(
 ) (*oapi.AuthResponse, error) {
 	email := req.Body.Email
 	pwd := req.Body.Password
-	// 验证密码
-	res, err := user_repo.GetUserByEmailAndPassword(ctx, app.DB, string(email), pwd)
+
+	// 检测用户是否存在
+	user, err := user_repo.GetUserByEmail(ctx, app.DB, string(email))
 	if err != nil {
 		return nil, err
 	}
+
+	// 验证密码
+	err = user_repo.CheckPassword(ctx, app.DB, user.ID, pwd)
+	if err != nil {
+		return nil, err
+	}
+
 	// 登录流程
-	return realLogin(ctx, app, res)
+	return realLogin(ctx, app.DB, app.Config.JWTSecret, user)
 }
 
 func realLogin(
 	ctx context.Context,
-	app *config.App,
+	db qrm.DB,
+	JWTSecret string,
 	res *model.Users,
 ) (*oapi.AuthResponse, error) {
 	// 生成 JWT
@@ -61,14 +98,14 @@ func realLogin(
 		"email":   res.Email,
 		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 	})
-	tokenString, err := token.SignedString([]byte(app.Config.JWTSecret))
+	tokenString, err := token.SignedString([]byte(JWTSecret))
 	if err != nil {
 		return nil, err
 	}
 
 	// 写登录日志
 	ip := ""
-	loginInfo, err := user_repo.InsertLoginLog(ctx, app.DB, res.ID, ip)
+	loginInfo, err := user_repo.InsertLoginLog(ctx, db, res.ID, ip)
 	if err != nil {
 		return nil, err
 	}
