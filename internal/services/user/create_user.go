@@ -69,7 +69,7 @@ func LoginUser(
 ) (*oapi.AuthResponse, error) {
 	email := req.Body.Email
 	pwd := req.Body.Password
-
+	ip, _ := ctx.Value("real_ip").(string)
 	// 检测用户是否存在
 	user, err := user_repo.GetUserByEmail(ctx, app.DB, string(email))
 	if err != nil {
@@ -83,7 +83,7 @@ func LoginUser(
 	}
 
 	// 登录流程
-	return realLogin(ctx, app.DB, app.Config.JWTSecret, user)
+	return realLogin(ctx, app.DB, app.Config.JWTSecret, user, ip)
 }
 
 func realLogin(
@@ -91,6 +91,7 @@ func realLogin(
 	db qrm.DB,
 	JWTSecret string,
 	res *model.Users,
+	ip string,
 ) (*oapi.AuthResponse, error) {
 	// 生成 JWT
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -104,7 +105,7 @@ func realLogin(
 	}
 
 	// 写登录日志
-	ip := ""
+
 	loginInfo, err := user_repo.InsertLoginLog(ctx, db, res.ID, ip)
 	if err != nil {
 		return nil, err
