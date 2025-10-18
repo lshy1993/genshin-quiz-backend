@@ -25,6 +25,7 @@ type questionsTable struct {
 	Difficulty   postgres.ColumnString
 	IsPublished  postgres.ColumnBool
 	PublishedAt  postgres.ColumnTimestampz
+	CreatedBy    postgres.ColumnInteger
 	CreatedAt    postgres.ColumnTimestampz
 	SubmitCount  postgres.ColumnInteger
 	CorrectCount postgres.ColumnInteger
@@ -78,12 +79,13 @@ func newQuestionsTableImpl(schemaName, tableName, alias string) questionsTable {
 		DifficultyColumn   = postgres.StringColumn("difficulty")
 		IsPublishedColumn  = postgres.BoolColumn("is_published")
 		PublishedAtColumn  = postgres.TimestampzColumn("published_at")
+		CreatedByColumn    = postgres.IntegerColumn("created_by")
 		CreatedAtColumn    = postgres.TimestampzColumn("created_at")
 		SubmitCountColumn  = postgres.IntegerColumn("submit_count")
 		CorrectCountColumn = postgres.IntegerColumn("correct_count")
 		LikesColumn        = postgres.IntegerColumn("likes")
-		allColumns         = postgres.ColumnList{IDColumn, QuestionUUIDColumn, PublicColumn, QuestionTypeColumn, CategoryColumn, DifficultyColumn, IsPublishedColumn, PublishedAtColumn, CreatedAtColumn, SubmitCountColumn, CorrectCountColumn, LikesColumn}
-		mutableColumns     = postgres.ColumnList{QuestionUUIDColumn, PublicColumn, QuestionTypeColumn, CategoryColumn, DifficultyColumn, IsPublishedColumn, PublishedAtColumn, CreatedAtColumn, SubmitCountColumn, CorrectCountColumn, LikesColumn}
+		allColumns         = postgres.ColumnList{IDColumn, QuestionUUIDColumn, PublicColumn, QuestionTypeColumn, CategoryColumn, DifficultyColumn, IsPublishedColumn, PublishedAtColumn, CreatedByColumn, CreatedAtColumn, SubmitCountColumn, CorrectCountColumn, LikesColumn}
+		mutableColumns     = postgres.ColumnList{QuestionUUIDColumn, PublicColumn, QuestionTypeColumn, CategoryColumn, DifficultyColumn, IsPublishedColumn, PublishedAtColumn, CreatedByColumn, CreatedAtColumn, SubmitCountColumn, CorrectCountColumn, LikesColumn}
 		defaultColumns     = postgres.ColumnList{IDColumn, QuestionUUIDColumn, PublicColumn, IsPublishedColumn, CreatedAtColumn, SubmitCountColumn, CorrectCountColumn, LikesColumn}
 	)
 
@@ -99,6 +101,7 @@ func newQuestionsTableImpl(schemaName, tableName, alias string) questionsTable {
 		Difficulty:   DifficultyColumn,
 		IsPublished:  IsPublishedColumn,
 		PublishedAt:  PublishedAtColumn,
+		CreatedBy:    CreatedByColumn,
 		CreatedAt:    CreatedAtColumn,
 		SubmitCount:  SubmitCountColumn,
 		CorrectCount: CorrectCountColumn,

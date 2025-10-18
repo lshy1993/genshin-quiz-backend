@@ -21,6 +21,7 @@ CREATE TABLE questions (
     difficulty difficulty NOT NULL,
     is_published BOOLEAN NOT NULL DEFAULT FALSE,
     published_at TIMESTAMPTZ,
+    created_by BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     -- 快速读取用的冗余统计（可选）
     submit_count BIGINT NOT NULL DEFAULT 0,
@@ -35,7 +36,7 @@ CREATE TABLE question_options (
     question_id BIGINT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
     option_type question_option_type NOT NULL DEFAULT 'text',
     img_url TEXT, -- optional image URL
-    is_answered BOOLEAN NOT NULL DEFAULT FALSE,
+    is_answer BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
         -- 快速读取用的冗余统计（可选）
     selected_count BIGINT NOT NULL DEFAULT 0

@@ -76,6 +76,13 @@ const (
 	VoteOptionTypeText  VoteOptionType = "text"
 )
 
+// Defines values for GetVotesParamsType.
+const (
+	All       GetVotesParamsType = "all"
+	Available GetVotesParamsType = "available"
+	Expired   GetVotesParamsType = "expired"
+)
+
 // AuthResponse defines model for AuthResponse.
 type AuthResponse struct {
 	// Token JWT token
@@ -340,20 +347,25 @@ type PostRegisterUserJSONBody struct {
 
 // GetExamsParams defines parameters for GetExams.
 type GetExamsParams struct {
-	Ids        *[]openapi_types.UUID `form:"ids,omitempty" json:"ids,omitempty"`
-	Limit      *int                  `form:"limit,omitempty" json:"limit,omitempty"`
-	Offset     *int                  `form:"offset,omitempty" json:"offset,omitempty"`
-	Category   *QuestionCategory     `form:"category,omitempty" json:"category,omitempty"`
-	Difficulty *QuestionDifficulty   `form:"difficulty,omitempty" json:"difficulty,omitempty"`
+	Page       *int                `form:"page,omitempty" json:"page,omitempty"`
+	Limit      *int                `form:"limit,omitempty" json:"limit,omitempty"`
+	Category   *QuestionCategory   `form:"category,omitempty" json:"category,omitempty"`
+	Difficulty *QuestionDifficulty `form:"difficulty,omitempty" json:"difficulty,omitempty"`
+	Query      *string             `form:"query,omitempty" json:"query,omitempty"`
+	SortBy     *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+	SortDesc   *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
 }
 
 // GetQuestionsParams defines parameters for GetQuestions.
 type GetQuestionsParams struct {
-	Ids        *[]openapi_types.UUID `form:"ids,omitempty" json:"ids,omitempty"`
-	Limit      *int                  `form:"limit,omitempty" json:"limit,omitempty"`
-	Offset     *int                  `form:"offset,omitempty" json:"offset,omitempty"`
-	Category   *QuestionCategory     `form:"category,omitempty" json:"category,omitempty"`
-	Difficulty *QuestionDifficulty   `form:"difficulty,omitempty" json:"difficulty,omitempty"`
+	Page       *int                `form:"page,omitempty" json:"page,omitempty"`
+	Limit      *int                `form:"limit,omitempty" json:"limit,omitempty"`
+	Category   *QuestionCategory   `form:"category,omitempty" json:"category,omitempty"`
+	Difficulty *QuestionDifficulty `form:"difficulty,omitempty" json:"difficulty,omitempty"`
+	Query      *string             `form:"query,omitempty" json:"query,omitempty"`
+	Language   *[]string           `form:"language,omitempty" json:"language,omitempty"`
+	SortBy     *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+	SortDesc   *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
 }
 
 // GetUsersParams defines parameters for GetUsers.
@@ -365,9 +377,16 @@ type GetUsersParams struct {
 
 // GetVotesParams defines parameters for GetVotes.
 type GetVotesParams struct {
-	Limit  *int `form:"limit,omitempty" json:"limit,omitempty"`
-	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+	Page     *int                `form:"page,omitempty" json:"page,omitempty"`
+	Limit    *int                `form:"limit,omitempty" json:"limit,omitempty"`
+	Type     *GetVotesParamsType `form:"type,omitempty" json:"type,omitempty"`
+	Query    *string             `form:"query,omitempty" json:"query,omitempty"`
+	SortBy   *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+	SortDesc *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
 }
+
+// GetVotesParamsType defines parameters for GetVotes.
+type GetVotesParamsType string
 
 // PostVoteJSONBody defines parameters for PostVote.
 type PostVoteJSONBody struct {
@@ -1077,9 +1096,9 @@ func NewGetExamsRequest(server string, params *GetExamsParams) (*http.Request, e
 	if params != nil {
 		queryValues := queryURL.Query()
 
-		if params.Ids != nil {
+		if params.Page != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -1096,22 +1115,6 @@ func NewGetExamsRequest(server string, params *GetExamsParams) (*http.Request, e
 		if params.Limit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Offset != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -1144,6 +1147,54 @@ func NewGetExamsRequest(server string, params *GetExamsParams) (*http.Request, e
 		if params.Difficulty != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "difficulty", runtime.ParamLocationQuery, *params.Difficulty); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Query != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "query", runtime.ParamLocationQuery, *params.Query); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortBy", runtime.ParamLocationQuery, *params.SortBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortDesc != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortDesc", runtime.ParamLocationQuery, *params.SortDesc); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -1345,9 +1396,9 @@ func NewGetQuestionsRequest(server string, params *GetQuestionsParams) (*http.Re
 	if params != nil {
 		queryValues := queryURL.Query()
 
-		if params.Ids != nil {
+		if params.Page != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -1364,22 +1415,6 @@ func NewGetQuestionsRequest(server string, params *GetQuestionsParams) (*http.Re
 		if params.Limit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Offset != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -1412,6 +1447,70 @@ func NewGetQuestionsRequest(server string, params *GetQuestionsParams) (*http.Re
 		if params.Difficulty != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "difficulty", runtime.ParamLocationQuery, *params.Difficulty); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Query != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "query", runtime.ParamLocationQuery, *params.Query); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Language != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "language", runtime.ParamLocationQuery, *params.Language); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortBy", runtime.ParamLocationQuery, *params.SortBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortDesc != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortDesc", runtime.ParamLocationQuery, *params.SortDesc); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -1809,6 +1908,22 @@ func NewGetVotesRequest(server string, params *GetVotesParams) (*http.Request, e
 	if params != nil {
 		queryValues := queryURL.Query()
 
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.Limit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
@@ -1825,9 +1940,57 @@ func NewGetVotesRequest(server string, params *GetVotesParams) (*http.Request, e
 
 		}
 
-		if params.Offset != nil {
+		if params.Type != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "type", runtime.ParamLocationQuery, *params.Type); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Query != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "query", runtime.ParamLocationQuery, *params.Query); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortBy", runtime.ParamLocationQuery, *params.SortBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortDesc != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortDesc", runtime.ParamLocationQuery, *params.SortDesc); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -2175,10 +2338,8 @@ type GetExamsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Exams  *[]Exam `json:"exams,omitempty"`
-		Limit  *int    `json:"limit,omitempty"`
-		Offset *int    `json:"offset,omitempty"`
-		Total  *int    `json:"total,omitempty"`
+		Exams *[]Exam `json:"exams,omitempty"`
+		Total *int    `json:"total,omitempty"`
 	}
 	JSON500 *InternalServerError
 }
@@ -2304,11 +2465,10 @@ type GetQuestionsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Limit     *int        `json:"limit,omitempty"`
-		Offset    *int        `json:"offset,omitempty"`
-		Questions *[]Question `json:"questions,omitempty"`
-		Total     *int        `json:"total,omitempty"`
+		Questions []Question `json:"questions"`
+		Total     int        `json:"total"`
 	}
+	JSON400 *BadRequest
 	JSON500 *InternalServerError
 }
 
@@ -2538,10 +2698,8 @@ type GetVotesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Limit  *int    `json:"limit,omitempty"`
-		Offset *int    `json:"offset,omitempty"`
-		Total  *int    `json:"total,omitempty"`
-		Votes  *[]Vote `json:"votes,omitempty"`
+		Total *int    `json:"total,omitempty"`
+		Votes *[]Vote `json:"votes,omitempty"`
 	}
 	JSON500 *InternalServerError
 }
@@ -3035,10 +3193,8 @@ func ParseGetExamsResponse(rsp *http.Response) (*GetExamsResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Exams  *[]Exam `json:"exams,omitempty"`
-			Limit  *int    `json:"limit,omitempty"`
-			Offset *int    `json:"offset,omitempty"`
-			Total  *int    `json:"total,omitempty"`
+			Exams *[]Exam `json:"exams,omitempty"`
+			Total *int    `json:"total,omitempty"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3268,15 +3424,20 @@ func ParseGetQuestionsResponse(rsp *http.Response) (*GetQuestionsResponse, error
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Limit     *int        `json:"limit,omitempty"`
-			Offset    *int        `json:"offset,omitempty"`
-			Questions *[]Question `json:"questions,omitempty"`
-			Total     *int        `json:"total,omitempty"`
+			Questions []Question `json:"questions"`
+			Total     int        `json:"total"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest InternalServerError
@@ -3694,10 +3855,8 @@ func ParseGetVotesResponse(rsp *http.Response) (*GetVotesResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Limit  *int    `json:"limit,omitempty"`
-			Offset *int    `json:"offset,omitempty"`
-			Total  *int    `json:"total,omitempty"`
-			Votes  *[]Vote `json:"votes,omitempty"`
+			Total *int    `json:"total,omitempty"`
+			Votes *[]Vote `json:"votes,omitempty"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3910,10 +4069,10 @@ type ServerInterface interface {
 	// Update user
 	// (PUT /users/{id})
 	UpdateUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
-	// 获取投票列表
+	// Get all votes
 	// (GET /votes)
 	GetVotes(w http.ResponseWriter, r *http.Request, params GetVotesParams)
-	// 创建投票
+	// Create new vote
 	// (POST /votes)
 	PostCreateVote(w http.ResponseWriter, r *http.Request)
 	// 获取投票详情（含当前结果）
@@ -4030,13 +4189,13 @@ func (_ Unimplemented) UpdateUser(w http.ResponseWriter, r *http.Request, id ope
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// 获取投票列表
+// Get all votes
 // (GET /votes)
 func (_ Unimplemented) GetVotes(w http.ResponseWriter, r *http.Request, params GetVotesParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// 创建投票
+// Create new vote
 // (POST /votes)
 func (_ Unimplemented) PostCreateVote(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
@@ -4113,11 +4272,11 @@ func (siw *ServerInterfaceWrapper) GetExams(w http.ResponseWriter, r *http.Reque
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetExamsParams
 
-	// ------------- Optional query parameter "ids" -------------
+	// ------------- Optional query parameter "page" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "ids", r.URL.Query(), &params.Ids)
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
 	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "ids", Err: err})
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
 		return
 	}
 
@@ -4126,14 +4285,6 @@ func (siw *ServerInterfaceWrapper) GetExams(w http.ResponseWriter, r *http.Reque
 	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "offset" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "offset", r.URL.Query(), &params.Offset)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "offset", Err: err})
 		return
 	}
 
@@ -4150,6 +4301,30 @@ func (siw *ServerInterfaceWrapper) GetExams(w http.ResponseWriter, r *http.Reque
 	err = runtime.BindQueryParameter("form", true, false, "difficulty", r.URL.Query(), &params.Difficulty)
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "difficulty", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "query" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "query", r.URL.Query(), &params.Query)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "query", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sortBy" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortBy", r.URL.Query(), &params.SortBy)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sortBy", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sortDesc" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortDesc", r.URL.Query(), &params.SortDesc)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sortDesc", Err: err})
 		return
 	}
 
@@ -4261,11 +4436,11 @@ func (siw *ServerInterfaceWrapper) GetQuestions(w http.ResponseWriter, r *http.R
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetQuestionsParams
 
-	// ------------- Optional query parameter "ids" -------------
+	// ------------- Optional query parameter "page" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "ids", r.URL.Query(), &params.Ids)
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
 	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "ids", Err: err})
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
 		return
 	}
 
@@ -4274,14 +4449,6 @@ func (siw *ServerInterfaceWrapper) GetQuestions(w http.ResponseWriter, r *http.R
 	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "offset" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "offset", r.URL.Query(), &params.Offset)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "offset", Err: err})
 		return
 	}
 
@@ -4298,6 +4465,38 @@ func (siw *ServerInterfaceWrapper) GetQuestions(w http.ResponseWriter, r *http.R
 	err = runtime.BindQueryParameter("form", true, false, "difficulty", r.URL.Query(), &params.Difficulty)
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "difficulty", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "query" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "query", r.URL.Query(), &params.Query)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "query", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "language" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "language", r.URL.Query(), &params.Language)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "language", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sortBy" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortBy", r.URL.Query(), &params.SortBy)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sortBy", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sortDesc" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortDesc", r.URL.Query(), &params.SortDesc)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sortDesc", Err: err})
 		return
 	}
 
@@ -4527,6 +4726,14 @@ func (siw *ServerInterfaceWrapper) GetVotes(w http.ResponseWriter, r *http.Reque
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetVotesParams
 
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
 	// ------------- Optional query parameter "limit" -------------
 
 	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
@@ -4535,11 +4742,35 @@ func (siw *ServerInterfaceWrapper) GetVotes(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// ------------- Optional query parameter "offset" -------------
+	// ------------- Optional query parameter "type" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "offset", r.URL.Query(), &params.Offset)
+	err = runtime.BindQueryParameter("form", true, false, "type", r.URL.Query(), &params.Type)
 	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "offset", Err: err})
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "type", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "query" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "query", r.URL.Query(), &params.Query)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "query", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sortBy" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortBy", r.URL.Query(), &params.SortBy)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sortBy", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sortDesc" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortDesc", r.URL.Query(), &params.SortDesc)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sortDesc", Err: err})
 		return
 	}
 
@@ -4933,10 +5164,8 @@ type GetExamsResponseObject interface {
 }
 
 type GetExams200JSONResponse struct {
-	Exams  *[]Exam `json:"exams,omitempty"`
-	Limit  *int    `json:"limit,omitempty"`
-	Offset *int    `json:"offset,omitempty"`
-	Total  *int    `json:"total,omitempty"`
+	Exams *[]Exam `json:"exams,omitempty"`
+	Total *int    `json:"total,omitempty"`
 }
 
 func (response GetExams200JSONResponse) VisitGetExamsResponse(w http.ResponseWriter) error {
@@ -5168,15 +5397,22 @@ type GetQuestionsResponseObject interface {
 }
 
 type GetQuestions200JSONResponse struct {
-	Limit     *int        `json:"limit,omitempty"`
-	Offset    *int        `json:"offset,omitempty"`
-	Questions *[]Question `json:"questions,omitempty"`
-	Total     *int        `json:"total,omitempty"`
+	Questions []Question `json:"questions"`
+	Total     int        `json:"total"`
 }
 
 func (response GetQuestions200JSONResponse) VisitGetQuestionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestions400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response GetQuestions400JSONResponse) VisitGetQuestionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -5601,10 +5837,8 @@ type GetVotesResponseObject interface {
 }
 
 type GetVotes200JSONResponse struct {
-	Limit  *int    `json:"limit,omitempty"`
-	Offset *int    `json:"offset,omitempty"`
-	Total  *int    `json:"total,omitempty"`
-	Votes  *[]Vote `json:"votes,omitempty"`
+	Total *int    `json:"total,omitempty"`
+	Votes *[]Vote `json:"votes,omitempty"`
 }
 
 func (response GetVotes200JSONResponse) VisitGetVotesResponse(w http.ResponseWriter) error {
@@ -5825,10 +6059,10 @@ type StrictServerInterface interface {
 	// Update user
 	// (PUT /users/{id})
 	UpdateUser(ctx context.Context, request UpdateUserRequestObject) (UpdateUserResponseObject, error)
-	// 获取投票列表
+	// Get all votes
 	// (GET /votes)
 	GetVotes(ctx context.Context, request GetVotesRequestObject) (GetVotesResponseObject, error)
-	// 创建投票
+	// Create new vote
 	// (POST /votes)
 	PostCreateVote(ctx context.Context, request PostCreateVoteRequestObject) (PostCreateVoteResponseObject, error)
 	// 获取投票详情（含当前结果）

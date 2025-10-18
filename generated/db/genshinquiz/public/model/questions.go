@@ -22,6 +22,7 @@ type Questions struct {
 	Difficulty   Difficulty
 	IsPublished  bool
 	PublishedAt  *time.Time
+	CreatedBy    int64
 	CreatedAt    time.Time
 	SubmitCount  int64
 	CorrectCount int64
