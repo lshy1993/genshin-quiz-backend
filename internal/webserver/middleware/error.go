@@ -77,7 +77,9 @@ func writeErrorResponse(w http.ResponseWriter, statusCode int, message, code, de
 	if err != nil {
 		// If JSON encoding fails, write a simple error message
 		// We intentionally ignore the error from Write as there's nothing more we can do
-		w.Write([]byte(`{"error":"Internal server error"}`)) //nolint:errcheck // fallback error writing
+		w.Write(
+			[]byte(`{"error":"Internal server error"}`),
+		) //nolint:errcheck // fallback error writing
 	}
 }
 
@@ -128,7 +130,13 @@ func HandleResponseErrorWithLog(
 		)
 
 		// 返回通用的 500 错误
-		writeErrorResponse(w, http.StatusInternalServerError, "Internal server error", "INTERNAL_ERROR", err.Error())
+		writeErrorResponse(
+			w,
+			http.StatusInternalServerError,
+			"Internal server error",
+			"INTERNAL_ERROR",
+			err.Error(),
+		)
 	}
 }
 
@@ -153,6 +161,12 @@ func handleAPIError(w http.ResponseWriter, apiErr *errors.APIError) {
 		writeErrorResponse(w, apiErr.Code, apiErr.Message, "TOO_MANY_REQUESTS", apiErr.Detail)
 	default:
 		// 500 及其他未知错误
-		writeErrorResponse(w, http.StatusInternalServerError, "Internal server error", "INTERNAL_ERROR", "")
+		writeErrorResponse(
+			w,
+			http.StatusInternalServerError,
+			"Internal server error",
+			"INTERNAL_ERROR",
+			"",
+		)
 	}
 }

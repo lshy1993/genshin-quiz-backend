@@ -1,8 +1,25 @@
 package dao
 
 import (
+	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
 )
+
+// 执行查询
+type SimpleQuestion struct {
+	Question    model.Questions
+	User        model.Users
+	Translation model.QuestionTranslations
+	Solved      bool
+}
+
+// 单条question详情
+type DetailedQuestion struct {
+	SimpleQuestion
+	Submissions        model.QuestionSubmissions
+	Options            []model.QuestionOptions
+	OptionTranslations []model.OptionTranslations
+}
 
 // QuestionListParams 查询参数
 type QuestionListParams struct {

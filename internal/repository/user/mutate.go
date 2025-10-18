@@ -47,7 +47,8 @@ func InsertUser(
 	if err != nil {
 		errStr := err.Error()
 		fmt.Print(errStr)
-		if errStr != "" && (contains(errStr, "duplicate key") || contains(errStr, "unique constraint")) {
+		if errStr != "" &&
+			(contains(errStr, "duplicate key") || contains(errStr, "unique constraint")) {
 			return nil, api_error.ErrUserAlreadyExists
 		}
 		return nil, errors.WrapPrefix(err, "insert user failed", 0)
@@ -85,7 +86,8 @@ func InsertUserAuth(
 	_, err = insertStmt.ExecContext(ctx, db)
 	if err != nil {
 		errStr := err.Error()
-		if errStr != "" && (contains(errStr, "duplicate key") || contains(errStr, "unique constraint")) {
+		if errStr != "" &&
+			(contains(errStr, "duplicate key") || contains(errStr, "unique constraint")) {
 			return api_error.NewBadRequestError("user password already exists")
 		}
 		return errors.WrapPrefix(err, "insert password failed", 0)

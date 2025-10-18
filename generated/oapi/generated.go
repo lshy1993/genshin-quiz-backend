@@ -130,9 +130,6 @@ type Question struct {
 	// AnswerCount 总答题人数
 	AnswerCount *int `json:"answer_count,omitempty"`
 
-	// Answers 正确选项ID
-	Answers *[]openapi_types.UUID `json:"answers,omitempty"`
-
 	// Category 题目分类
 	Category QuestionCategory `json:"category"`
 
@@ -179,11 +176,14 @@ type QuestionDifficulty string
 // QuestionOption defines model for QuestionOption.
 type QuestionOption struct {
 	// Count 选中次数
-	Count *float32           `json:"count,omitempty"`
+	Count *int               `json:"count,omitempty"`
 	Id    openapi_types.UUID `json:"id"`
 
 	// Image 选项图片URL
 	Image *string `json:"image,omitempty"`
+
+	// IsAnswer 是否为正确答案
+	IsAnswer *bool `json:"is_answer,omitempty"`
 
 	// Text 选项文本
 	Text *string `json:"text,omitempty"`
@@ -202,9 +202,6 @@ type QuestionType string
 type QuestionWithAnswer struct {
 	// AnswerCount 总答题人数
 	AnswerCount *int `json:"answer_count,omitempty"`
-
-	// Answers 正确选项ID
-	Answers []openapi_types.UUID `json:"answers"`
 
 	// Category 题目分类
 	Category QuestionCategory `json:"category"`
