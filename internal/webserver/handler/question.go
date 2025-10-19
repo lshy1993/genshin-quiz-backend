@@ -16,3 +16,14 @@ func (h *Handler) GetQuestions(
 	}
 	return *res, nil
 }
+
+func (h *Handler) GetQuestion(
+	ctx context.Context,
+	req oapi.GetQuestionRequestObject,
+) (oapi.GetQuestionResponseObject, error) {
+	res, err := services.GetQuestion(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return *res, nil
+}

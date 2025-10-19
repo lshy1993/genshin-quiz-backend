@@ -355,14 +355,14 @@ type GetExamsParams struct {
 
 // GetQuestionsParams defines parameters for GetQuestions.
 type GetQuestionsParams struct {
-	Page       *int                `form:"page,omitempty" json:"page,omitempty"`
-	Limit      *int                `form:"limit,omitempty" json:"limit,omitempty"`
-	Category   *QuestionCategory   `form:"category,omitempty" json:"category,omitempty"`
-	Difficulty *QuestionDifficulty `form:"difficulty,omitempty" json:"difficulty,omitempty"`
-	Query      *string             `form:"query,omitempty" json:"query,omitempty"`
-	Language   *[]string           `form:"language,omitempty" json:"language,omitempty"`
-	SortBy     *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
-	SortDesc   *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
+	Page       *int                  `form:"page,omitempty" json:"page,omitempty"`
+	Limit      *int                  `form:"limit,omitempty" json:"limit,omitempty"`
+	Category   *QuestionCategory     `form:"category,omitempty" json:"category,omitempty"`
+	Difficulty *[]QuestionDifficulty `form:"difficulty,omitempty" json:"difficulty,omitempty"`
+	Query      *string               `form:"query,omitempty" json:"query,omitempty"`
+	Language   *[]string             `form:"language,omitempty" json:"language,omitempty"`
+	SortBy     *string               `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+	SortDesc   *bool                 `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
 }
 
 // GetUsersParams defines parameters for GetUsers.

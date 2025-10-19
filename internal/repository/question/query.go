@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 	"genshin-quiz/generated/oapi"
 	dao "genshin-quiz/internal/dao"
@@ -24,10 +23,6 @@ func GetQuestions(
 	transTbl := table.QuestionTranslations
 	subTbl := table.QuestionSubmissions
 	userTbl := table.Users
-	firstLang := "en"
-	if len(params.Language) > 1 {
-		firstLang = params.Language[0]
-	}
 
 	offset := (params.Page - 1) * params.NumPerPage
 	if offset < 0 {
@@ -35,33 +30,37 @@ func GetQuestions(
 	}
 
 	// 基础查询
-	query := pg.SELECT(
+	stmt := pg.SELECT(
 		tbl.AllColumns,
 	).FROM(
-		tbl.LEFT_JOIN(transTbl, tbl.ID.EQ(transTbl.QuestionID).
-			AND(transTbl.Language.EQ(pg.String(firstLang)))).
+		tbl.LEFT_JOIN(
+			transTbl,
+			tbl.ID.EQ(transTbl.QuestionID),
+		).
 			LEFT_JOIN(subTbl, tbl.ID.EQ(subTbl.QuestionID)).
 			LEFT_JOIN(userTbl, tbl.CreatedBy.EQ(userTbl.ID)),
-	).WHERE(
-		baseCondition(params),
-	).ORDER_BY(baseOrder(params)).
+	).
+		WHERE(
+			baseCondition(params),
+		).ORDER_BY(baseOrder(params)).
 		LIMIT(int64(params.NumPerPage)).
 		OFFSET(int64(offset))
 
 	// 先获取总数
-	countQuery := pg.SELECT(pg.COUNT(pg.STAR)).
+	countStmt := pg.SELECT(pg.COUNT(pg.STAR)).
 		FROM(tbl).
-		WHERE(
-			tbl.Public.IS_TRUE().AND(tbl.IsPublished.IS_TRUE()),
-		)
-	var totalCount int64
-	err := countQuery.QueryContext(ctx, db, &totalCount)
+		WHERE(baseCondition(params))
+	var countResult struct {
+		Count int64 `alias:"count"`
+	}
+	// fmt.Print(countStmt.DebugSql())
+	err := countStmt.QueryContext(ctx, db, &countResult)
 	if err != nil {
 		return nil, err
 	}
 
 	var questions []dao.SimpleQuestion
-	err = query.QueryContext(ctx, db, &questions)
+	err = stmt.QueryContext(ctx, db, &questions)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +72,7 @@ func GetQuestions(
 
 	return &dao.QuestionListResult{
 		Questions: dtos,
-		Total:     int(totalCount),
+		Total:     int(countResult.Count),
 	}, nil
 }
 
@@ -81,19 +80,34 @@ func baseCondition(params dao.QuestionListParams) pg.BoolExpression {
 	tbl := table.Questions
 	translationTbl := table.QuestionTranslations
 	condition := tbl.Public.IS_TRUE().AND(tbl.IsPublished.IS_TRUE())
+	// 添加语言过滤
+	if params.Language != nil && len(*params.Language) > 1 {
+		firstLang := []pg.Expression{}
+		for _, v := range *params.Language {
+			firstLang = append(firstLang, pg.String(v))
+		}
+		condition = condition.AND(translationTbl.Language.IN(firstLang...))
+	}
+
 	// 添加分类过滤
-	if params.Category != "" {
-		condition = condition.AND(tbl.Category.EQ(pg.StringExp(pg.String(params.Category))))
+	if params.Category != nil {
+		cat := string(*params.Category)
+		condition = condition.AND(tbl.Category.EQ(pg.String(cat)))
 	}
 
 	// 添加难度过滤
-	if params.Difficulty != "" {
-		condition = condition.AND(tbl.Difficulty.EQ(pg.StringExp(pg.String(params.Difficulty))))
+	if params.Difficulty != nil {
+		diffExp := []pg.Expression{}
+		for _, diff := range *params.Difficulty {
+			diffStr := string(diff)
+			diffExp = append(diffExp, pg.String(diffStr))
+		}
+		condition = condition.AND(tbl.Difficulty.IN(diffExp...))
 	}
 
 	// 添加关键字搜索（在翻译表的question_text中搜索）
-	if params.Query != "" {
-		searchTerm := "%" + strings.ToLower(params.Query) + "%"
+	if params.Query != nil && *params.Query != "" {
+		searchTerm := "%" + strings.ToLower(*params.Query) + "%"
 		condition = condition.AND(pg.LOWER(translationTbl.QuestionText).LIKE(pg.String(searchTerm)))
 	}
 	return condition
@@ -101,7 +115,7 @@ func baseCondition(params dao.QuestionListParams) pg.BoolExpression {
 
 func baseOrder(params dao.QuestionListParams) pg.OrderByClause {
 	tbl := table.Questions
-	switch params.SortBy {
+	switch *params.SortBy {
 	case "PublishDate": // 上线时间
 		if params.SortDesc {
 			return tbl.PublishedAt.DESC()
@@ -141,7 +155,11 @@ func baseOrder(params dao.QuestionListParams) pg.OrderByClause {
 	}
 }
 
-func GetQuestionByUUID(ctx context.Context, db qrm.DB, uuid uuid.UUID) (*model.Questions, error) {
+func GetQuestionByUUID(
+	ctx context.Context,
+	db qrm.DB,
+	uuid uuid.UUID,
+) (*oapi.Question, error) {
 	tbl := table.Questions
 	stmt := pg.SELECT(tbl.AllColumns).FROM(
 		tbl,
@@ -149,11 +167,13 @@ func GetQuestionByUUID(ctx context.Context, db qrm.DB, uuid uuid.UUID) (*model.Q
 		tbl.QuestionUUID.EQ(pg.UUID(uuid)),
 	)
 
-	var question model.Questions
-	err := stmt.QueryContext(ctx, db, &question)
+	var result dao.DetailedQuestion
+	err := stmt.QueryContext(ctx, db, &result)
 	if err != nil {
 		return nil, err
 	}
 
-	return &question, nil
+	dto := transformer.ToDetailQuestion(result)
+
+	return &dto, nil
 }
