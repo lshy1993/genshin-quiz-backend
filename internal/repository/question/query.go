@@ -15,7 +15,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// GetQuestions 获取题目列表，支持分页、过滤、排序
 func GetQuestions(
 	ctx context.Context,
 	db qrm.DB,
@@ -106,9 +105,8 @@ func baseOrder(params dao.QuestionListParams) pg.OrderByClause {
 	case "PublishDate": // 上线时间
 		if params.SortDesc {
 			return tbl.PublishedAt.DESC()
-		} else {
-			return tbl.PublishedAt.DESC()
 		}
+		return tbl.PublishedAt.ASC()
 	case "Difficulty":
 		// 难度排序：easy < medium < hard
 		difficultyOrder := pg.CASE().
@@ -118,33 +116,28 @@ func baseOrder(params dao.QuestionListParams) pg.OrderByClause {
 			ELSE(pg.Int(0))
 		if params.SortDesc {
 			return difficultyOrder.DESC()
-		} else {
-			return difficultyOrder.ASC()
 		}
+		return difficultyOrder.ASC()
 	case "Likes": // 点赞数
 		if params.SortDesc {
 			return tbl.Likes.DESC()
-		} else {
-			return tbl.Likes.ASC()
 		}
+		return tbl.Likes.ASC()
 	case "Submissions": // 参与人数
 		if params.SortDesc {
 			return tbl.SubmitCount.DESC()
-		} else {
-			return tbl.SubmitCount.ASC()
 		}
+		return tbl.SubmitCount.ASC()
 	case "CorrectRate":
 		if params.SortDesc {
 			return tbl.CorrectCount.DESC()
-		} else {
-			return tbl.CorrectCount.ASC()
 		}
+		return tbl.CorrectCount.ASC()
 	default:
 		if params.SortDesc {
 			return tbl.PublishedAt.DESC()
-		} else {
-			return tbl.PublishedAt.DESC()
 		}
+		return tbl.PublishedAt.ASC()
 	}
 }
 

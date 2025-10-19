@@ -14,5 +14,5 @@ func (h *Handler) GetQuestions(
 	if err != nil {
 		return nil, err
 	}
-	return oapi.GetQuestions200JSONResponse(*res), nil
+	return *res, nil
 }

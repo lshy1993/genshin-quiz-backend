@@ -8,7 +8,7 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
-	api_error "genshin-quiz/internal/errors"
+	"genshin-quiz/internal/common"
 
 	"github.com/go-errors/errors"
 	"github.com/go-jet/jet/v2/qrm"
@@ -49,7 +49,7 @@ func InsertUser(
 		fmt.Print(errStr)
 		if errStr != "" &&
 			(contains(errStr, "duplicate key") || contains(errStr, "unique constraint")) {
-			return nil, api_error.ErrUserAlreadyExists
+			return nil, common.ErrUserAlreadyExists
 		}
 		return nil, errors.WrapPrefix(err, "insert user failed", 0)
 	}
@@ -88,7 +88,7 @@ func InsertUserAuth(
 		errStr := err.Error()
 		if errStr != "" &&
 			(contains(errStr, "duplicate key") || contains(errStr, "unique constraint")) {
-			return api_error.NewBadRequestError("user password already exists")
+			return common.NewBadRequestError("user password already exists")
 		}
 		return errors.WrapPrefix(err, "insert password failed", 0)
 	}
@@ -146,7 +146,6 @@ func Delete(
 	return nil
 }
 
-// contains 用于兼容 go1.17 及更早版本
 func contains(s, substr string) bool {
 	return len(substr) > 0 && len(s) >= len(substr) && (index(s, substr) >= 0)
 }

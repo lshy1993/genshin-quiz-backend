@@ -5,11 +5,11 @@ import (
 	"genshin-quiz/config"
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
+	"genshin-quiz/internal/dao/transformer"
 	user_repo "genshin-quiz/internal/repository/user"
-	"genshin-quiz/internal/transformer"
 	"time"
 
-	api_error "genshin-quiz/internal/errors"
+	"genshin-quiz/internal/common"
 
 	"github.com/go-errors/errors"
 	"github.com/go-jet/jet/v2/qrm"
@@ -30,7 +30,7 @@ func RegisterUser(
 		return nil, err
 	}
 	if user != nil {
-		return nil, api_error.ErrUserAlreadyExists
+		return nil, common.ErrUserAlreadyExists
 	}
 
 	// 创建用户
@@ -48,7 +48,8 @@ func RegisterUser(
 		tx.Rollback()
 		return nil, err
 	}
-	response, err := realLogin(ctx, tx, app.Config.JWTSecret, res)
+	ip := ""
+	response, err := realLogin(ctx, tx, app.Config.JWTSecret, res, ip)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -89,7 +90,7 @@ func LoginUser(
 func realLogin(
 	ctx context.Context,
 	db qrm.DB,
-	JWTSecret string,
+	secret string,
 	res *model.Users,
 	ip string,
 ) (*oapi.AuthResponse, error) {
@@ -99,7 +100,7 @@ func realLogin(
 		"email":   res.Email,
 		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 	})
-	tokenString, err := token.SignedString([]byte(JWTSecret))
+	tokenString, err := token.SignedString([]byte(secret))
 	if err != nil {
 		return nil, err
 	}

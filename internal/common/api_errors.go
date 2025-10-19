@@ -1,11 +1,10 @@
-package errors
+package common
 
 import (
 	"fmt"
 	"net/http"
 )
 
-// APIError 定义统一的 API 错误结构
 type APIError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -16,8 +15,8 @@ func (e *APIError) Error() string {
 	return fmt.Sprintf("API Error %d: %s", e.Code, e.Message)
 }
 
-// HTTP 状态码对应的错误构造函数
 func NewBadRequestError(message string) *APIError {
+	// HTTP 状态码对应的错误构造函数
 	return &APIError{
 		Code:    http.StatusBadRequest,
 		Message: message,
@@ -45,7 +44,6 @@ func NewInternalServerError(message string) *APIError {
 	}
 }
 
-// 预定义的常用错误
 var (
 	ErrUserNotFound       = NewNotFoundError("用户不存在")
 	ErrUserAlreadyExists  = NewBadRequestError("用户已存在")

@@ -8,8 +8,9 @@ import (
 	"github.com/getsentry/sentry-go"
 	"go.uber.org/zap"
 
+	stdErrors "errors"
 	"genshin-quiz/config"
-	"genshin-quiz/internal/errors"
+	"genshin-quiz/internal/common"
 )
 
 type ErrorResponse struct {
@@ -76,10 +77,7 @@ func writeErrorResponse(w http.ResponseWriter, statusCode int, message, code, de
 	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
 		// If JSON encoding fails, write a simple error message
-		// We intentionally ignore the error from Write as there's nothing more we can do
-		w.Write(
-			[]byte(`{"error":"Internal server error"}`),
-		) //nolint:errcheck // fallback error writing
+		zap.L().Error("JSON encode error", zap.Error(err))
 	}
 }
 
@@ -103,7 +101,8 @@ func HandleResponseErrorWithLog(
 ) func(w http.ResponseWriter, r *http.Request, err error) {
 	return func(w http.ResponseWriter, r *http.Request, err error) {
 		// 检查是否是我们定义的 API 错误
-		if apiErr, ok := err.(*errors.APIError); ok {
+		var apiErr *common.APIError
+		if stdErrors.As(err, &apiErr) {
 			handleAPIError(w, apiErr)
 			return
 		}
@@ -140,9 +139,8 @@ func HandleResponseErrorWithLog(
 	}
 }
 
-// handleAPIError 处理自定义的 APIError
-func handleAPIError(w http.ResponseWriter, apiErr *errors.APIError) {
-	// 根据状态码返回相应的响应
+func handleAPIError(w http.ResponseWriter, apiErr *common.APIError) {
+	// 处理自定义的 APIError 根据状态码返回相应的响应
 	switch apiErr.Code {
 	case 400:
 		writeErrorResponse(w, apiErr.Code, apiErr.Message, "BAD_REQUEST", apiErr.Detail)

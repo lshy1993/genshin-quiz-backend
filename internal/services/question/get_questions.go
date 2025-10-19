@@ -14,7 +14,6 @@ func GetQuestions(
 	app *config.App,
 	req oapi.GetQuestionsRequestObject,
 ) (*oapi.GetQuestions200JSONResponse, error) {
-
 	param := dao.QuestionListParams{
 		Page:       *req.Params.Page,
 		NumPerPage: *req.Params.Limit,
@@ -33,6 +32,6 @@ func GetQuestions(
 
 	return &oapi.GetQuestions200JSONResponse{
 		Questions: dao.Questions,
-		Total:     int(dao.Total),
+		Total:     dao.Total,
 	}, nil
 }

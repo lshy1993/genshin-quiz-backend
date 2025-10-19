@@ -4,8 +4,6 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/dao"
-
-	"github.com/google/uuid"
 )
 
 func ToSimpleQuestion(
@@ -40,14 +38,14 @@ func ToDetailQuestion(
 	res dao.DetailedQuestion,
 ) oapi.Question {
 	answered := 0
-	var answers []uuid.UUID
-	if res.Solved {
-		for _, opt := range res.Options {
-			if opt.IsAnswered {
-				answers = append(answers, opt.OptionUUID)
-			}
-		}
-	}
+	// var answers []uuid.UUID
+	// if res.Solved {
+	// 	for _, opt := range res.Options {
+	// 		if opt.IsAnswered {
+	// 			answers = append(answers, opt.OptionUUID)
+	// 		}
+	// 	}
+	// }
 	correct := int(res.Question.CorrectCount)
 	likes := int(res.Question.Likes)
 	likeStatus := oapi.QuestionLikeStatus(0)

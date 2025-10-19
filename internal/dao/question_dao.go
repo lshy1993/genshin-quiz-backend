@@ -5,7 +5,6 @@ import (
 	"genshin-quiz/generated/oapi"
 )
 
-// 执行查询
 type SimpleQuestion struct {
 	Question    model.Questions
 	User        model.Users
@@ -13,7 +12,6 @@ type SimpleQuestion struct {
 	Solved      bool
 }
 
-// 单条question详情
 type DetailedQuestion struct {
 	SimpleQuestion
 	Submissions        model.QuestionSubmissions
@@ -21,7 +19,6 @@ type DetailedQuestion struct {
 	OptionTranslations []model.OptionTranslations
 }
 
-// QuestionListParams 查询参数
 type QuestionListParams struct {
 	Page       int      // 页码，从1开始
 	NumPerPage int      // 每页数量
@@ -33,18 +30,14 @@ type QuestionListParams struct {
 	Language   []string // 语言，默认 'zh-CN'
 }
 
-// QuestionListResult 查询结果
 type QuestionListResult struct {
 	Questions []oapi.Question
 	Total     int
 }
 
-// SortBy 排序方式
-type SortBy string
-
-const (
-	SortByDate       SortBy = "date"
-	SortByDifficulty SortBy = "difficulty"
-	SortByLikes      SortBy = "likes"
-	SortByText       SortBy = "text"
-)
+// const (
+// 	SortByDate       SortBy = "date"
+// 	SortByDifficulty SortBy = "difficulty"
+// 	SortByLikes      SortBy = "likes"
+// 	SortByText       SortBy = "text"
+// )

@@ -6,7 +6,7 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
-	api_error "genshin-quiz/internal/errors"
+	"genshin-quiz/internal/common"
 
 	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
@@ -30,7 +30,7 @@ func GetUserByEmail(
 	var user []model.Users
 	err := stmt.QueryContext(ctx, db, &user)
 	if len(user) == 0 {
-		return nil, api_error.ErrUserNotFound
+		return nil, common.ErrUserNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func GetUserByEmail(
 func CheckPassword(
 	ctx context.Context,
 	db qrm.DB,
-	userId int64,
+	userID int64,
 	pwd string,
 ) error {
 	authTbl := table.UserPasswords
@@ -53,14 +53,14 @@ func CheckPassword(
 	}
 
 	stmt := pg.SELECT(authTbl.AllColumns).FROM(authTbl).WHERE(
-		authTbl.UserID.EQ(pg.Int64(userId)).AND(
+		authTbl.UserID.EQ(pg.Int64(userID)).AND(
 			authTbl.PasswordHash.EQ(pg.String(string(hashedPwd))),
 		),
 	)
 	var user []model.Users
 	err = stmt.QueryContext(ctx, db, &user)
 	if len(user) == 0 {
-		return api_error.ErrInvalidCredentials
+		return common.ErrInvalidCredentials
 	}
 	if err != nil {
 		return errors.WrapPrefix(err, "checking password failed", 0)
