@@ -46,24 +46,23 @@ func CheckPassword(
 	pwd string,
 ) error {
 	authTbl := table.UserPasswords
-
-	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	stmt := pg.SELECT(authTbl.AllColumns).
+		FROM(authTbl).
+		WHERE(
+			authTbl.UserID.EQ(pg.Int64(userID)),
+		)
+	var user []model.UserPasswords
+	err := stmt.QueryContext(ctx, db, &user)
 	if err != nil {
-		return err
+		return errors.WrapPrefix(err, "checking password failed", 0)
 	}
-
-	stmt := pg.SELECT(authTbl.AllColumns).FROM(authTbl).WHERE(
-		authTbl.UserID.EQ(pg.Int64(userID)).AND(
-			authTbl.PasswordHash.EQ(pg.String(string(hashedPwd))),
-		),
-	)
-	var user []model.Users
-	err = stmt.QueryContext(ctx, db, &user)
 	if len(user) == 0 {
 		return common.ErrInvalidCredentials
 	}
+	err = bcrypt.CompareHashAndPassword([]byte(user[0].PasswordHash), []byte(pwd))
 	if err != nil {
-		return errors.WrapPrefix(err, "checking password failed", 0)
+		// 密码错误
+		return common.ErrInvalidCredentials
 	}
 
 	return nil

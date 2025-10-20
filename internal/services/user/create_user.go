@@ -26,10 +26,10 @@ func RegisterUser(
 
 	// 检测用户是否存在
 	user, err := user_repo.GetUserByEmail(ctx, app.DB, string(email))
-	if err != nil {
+	if err != common.ErrUserNotFound {
+		// 其他错误
 		return nil, err
-	}
-	if user != nil {
+	} else if user != nil {
 		return nil, common.ErrUserAlreadyExists
 	}
 
@@ -48,8 +48,7 @@ func RegisterUser(
 		tx.Rollback()
 		return nil, err
 	}
-	ip := ""
-	response, err := realLogin(ctx, tx, app.Config.JWTSecret, res, ip)
+	response, err := realLogin(ctx, tx, app.Config.JWTSecret, res)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -70,7 +69,7 @@ func LoginUser(
 ) (*oapi.AuthResponse, error) {
 	email := req.Body.Email
 	pwd := req.Body.Password
-	ip, _ := ctx.Value("real_ip").(string)
+
 	// 检测用户是否存在
 	user, err := user_repo.GetUserByEmail(ctx, app.DB, string(email))
 	if err != nil {
@@ -84,7 +83,7 @@ func LoginUser(
 	}
 
 	// 登录流程
-	return realLogin(ctx, app.DB, app.Config.JWTSecret, user, ip)
+	return realLogin(ctx, app.DB, app.Config.JWTSecret, user)
 }
 
 func realLogin(
@@ -92,7 +91,6 @@ func realLogin(
 	db qrm.DB,
 	secret string,
 	res *model.Users,
-	ip string,
 ) (*oapi.AuthResponse, error) {
 	// 生成 JWT
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -106,7 +104,7 @@ func realLogin(
 	}
 
 	// 写登录日志
-
+	ip, _ := ctx.Value("real_ip").(string)
 	loginInfo, err := user_repo.InsertLoginLog(ctx, db, res.ID, ip)
 	if err != nil {
 		return nil, err

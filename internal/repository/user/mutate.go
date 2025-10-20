@@ -3,6 +3,7 @@ package user_repo
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"genshin-quiz/generated/db/genshinquiz/public/model"
@@ -25,6 +26,12 @@ func InsertUser(
 
 	newUUID := uuid.New()
 	strUUID := newUUID.String()
+	idx := strings.LastIndex(strUUID, "-")
+	tmpName := strUUID
+	if idx != -1 && idx+1 < len(strUUID) {
+		tmpName = strUUID[idx+1:]
+	}
+	tmpName = "guest_" + tmpName
 
 	insertStmt := tbl.INSERT(
 		tbl.UserUUID,
@@ -36,7 +43,7 @@ func InsertUser(
 		MODEL(model.Users{
 			UserUUID:    newUUID,
 			Email:       email,
-			DisplayName: &strUUID,
+			DisplayName: &tmpName,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}).
@@ -66,7 +73,7 @@ func InsertUserAuth(
 
 	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		return errors.WrapPrefix(err, "hash password failed", 0)
 	}
 
 	now := time.Now()

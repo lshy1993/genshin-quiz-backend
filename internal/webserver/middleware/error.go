@@ -103,22 +103,9 @@ func HandleResponseErrorWithLog(
 		// 检查是否是我们定义的 API 错误
 		var apiErr *common.APIError
 		if stdErrors.As(err, &apiErr) {
-			handleAPIError(w, apiErr)
+			handleAPIError(app, w, apiErr)
 			return
 		}
-
-		// 手动捕获错误到Sentry (如果已初始化)
-		sentry.WithScope(func(scope *sentry.Scope) {
-			scope.SetRequest(r)
-			scope.SetLevel(sentry.LevelError)
-			scope.SetTag("error_type", "response_error")
-			scope.SetContext("request", map[string]interface{}{
-				"method":  r.Method,
-				"url":     r.URL.String(),
-				"headers": r.Header,
-			})
-			sentry.CaptureException(err)
-		})
 
 		// 记录未处理的错误
 		app.Logger.Error("Unhandled Response error",
@@ -127,6 +114,9 @@ func HandleResponseErrorWithLog(
 			zap.Error(err),
 			zap.String("request_id", r.Header.Get("X-Request-ID")),
 		)
+
+		// 上报 Sentry
+		sentry.CaptureException(err)
 
 		// 返回通用的 500 错误
 		writeErrorResponse(
@@ -139,12 +129,22 @@ func HandleResponseErrorWithLog(
 	}
 }
 
-func handleAPIError(w http.ResponseWriter, apiErr *common.APIError) {
+func handleAPIError(
+	app *config.App,
+	w http.ResponseWriter,
+	apiErr *common.APIError,
+) {
 	// 处理自定义的 APIError 根据状态码返回相应的响应
 	switch apiErr.Code {
 	case 400:
 		writeErrorResponse(w, apiErr.Code, apiErr.Message, "BAD_REQUEST", apiErr.Detail)
 	case 401:
+		// Debug: 打印错误详情供调试
+		app.Logger.Info("Unauthorized API error",
+			zap.Int("code", apiErr.Code),
+			zap.String("message", apiErr.Message),
+			zap.String("detail", apiErr.Detail),
+		)
 		// 401 错误通常不返回响应体，只返回状态码
 		w.WriteHeader(http.StatusUnauthorized)
 	case 403:
