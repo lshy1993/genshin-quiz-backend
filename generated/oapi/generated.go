@@ -22,9 +22,9 @@ import (
 
 // Defines values for QuestionLikeStatus.
 const (
-	QuestionLikeStatusMinus1 QuestionLikeStatus = -1
-	QuestionLikeStatusN0     QuestionLikeStatus = 0
-	QuestionLikeStatusN1     QuestionLikeStatus = 1
+	Minus1 QuestionLikeStatus = -1
+	N0     QuestionLikeStatus = 0
+	N1     QuestionLikeStatus = 1
 )
 
 // Defines values for QuestionCategory.
@@ -60,13 +60,6 @@ const (
 	MultipleChoice QuestionType = "multiple_choice"
 	SingleChoice   QuestionType = "single_choice"
 	TrueFalse      QuestionType = "true_false"
-)
-
-// Defines values for QuestionWithAnswerLikeStatus.
-const (
-	QuestionWithAnswerLikeStatusMinus1 QuestionWithAnswerLikeStatus = -1
-	QuestionWithAnswerLikeStatusN0     QuestionWithAnswerLikeStatus = 0
-	QuestionWithAnswerLikeStatusN1     QuestionWithAnswerLikeStatus = 1
 )
 
 // Defines values for VoteOptionType.
@@ -195,50 +188,35 @@ type QuestionOption struct {
 // QuestionOptionType 选项类型
 type QuestionOptionType string
 
+// QuestionTranslation defines model for QuestionTranslation.
+type QuestionTranslation struct {
+	Explanation string `json:"explanation"`
+	Options     []struct {
+		IsAnswer bool   `json:"is_answer"`
+		Text     string `json:"text"`
+	} `json:"options"`
+	QuestionText string `json:"question_text"`
+}
+
 // QuestionType 题目类型
 type QuestionType string
 
 // QuestionWithAnswer defines model for QuestionWithAnswer.
 type QuestionWithAnswer struct {
-	// AnswerCount 总答题人数
-	AnswerCount *int `json:"answer_count,omitempty"`
-
 	// Category 题目分类
 	Category QuestionCategory `json:"category"`
 
-	// CorrectCount 总答对人数
-	CorrectCount *int               `json:"correct_count,omitempty"`
-	CreatedAt    time.Time          `json:"created_at"`
-	CreatedBy    openapi_types.UUID `json:"created_by"`
-
 	// Difficulty 难度等级
-	Difficulty  QuestionDifficulty `json:"difficulty"`
-	Explanation *string            `json:"explanation,omitempty"`
-	Id          openapi_types.UUID `json:"id"`
-
-	// Languages 支持的多语言列表
-	Languages []string `json:"languages"`
-
-	// LikeStatus 点赞状态，1=已点赞，-1=已点踩，0=未操作
-	LikeStatus *QuestionWithAnswerLikeStatus `json:"likeStatus,omitempty"`
-
-	// Likes 点赞数
-	Likes   *int             `json:"likes,omitempty"`
-	Options []QuestionOption `json:"options"`
-
-	// Public 是否公开可见
-	Public       bool   `json:"public"`
-	QuestionText string `json:"question_text"`
+	Difficulty QuestionDifficulty `json:"difficulty"`
+	Public     bool               `json:"public"`
 
 	// QuestionType 题目类型
 	QuestionType QuestionType `json:"question_type"`
-
-	// Solved 是否已经通过了
-	Solved *bool `json:"solved,omitempty"`
+	Translations []struct {
+		Language string              `json:"language"`
+		Text     QuestionTranslation `json:"text"`
+	} `json:"translations"`
 }
-
-// QuestionWithAnswerLikeStatus 点赞状态，1=已点赞，-1=已点踩，0=未操作
-type QuestionWithAnswerLikeStatus int
 
 // User defines model for User.
 type User struct {
