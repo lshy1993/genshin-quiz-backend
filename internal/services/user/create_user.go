@@ -14,6 +14,7 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func RegisterUser(
@@ -70,20 +71,20 @@ func LoginUser(
 	email := req.Body.Email
 	pwd := req.Body.Password
 
-	// 检测用户是否存在
-	user, err := user_repo.GetUserByEmail(ctx, app.DB, string(email))
+	// 获取用户信息
+	authInfo, err := user_repo.GetPasswordByEmail(ctx, app.DB, string(email))
 	if err != nil {
 		return nil, err
 	}
 
-	// 验证密码
-	err = user_repo.CheckPassword(ctx, app.DB, user.ID, pwd)
+	err = bcrypt.CompareHashAndPassword([]byte(authInfo.Auth.PasswordHash), []byte(pwd))
 	if err != nil {
-		return nil, err
+		// 密码错误
+		return nil, common.ErrInvalidCredentials
 	}
 
 	// 登录流程
-	return realLogin(ctx, app.DB, app.Config.JWTSecret, user)
+	return realLogin(ctx, app.DB, app.Config.JWTSecret, &authInfo.User)
 }
 
 func realLogin(

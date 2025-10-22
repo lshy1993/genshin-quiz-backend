@@ -7,11 +7,11 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
 	"genshin-quiz/internal/common"
+	"genshin-quiz/internal/dao"
 
 	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func GetUserByEmail(
@@ -39,33 +39,28 @@ func GetUserByEmail(
 	return &user[0], nil
 }
 
-func CheckPassword(
+func GetPasswordByEmail(
 	ctx context.Context,
 	db qrm.DB,
-	userID int64,
-	pwd string,
-) error {
+	email string,
+) (*dao.UserInfoWithAuth, error) {
+	tbl := table.Users
 	authTbl := table.UserPasswords
-	stmt := pg.SELECT(authTbl.AllColumns).
-		FROM(authTbl).
+	stmt := pg.SELECT(tbl.AllColumns, authTbl.PasswordHash).
+		FROM(tbl.LEFT_JOIN(authTbl, tbl.ID.EQ(authTbl.UserID))).
 		WHERE(
-			authTbl.UserID.EQ(pg.Int64(userID)),
+			tbl.Email.EQ(pg.String(email)),
 		)
-	var user []model.UserPasswords
-	err := stmt.QueryContext(ctx, db, &user)
+	var auth []dao.UserInfoWithAuth
+	err := stmt.QueryContext(ctx, db, &auth)
 	if err != nil {
-		return errors.WrapPrefix(err, "checking password failed", 0)
+		return nil, errors.WrapPrefix(err, "checking password failed", 0)
 	}
-	if len(user) == 0 {
-		return common.ErrInvalidCredentials
-	}
-	err = bcrypt.CompareHashAndPassword([]byte(user[0].PasswordHash), []byte(pwd))
-	if err != nil {
-		// 密码错误
-		return common.ErrInvalidCredentials
+	if len(auth) == 0 {
+		return nil, common.ErrUserNotFound
 	}
 
-	return nil
+	return &auth[0], nil
 }
 
 func GetUserInfoByID(
