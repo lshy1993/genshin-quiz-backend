@@ -2,24 +2,25 @@ package middleware
 
 import (
 	"context"
+	user_repo "genshin-quiz/internal/repository/user"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-chi/jwtauth/v5"
-	"github.com/go-chi/render"
+	"github.com/go-jet/jet/v2/qrm"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type UserClaims struct {
-	UserID   int64  `json:"user_id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	UserID int64  `json:"user_id"`
+	Email  string `json:"email"`
 	jwt.RegisteredClaims
 }
 
 type userContextKey struct{}
 
-func JWTAuth(jwtSecret string) func(http.Handler) http.Handler {
+func JWTAuth(jwtSecret string, db qrm.DB) func(http.Handler) http.Handler {
 	tokenAuth := jwtauth.New("HS256", []byte(jwtSecret), nil)
 
 	return func(next http.Handler) http.Handler {
@@ -60,23 +61,34 @@ func JWTAuth(jwtSecret string) func(http.Handler) http.Handler {
 				return
 			}
 
-			username, ok := claims["username"].(string)
-			if !ok {
-				http.Error(w, "Invalid username in token", http.StatusUnauthorized)
-				return
-			}
-
 			email, ok := claims["email"].(string)
 			if !ok {
 				http.Error(w, "Invalid email in token", http.StatusUnauthorized)
 				return
 			}
 
-			// Create user claims
+			// 检查用户是否仍然存在于数据库中
+			userExists, err := user_repo.CheckUserExists(r.Context(), db, int64(userID))
+			if err != nil {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				return
+			}
+
+			if !userExists {
+				// 用户已被删除，返回特殊的强制登出响应
+				writeErrorResponse(
+					w,
+					http.StatusUnauthorized,
+					"User account no longer exists",
+					"USER_DELETED",
+					"Your account has been removed. Please login again.",
+					true, // 强制登出
+				)
+				return
+			} // Create user claims
 			userClaims := UserClaims{
-				UserID:   int64(userID),
-				Username: username,
-				Email:    email,
+				UserID: int64(userID),
+				Email:  email,
 			}
 
 			// Add user claims to context
@@ -89,7 +101,12 @@ func JWTAuth(jwtSecret string) func(http.Handler) http.Handler {
 }
 
 func GetUserFromContext(r *http.Request) (*UserClaims, bool) {
-	user, ok := r.Context().Value(userContextKey{}).(UserClaims)
+	return GetUserFromContextOnly(r.Context())
+}
+
+// GetUserFromContextOnly - 从 context 获取用户信息（通用函数）
+func GetUserFromContextOnly(ctx context.Context) (*UserClaims, bool) {
+	user, ok := ctx.Value(userContextKey{}).(UserClaims)
 	return &user, ok
 }
 
@@ -115,12 +132,6 @@ func Authenticator(next http.Handler) http.Handler {
 			return
 		}
 
-		username, ok := claims["username"].(string)
-		if !ok {
-			http.Error(w, "Invalid username in token", http.StatusUnauthorized)
-			return
-		}
-
 		email, ok := claims["email"].(string)
 		if !ok {
 			http.Error(w, "Invalid email in token", http.StatusUnauthorized)
@@ -129,9 +140,8 @@ func Authenticator(next http.Handler) http.Handler {
 
 		// Create user claims
 		userClaims := UserClaims{
-			UserID:   int64(userID),
-			Username: username,
-			Email:    email,
+			UserID: int64(userID),
+			Email:  email,
 		}
 
 		// Add user claims to context
@@ -146,8 +156,14 @@ func AdminOnly(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userClaims, ok := GetUserFromContext(r)
 		if !ok || userClaims == nil {
-			render.Status(r, http.StatusUnauthorized)
-			render.JSON(w, r, map[string]string{"error": "Unauthorized"})
+			writeErrorResponse(
+				w,
+				http.StatusUnauthorized,
+				"Unauthorized",
+				"UNAUTHORIZED",
+				"Admin access required",
+				false, // 不需要强制登出，只是权限不足
+			)
 			return
 		}
 
@@ -157,4 +173,15 @@ func AdminOnly(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// GenerateJWT 生成 JWT token
+func GenerateJWT(userID int64, email, secret string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": userID,
+		"email":   email,
+		"exp":     time.Now().Add(24 * time.Hour).Unix(),
+	})
+
+	return token.SignedString([]byte(secret))
 }

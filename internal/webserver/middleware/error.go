@@ -14,9 +14,10 @@ import (
 )
 
 type ErrorResponse struct {
-	Error   string `json:"error"`
-	Code    string `json:"code,omitempty"`
-	Details string `json:"details,omitempty"`
+	Error       string `json:"error"`
+	Code        string `json:"code,omitempty"`
+	Details     string `json:"details,omitempty"`
+	ForceLogout bool   `json:"force_logout,omitempty"`
 }
 
 func Handler(app *config.App) func(next http.Handler) http.Handler {
@@ -52,6 +53,7 @@ func Handler(app *config.App) func(next http.Handler) http.Handler {
 						"Internal server error",
 						"",
 						"",
+						false,
 					)
 				}
 			}()
@@ -66,14 +68,15 @@ func Handler(app *config.App) func(next http.Handler) http.Handler {
 // 	writeErrorResponse(w, statusCode, message, code, details)
 // }
 
-func writeErrorResponse(w http.ResponseWriter, statusCode int, message, code, details string) {
+func writeErrorResponse(w http.ResponseWriter, statusCode int, message, code, details string, forceLogout bool) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
 	response := ErrorResponse{
-		Error:   message,
-		Code:    code,
-		Details: details,
+		Error:       message,
+		Code:        code,
+		Details:     details,
+		ForceLogout: forceLogout,
 	}
 
 	err := json.NewEncoder(w).Encode(response)
@@ -94,7 +97,7 @@ func HandleBadRequestError(
 			zap.String("request_id", r.Header.Get("X-Request-ID")),
 		)
 
-		writeErrorResponse(w, http.StatusBadRequest, "Bad request", "INVALID_REQUEST", err.Error())
+		writeErrorResponse(w, http.StatusBadRequest, "Bad request", "INVALID_REQUEST", err.Error(), false)
 	}
 }
 
@@ -129,6 +132,7 @@ func HandleResponseErrorWithLog(
 			"Internal server error",
 			"INTERNAL_ERROR",
 			err.Error(),
+			false,
 		)
 	}
 }
@@ -141,7 +145,7 @@ func handleAPIError(
 	// 处理自定义的 APIError 根据状态码返回相应的响应
 	switch apiErr.Code {
 	case 400:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "BAD_REQUEST", apiErr.Detail)
+		writeErrorResponse(w, apiErr.Code, apiErr.Message, "BAD_REQUEST", apiErr.Detail, false)
 	case 401:
 		// Debug: 打印错误详情供调试
 		app.Logger.Info("Unauthorized API error",
@@ -152,15 +156,15 @@ func handleAPIError(
 		// 401 错误通常不返回响应体，只返回状态码
 		w.WriteHeader(http.StatusUnauthorized)
 	case 403:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "FORBIDDEN", apiErr.Detail)
+		writeErrorResponse(w, apiErr.Code, apiErr.Message, "FORBIDDEN", apiErr.Detail, false)
 	case 404:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "NOT_FOUND", apiErr.Detail)
+		writeErrorResponse(w, apiErr.Code, apiErr.Message, "NOT_FOUND", apiErr.Detail, false)
 	case 409:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "CONFLICT", apiErr.Detail)
+		writeErrorResponse(w, apiErr.Code, apiErr.Message, "CONFLICT", apiErr.Detail, false)
 	case 422:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "UNPROCESSABLE_ENTITY", apiErr.Detail)
+		writeErrorResponse(w, apiErr.Code, apiErr.Message, "UNPROCESSABLE_ENTITY", apiErr.Detail, false)
 	case 429:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "TOO_MANY_REQUESTS", apiErr.Detail)
+		writeErrorResponse(w, apiErr.Code, apiErr.Message, "TOO_MANY_REQUESTS", apiErr.Detail, false)
 	default:
 		// 500 及其他未知错误
 		writeErrorResponse(
@@ -169,6 +173,7 @@ func handleAPIError(
 			"Internal server error",
 			"INTERNAL_ERROR",
 			"",
+			false,
 		)
 	}
 }

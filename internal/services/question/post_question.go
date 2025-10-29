@@ -2,12 +2,14 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"genshin-quiz/config"
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
 	question_repo "genshin-quiz/internal/repository/question"
+	"genshin-quiz/internal/webserver/middleware"
 
 	"github.com/google/uuid"
 )
@@ -17,6 +19,12 @@ func PostCreateQuestion(
 	app *config.App,
 	req oapi.PostCreateQuestionRequestObject,
 ) (oapi.PostCreateQuestionResponseObject, error) {
+	// 从 context 中获取用户信息
+	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
+	if !ok {
+		return nil, fmt.Errorf("user not found in context")
+	}
+
 	now := time.Now()
 	// 提问表主体
 	insertModel := model.Questions{
@@ -27,7 +35,7 @@ func PostCreateQuestion(
 		Difficulty:   model.Difficulty(req.Body.Difficulty),
 		IsPublished:  true,
 		PublishedAt:  &now,
-		CreatedBy:    0,
+		CreatedBy:    userClaims.UserID, // 使用从 JWT 获取的用户 ID
 		CreatedAt:    now,
 	}
 	createdQuestion, err := question_repo.InsertQuestion(ctx, app.DB, insertModel)

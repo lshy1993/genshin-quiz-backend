@@ -75,22 +75,22 @@ func NewServer(app *config.App) *Server {
 		})
 	})
 
-	// Setup API routes without authentication (temporarily for testing)
-	// TODO: Add JWT authentication back for protected routes
-	// r.Group(func(r chi.Router) {
-	// 	r.Use(jwtauth.Verifier(app.JWTAuth))
-	// 	r.Use(mw.Authenticator)
-	baseURL := ""
-	serverOptions := oapi.StrictHTTPServerOptions{
-		RequestErrorHandlerFunc:  mw.HandleBadRequestError(app),
-		ResponseErrorHandlerFunc: mw.HandleResponseErrorWithLog(app),
-	}
-	strictHandler := oapi.NewStrictHandlerWithOptions(
-		handler.NewHandler(app),
-		[]oapi.StrictMiddlewareFunc{},
-		serverOptions,
-	)
-	oapi.HandlerFromMuxWithBaseURL(strictHandler, r, baseURL)
+	// Setup API routes with authentication
+	r.Group(func(r chi.Router) {
+		r.Use(mw.JWTAuth(app.Config.JWTSecret, app.DB))
+
+		baseURL := ""
+		serverOptions := oapi.StrictHTTPServerOptions{
+			RequestErrorHandlerFunc:  mw.HandleBadRequestError(app),
+			ResponseErrorHandlerFunc: mw.HandleResponseErrorWithLog(app),
+		}
+		strictHandler := oapi.NewStrictHandlerWithOptions(
+			handler.NewHandler(app),
+			[]oapi.StrictMiddlewareFunc{},
+			serverOptions,
+		)
+		oapi.HandlerFromMuxWithBaseURL(strictHandler, r, baseURL)
+	})
 
 	defer sentry.Flush(2 * time.Second)
 

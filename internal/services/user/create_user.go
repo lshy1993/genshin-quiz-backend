@@ -8,13 +8,12 @@ import (
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/dao/transformer"
 	user_repo "genshin-quiz/internal/repository/user"
-	"time"
+	"genshin-quiz/internal/webserver/middleware"
 
 	"genshin-quiz/internal/common"
 
 	go_errors "github.com/go-errors/errors"
 	"github.com/go-jet/jet/v2/qrm"
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -95,12 +94,7 @@ func realLogin(
 	res *model.Users,
 ) (*oapi.AuthResponse, error) {
 	// 生成 JWT
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": res.ID,
-		"email":   res.Email,
-		"exp":     time.Now().Add(24 * time.Hour).Unix(),
-	})
-	tokenString, err := token.SignedString([]byte(secret))
+	tokenString, err := middleware.GenerateJWT(res.ID, res.Email, secret)
 	if err != nil {
 		return nil, err
 	}
