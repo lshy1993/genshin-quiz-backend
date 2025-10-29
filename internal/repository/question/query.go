@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 	"genshin-quiz/generated/oapi"
 	dao "genshin-quiz/internal/dao"
@@ -74,7 +75,7 @@ func GetQuestions(
 
 	dtos := make([]oapi.Question, 0, len(questions))
 	for _, q := range questions {
-		dtos = append(dtos, transformer.ToSimpleQuestion(q))
+		dtos = append(dtos, transformer.ConvertSimpleToQuestion(q, false))
 	}
 
 	return &dao.QuestionListResult{
@@ -158,21 +159,130 @@ func GetQuestionByUUID(
 	ctx context.Context,
 	db qrm.DB,
 	uuid uuid.UUID,
-) (*oapi.Question, error) {
+	language *string,
+) (*dao.SimpleQuestion, error) {
 	tbl := table.Questions
-	stmt := pg.SELECT(tbl.AllColumns).FROM(
-		tbl,
+	transTbl := table.QuestionTranslations
+	userTbl := table.Users
+
+	defaultLang := "zh" // 默认语言
+	if language != nil {
+		defaultLang = *language // 使用指定语言
+	}
+
+	stmt := pg.SELECT(
+		tbl.AllColumns,
+		transTbl.AllColumns,
+		userTbl.UserUUID,
+	).FROM(
+		tbl.LEFT_JOIN(transTbl,
+			tbl.ID.EQ(transTbl.QuestionID).AND(transTbl.Language.EQ(pg.String(defaultLang))),
+		).LEFT_JOIN(userTbl, userTbl.ID.EQ(tbl.CreatedBy)),
 	).WHERE(
 		tbl.QuestionUUID.EQ(pg.UUID(uuid)),
 	)
 
-	var result dao.DetailedQuestion
+	var result dao.SimpleQuestion
 	err := stmt.QueryContext(ctx, db, &result)
 	if err != nil {
 		return nil, err
 	}
 
-	dto := transformer.ToDetailQuestion(result)
+	return &result, nil
+}
+
+func GetQuestionTranslation(
+	ctx context.Context,
+	db qrm.DB,
+	questionID int64,
+	language *[]string,
+) (*[]model.QuestionTranslations, error) {
+	tbl := table.QuestionTranslations
+
+	// langExp := []pg.Expression{}
+	// for _, lang := range *language {
+	// 	langExp = append(langExp, pg.String(string(lang)))
+	// }
+
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl).
+		WHERE(tbl.QuestionID.EQ(pg.Int64(questionID)))
+
+	var dto []model.QuestionTranslations
+	err := stmt.QueryContext(ctx, db, &dto)
+	if err != nil {
+		return nil, err
+	}
 
 	return &dto, nil
+}
+
+func GetQuestionOptions(
+	ctx context.Context,
+	db qrm.DB,
+	questionID int64,
+) (*[]model.QuestionOptions, error) {
+	tbl := table.QuestionOptions
+
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl).
+		WHERE(
+			tbl.QuestionID.EQ(pg.Int64(questionID)))
+
+	var options []model.QuestionOptions
+	err := stmt.QueryContext(ctx, db, &options)
+	if err != nil {
+		return nil, err
+	}
+
+	return &options, nil
+}
+
+func GetQuestionOptionTranslations(
+	ctx context.Context,
+	db qrm.DB,
+	optionIDs []int64,
+	language *[]string,
+) (*[]model.OptionTranslations, error) {
+	tbl := table.OptionTranslations
+
+	// 直接构建 IN 表达式
+	optionIDExpressions := make([]pg.Expression, 0, len(optionIDs))
+	for _, id := range optionIDs {
+		optionIDExpressions = append(optionIDExpressions, pg.Int64(id))
+	}
+
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl).
+		WHERE(tbl.OptionID.IN(optionIDExpressions...))
+
+	var dto []model.OptionTranslations
+	err := stmt.QueryContext(ctx, db, &dto)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto, nil
+}
+
+func GetQuestionSubmissionCount(
+	ctx context.Context,
+	db qrm.DB,
+	questionID int64,
+) (*int64, error) {
+	tbl := table.QuestionSubmissions
+
+	stmt := pg.SELECT(pg.COUNT(pg.STAR)).
+		FROM(tbl).
+		WHERE(tbl.QuestionID.EQ(pg.Int64(questionID)).AND(tbl.IsPractice.EQ(pg.Bool(false))))
+
+	var result struct {
+		Count int64 `alias:"count"`
+	}
+	err := stmt.QueryContext(ctx, db, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result.Count, nil
 }

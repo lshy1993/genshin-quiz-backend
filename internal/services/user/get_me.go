@@ -25,14 +25,27 @@ func GetMe(
 		return nil, err
 	}
 
+	avatar := ""
+	if userInfo.AvatarURL != nil {
+		avatar = *userInfo.AvatarURL
+	}
+	country := "Unknown"
+	if userInfo.Location != nil {
+		country = *userInfo.Location
+	}
+	displayName := ""
+	if userInfo.DisplayName != nil {
+		displayName = *userInfo.DisplayName
+	}
+
 	return &oapi.User{
 		Uuid:             userInfo.UserUUID,
-		AvatarUrl:        *userInfo.AvatarURL,
-		Country:          *userInfo.Location,
+		AvatarUrl:        avatar,
+		Country:          country,
 		Ip:               "",
 		Language:         userInfo.Language,
 		LastLoginAt:      userInfo.CreatedAt,
-		Nickname:         *userInfo.DisplayName,
+		Nickname:         displayName,
 		RegisteredAt:     userInfo.CreatedAt,
 		QuestionsCreated: 0,
 		TotalAnswers:     0,

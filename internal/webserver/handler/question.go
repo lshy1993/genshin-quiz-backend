@@ -25,7 +25,7 @@ func (h *Handler) GetQuestion(
 	if err != nil {
 		return nil, err
 	}
-	return *res, nil
+	return (oapi.GetQuestion200JSONResponse)(*res), nil
 }
 
 func (h *Handler) PostCreateQuestion(

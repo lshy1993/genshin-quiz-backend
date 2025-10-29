@@ -6,13 +6,13 @@ import (
 	"genshin-quiz/internal/dao"
 )
 
-func ToSimpleQuestion(
+func ConvertSimpleToQuestion(
 	res dao.SimpleQuestion,
+	solved bool,
 ) oapi.Question {
 	answered := 0
 	correct := int(res.Question.CorrectCount)
 	likes := int(res.Question.Likes)
-	solved := res.Solved
 	likeStatus := oapi.QuestionLikeStatus(0)
 
 	return oapi.Question{
@@ -34,29 +34,23 @@ func ToSimpleQuestion(
 	}
 }
 
-func ToDetailQuestion(
+func ConvertDetailToQuestion(
 	res dao.DetailedQuestion,
 ) oapi.Question {
-	answerCount := 0
-	// var answers []uuid.UUID
-	// if res.Solved {
-	// 	for _, opt := range res.Options {
-	// 		if opt.IsAnswered {
-	// 			answers = append(answers, opt.OptionUUID)
-	// 		}
-	// 	}
-	// }
+	answer := int(res.SubmissionCount)
 	correct := int(res.Question.CorrectCount)
 	likes := int(res.Question.Likes)
-	likeStatus := oapi.QuestionLikeStatus(0)
+	likeStatus := oapi.QuestionLikeStatus(0) // TODO: 根据用户数据设置喜欢状态
 	options := make([]oapi.QuestionOption, 0, len(res.Options))
+	solved := false
 	for i, translation := range res.OptionTranslations {
 		opt := res.Options[i]
 		dto := ToQuestionOption(opt, translation)
 		options = append(options, dto)
 	}
+
 	return oapi.Question{
-		AnswerCount:  &answerCount,
+		AnswerCount:  &answer,
 		Category:     oapi.QuestionCategory(res.Question.Category),
 		CorrectCount: &correct,
 		CreatedAt:    res.Question.CreatedAt,
@@ -71,7 +65,7 @@ func ToDetailQuestion(
 		Public:       res.Question.Public,
 		QuestionText: res.Translation.QuestionText,
 		QuestionType: oapi.QuestionType(res.Question.QuestionType),
-		Solved:       &res.Solved,
+		Solved:       &solved,
 	}
 }
 
@@ -79,11 +73,9 @@ func ToQuestionOption(
 	option model.QuestionOptions,
 	translation model.OptionTranslations,
 ) oapi.QuestionOption {
-	count := 1
-
+	count := int(option.SelectedCount)
 	text := map[string]string{}
 	text[translation.Language] = translation.OptionText
-
 	return oapi.QuestionOption{
 		Id:    &option.OptionUUID,
 		Count: &count,

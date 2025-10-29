@@ -9,14 +9,16 @@ type SimpleQuestion struct {
 	Question    model.Questions
 	User        model.Users
 	Translation model.QuestionTranslations
-	Solved      bool
+	// Solved      bool
 }
 
 type DetailedQuestion struct {
-	SimpleQuestion
-	Submissions        model.QuestionSubmissions
+	Question           model.Questions
+	User               model.Users
+	Translation        model.QuestionTranslations
 	Options            []model.QuestionOptions
 	OptionTranslations []model.OptionTranslations
+	SubmissionCount    int64
 }
 
 type QuestionListParams struct {
