@@ -75,9 +75,9 @@ func NewServer(app *config.App) *Server {
 		})
 	})
 
-	// Setup API routes with authentication
+	// Setup API routes - 使用条件认证中间件，根据路径决定是否需要认证
 	r.Group(func(r chi.Router) {
-		r.Use(mw.JWTAuth(app.Config.JWTSecret, app.DB))
+		r.Use(mw.ConditionalJWTAuth(app.Config.JWTSecret, app.DB))
 
 		baseURL := ""
 		serverOptions := oapi.StrictHTTPServerOptions{

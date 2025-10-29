@@ -110,48 +110,6 @@ func GetUserFromContextOnly(ctx context.Context) (*UserClaims, bool) {
 	return &user, ok
 }
 
-func Authenticator(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		token, claims, err := jwtauth.FromContext(r.Context())
-
-		if err != nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		if token == nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		// claims is already a map[string]interface{}
-		// Extract user information
-		userID, ok := claims["user_id"].(float64)
-		if !ok {
-			http.Error(w, "Invalid user ID in token", http.StatusUnauthorized)
-			return
-		}
-
-		email, ok := claims["email"].(string)
-		if !ok {
-			http.Error(w, "Invalid email in token", http.StatusUnauthorized)
-			return
-		}
-
-		// Create user claims
-		userClaims := UserClaims{
-			UserID: int64(userID),
-			Email:  email,
-		}
-
-		// Add user claims to context
-		ctx := context.WithValue(r.Context(), userContextKey{}, userClaims)
-
-		// Continue with the request
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
-
 func AdminOnly(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userClaims, ok := GetUserFromContext(r)
@@ -184,4 +142,66 @@ func GenerateJWT(userID int64, email, secret string) (string, error) {
 	})
 
 	return token.SignedString([]byte(secret))
+}
+
+func ConditionalJWTAuth(jwtSecret string, db qrm.DB) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			path := r.URL.Path
+			method := r.Method
+
+			// 检查是否是公开端点
+			if isPublicEndpoint(path, method) {
+				// 公开端点，不需要认证，直接通过
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			// 需要认证的端点，使用标准认证流程
+			authMiddleware := JWTAuth(jwtSecret, db)
+			authMiddleware(next).ServeHTTP(w, r)
+		})
+	}
+}
+
+func isPublicEndpoint(path, method string) bool {
+	// 定义不需要认证的路径和方法组合
+	publicEndpoints := map[string][]string{
+		// 认证相关 - 不需要认证
+		"/auth/register":        {"POST"},
+		"/auth/login":           {"POST"},
+		"/auth/forgot-password": {"POST"},
+
+		// 公开的只读API - 不需要认证
+		"/questions":   {"GET"},
+		"/questions/*": {"GET"}, // 通配符支持 /questions/{id}
+		"/exams":       {"GET"},
+		"/exams/*":     {"GET"}, // 通配符支持 /exams/{id}
+		"/votes":       {"GET"},
+		"/votes/*":     {"GET"}, // 只有GET操作公开，POST/PUT需要认证
+	}
+	// 精确匹配
+	if methods, exists := publicEndpoints[path]; exists {
+		for _, allowedMethod := range methods {
+			if allowedMethod == method {
+				return true
+			}
+		}
+	}
+
+	// 通配符匹配 (简单实现)
+	for pattern, methods := range publicEndpoints {
+		if strings.HasSuffix(pattern, "/*") {
+			prefix := strings.TrimSuffix(pattern, "/*")
+			if strings.HasPrefix(path, prefix+"/") {
+				for _, allowedMethod := range methods {
+					if allowedMethod == method {
+						return true
+					}
+				}
+			}
+		}
+	}
+
+	return false
 }
