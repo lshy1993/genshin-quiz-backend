@@ -18,12 +18,20 @@ func GetQuestions(
 	if req.Params.Page != nil {
 		page = *req.Params.Page
 	} else {
-		page = 0
+		page = 1 // 修正：页码从1开始，不是0
 	}
 	var limit int
 	if req.Params.Limit != nil {
 		limit = *req.Params.Limit
 	} else {
+		limit = 25
+	}
+
+	// 添加参数验证
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 || limit > 100 {
 		limit = 25
 	}
 

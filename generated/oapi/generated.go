@@ -312,8 +312,11 @@ type PostLoginUserJSONBody struct {
 
 // PostRegisterUserJSONBody defines parameters for PostRegisterUser.
 type PostRegisterUserJSONBody struct {
-	Email    openapi_types.Email `json:"email"`
-	Password string              `json:"password"`
+	Email openapi_types.Email `json:"email"`
+
+	// Language Preferred language code (e.g., "en", "zh")
+	Language *string `json:"language,omitempty"`
+	Password string  `json:"password"`
 }
 
 // GetExamsParams defines parameters for GetExams.

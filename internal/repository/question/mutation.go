@@ -64,9 +64,9 @@ func InsertQuestionOptions(
 	ctx context.Context,
 	db qrm.DB,
 	options []model.QuestionOptions,
-) error {
+) (*[]model.QuestionOptions, error) {
 	if len(options) == 0 {
-		return nil
+		return nil, nil
 	}
 
 	tbl := table.QuestionOptions
@@ -76,10 +76,15 @@ func InsertQuestionOptions(
 		tbl.OptionType,
 		tbl.ImgURL,
 		tbl.CreatedAt,
-	).MODELS(options)
+	).MODELS(options).RETURNING(tbl.AllColumns)
 
-	_, err := insertStmt.ExecContext(ctx, db)
-	return err
+	var insertedOptions []model.QuestionOptions
+	err := insertStmt.QueryContext(ctx, db, &insertedOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	return &insertedOptions, nil
 }
 
 func InsertOptionTranslations(

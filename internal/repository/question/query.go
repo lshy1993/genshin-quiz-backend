@@ -29,13 +29,21 @@ func GetQuestions(
 		offset = 0
 	}
 
-	// 基础查询
+	// 基础查询 - 使用语言过滤的JOIN
+	defaultLang := "zh" // 默认语言
+	if params.Language != nil {
+		defaultLang = (*params.Language)[0] // 使用第一个指定语言
+	}
+
 	stmt := pg.SELECT(
 		tbl.AllColumns,
+		transTbl.AllColumns,
+		userTbl.AllColumns,
+		subTbl.AllColumns,
 	).FROM(
 		tbl.LEFT_JOIN(
 			transTbl,
-			tbl.ID.EQ(transTbl.QuestionID),
+			tbl.ID.EQ(transTbl.QuestionID).AND(transTbl.Language.EQ(pg.String(defaultLang))),
 		).
 			LEFT_JOIN(subTbl, tbl.ID.EQ(subTbl.QuestionID)).
 			LEFT_JOIN(userTbl, tbl.CreatedBy.EQ(userTbl.ID)),
@@ -53,7 +61,6 @@ func GetQuestions(
 	var countResult struct {
 		Count int64 `alias:"count"`
 	}
-	// fmt.Print(countStmt.DebugSql())
 	err := countStmt.QueryContext(ctx, db, &countResult)
 	if err != nil {
 		return nil, err
@@ -65,7 +72,7 @@ func GetQuestions(
 		return nil, err
 	}
 
-	dtos := make([]oapi.Question, len(questions), 0)
+	dtos := make([]oapi.Question, 0, len(questions))
 	for _, q := range questions {
 		dtos = append(dtos, transformer.ToSimpleQuestion(q))
 	}
@@ -80,14 +87,6 @@ func baseCondition(params dao.QuestionListParams) pg.BoolExpression {
 	tbl := table.Questions
 	translationTbl := table.QuestionTranslations
 	condition := tbl.Public.IS_TRUE().AND(tbl.IsPublished.IS_TRUE())
-	// 添加语言过滤
-	if params.Language != nil && len(*params.Language) > 1 {
-		firstLang := []pg.Expression{}
-		for _, v := range *params.Language {
-			firstLang = append(firstLang, pg.String(v))
-		}
-		condition = condition.AND(translationTbl.Language.IN(firstLang...))
-	}
 
 	// 添加分类过滤
 	if params.Category != nil {

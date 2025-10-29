@@ -24,6 +24,7 @@ func RegisterUser(
 ) (*oapi.AuthResponse, error) {
 	email := req.Body.Email
 	pwd := req.Body.Password
+	language := req.Body.Language
 
 	// 检测用户是否存在
 	user, err := user_repo.GetUserByEmail(ctx, app.DB, string(email))
@@ -35,11 +36,11 @@ func RegisterUser(
 	}
 
 	// 创建用户
-	tx, err := app.DB.Begin()
+	tx, err := app.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, go_errors.WrapPrefix(err, "failed to begin transaction", 0)
 	}
-	res, err := user_repo.InsertUser(ctx, tx, string(email))
+	res, err := user_repo.InsertUser(ctx, tx, string(email), language)
 	if err != nil {
 		tx.Rollback()
 		return nil, err

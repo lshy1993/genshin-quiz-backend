@@ -21,6 +21,7 @@ func InsertUser(
 	ctx context.Context,
 	db qrm.DB,
 	email string,
+	language *string,
 ) (*model.Users, error) {
 	tbl := table.Users
 
@@ -37,6 +38,7 @@ func InsertUser(
 		tbl.UserUUID,
 		tbl.Email,
 		tbl.DisplayName,
+		tbl.Language,
 		tbl.CreatedAt,
 		tbl.UpdatedAt,
 	).
@@ -44,6 +46,7 @@ func InsertUser(
 			UserUUID:    newUUID,
 			Email:       email,
 			DisplayName: &tmpName,
+			Language:    language,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}).

@@ -14,6 +14,7 @@ func ToSimpleQuestion(
 	likes := int(res.Question.Likes)
 	solved := res.Solved
 	likeStatus := oapi.QuestionLikeStatus(0)
+
 	return oapi.Question{
 		AnswerCount:  &answered,
 		Category:     oapi.QuestionCategory(res.Question.Category),
@@ -23,7 +24,6 @@ func ToSimpleQuestion(
 		Difficulty:   oapi.QuestionDifficulty(res.Question.Difficulty),
 		Explanation:  nil,
 		Id:           res.Question.QuestionUUID,
-		Languages:    []string{},
 		LikeStatus:   &likeStatus,
 		Likes:        &likes,
 		Options:      nil,

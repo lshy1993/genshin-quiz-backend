@@ -8,7 +8,7 @@ CREATE TABLE users (
     avatar_url TEXT,
     location VARCHAR(100),
     timezone VARCHAR(50),
-    language VARCHAR(10) DEFAULT 'zh-CN',
+    language VARCHAR(10) DEFAULT 'zh',
     show_email BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP

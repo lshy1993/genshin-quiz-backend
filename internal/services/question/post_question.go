@@ -25,7 +25,13 @@ func PostCreateQuestion(
 		return nil, fmt.Errorf("user not found in context")
 	}
 
+	tx, err := app.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	now := time.Now()
+	fmt.Println("Creating question by user ID:", req.Body.QuestionType)
 	// 提问表主体
 	insertModel := model.Questions{
 		QuestionUUID: uuid.New(),
@@ -38,8 +44,9 @@ func PostCreateQuestion(
 		CreatedBy:    userClaims.UserID, // 使用从 JWT 获取的用户 ID
 		CreatedAt:    now,
 	}
-	createdQuestion, err := question_repo.InsertQuestion(ctx, app.DB, insertModel)
+	createdQuestion, err := question_repo.InsertQuestion(ctx, tx, insertModel)
 	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 	// 提问翻译
@@ -64,32 +71,44 @@ func PostCreateQuestion(
 	}
 
 	// 批量插入翻译数据
-	err = question_repo.InsertQuestionTranslations(ctx, app.DB, transModels)
+	err = question_repo.InsertQuestionTranslations(ctx, tx, transModels)
 	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
-	// 插入选项
+	// 选项生成数据
 	optionModels := make([]model.QuestionOptions, 0, len(req.Body.Options))
-	// 插入翻译
+	for _, option := range req.Body.Options {
+		optionModel := model.QuestionOptions{
+			QuestionID: createdQuestion.ID,
+			OptionUUID: uuid.New(),
+			OptionType: model.QuestionOptionType(option.Type),
+			ImgURL:     option.Image,
+			IsAnswer:   *option.IsAnswer,
+			CreatedAt:  now,
+		}
+		optionModels = append(optionModels, optionModel)
+	}
+	// 插入选项
+	insertedOptions, err := question_repo.InsertQuestionOptions(ctx, tx, optionModels)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// 翻译生成数据
 	optionTransModels := make(
 		[]model.OptionTranslations,
 		0,
 		len(req.Body.Options)*len(req.Body.QuestionText),
 	)
-	for _, option := range req.Body.Options {
-		optionModel := model.QuestionOptions{
-			QuestionID: createdQuestion.ID,
-			OptionUUID: uuid.New(),
-			IsAnswer:   *option.IsAnswer,
-			CreatedAt:  now,
-		}
-		optionModels = append(optionModels, optionModel)
-
+	for i, option := range *insertedOptions {
+		source := req.Body.Options[i]
 		// 为每个选项创建翻译记录
-		for lang, text := range *option.Text {
+		for lang, text := range *source.Text {
 			optionTransModel := model.OptionTranslations{
-				OptionID:   optionModel.ID,
+				OptionID:   option.ID,
 				Language:   lang,
 				OptionText: text,
 				CreatedAt:  now,
@@ -98,13 +117,15 @@ func PostCreateQuestion(
 			optionTransModels = append(optionTransModels, optionTransModel)
 		}
 	}
-
-	err = question_repo.InsertQuestionOptions(ctx, app.DB, optionModels)
+	// 插入选项翻译
+	err = question_repo.InsertOptionTranslations(ctx, tx, optionTransModels)
 	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
-	err = question_repo.InsertOptionTranslations(ctx, app.DB, optionTransModels)
-	if err != nil {
+
+	// 提交事务
+	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 
