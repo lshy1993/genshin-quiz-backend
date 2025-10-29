@@ -68,7 +68,12 @@ func Handler(app *config.App) func(next http.Handler) http.Handler {
 // 	writeErrorResponse(w, statusCode, message, code, details)
 // }
 
-func writeErrorResponse(w http.ResponseWriter, statusCode int, message, code, details string, forceLogout bool) {
+func writeErrorResponse(
+	w http.ResponseWriter,
+	statusCode int,
+	message, code, details string,
+	forceLogout bool,
+) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
@@ -97,7 +102,14 @@ func HandleBadRequestError(
 			zap.String("request_id", r.Header.Get("X-Request-ID")),
 		)
 
-		writeErrorResponse(w, http.StatusBadRequest, "Bad request", "INVALID_REQUEST", err.Error(), false)
+		writeErrorResponse(
+			w,
+			http.StatusBadRequest,
+			"Bad request",
+			"INVALID_REQUEST",
+			err.Error(),
+			false,
+		)
 	}
 }
 
@@ -162,9 +174,23 @@ func handleAPIError(
 	case 409:
 		writeErrorResponse(w, apiErr.Code, apiErr.Message, "CONFLICT", apiErr.Detail, false)
 	case 422:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "UNPROCESSABLE_ENTITY", apiErr.Detail, false)
+		writeErrorResponse(
+			w,
+			apiErr.Code,
+			apiErr.Message,
+			"UNPROCESSABLE_ENTITY",
+			apiErr.Detail,
+			false,
+		)
 	case 429:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "TOO_MANY_REQUESTS", apiErr.Detail, false)
+		writeErrorResponse(
+			w,
+			apiErr.Code,
+			apiErr.Message,
+			"TOO_MANY_REQUESTS",
+			apiErr.Detail,
+			false,
+		)
 	default:
 		// 500 及其他未知错误
 		writeErrorResponse(

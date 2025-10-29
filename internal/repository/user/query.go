@@ -13,6 +13,7 @@ import (
 	go_errors "github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
+	"github.com/google/uuid"
 )
 
 func GetUserByEmail(
@@ -87,7 +88,52 @@ func GetUserInfoByID(
 	return &user, nil
 }
 
-// CheckUserExists 检查用户是否存在（复用 GetUserInfoByID）
+func GetUserInfoByUUID(
+	ctx context.Context,
+	db qrm.DB,
+	uuid uuid.UUID,
+) (*model.Users, error) {
+	tbl := table.Users
+	stmt := pg.SELECT(tbl.AllColumns).FROM(tbl).WHERE(
+		tbl.UserUUID.EQ(pg.UUID(uuid)),
+	)
+
+	var users []*model.Users
+	err := stmt.QueryContext(ctx, db, &users)
+	if err != nil {
+		return nil, err
+	}
+	if len(users) == 0 {
+		return nil, common.ErrUserNotFound
+	}
+
+	return users[0], nil
+}
+
+func GetUserInfosByUUIDs(
+	ctx context.Context,
+	db qrm.DB,
+	uuids []uuid.UUID,
+) ([]*model.Users, error) {
+	tbl := table.Users
+
+	uuidExp := make([]pg.Expression, len(uuids))
+	for i, id := range uuids {
+		uuidExp[i] = pg.UUID(id)
+	}
+	stmt := pg.SELECT(tbl.AllColumns).FROM(tbl).WHERE(
+		tbl.UserUUID.IN(uuidExp...),
+	)
+
+	var users []*model.Users
+	err := stmt.QueryContext(ctx, db, &users)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
 func CheckUserExists(
 	ctx context.Context,
 	db qrm.DB,

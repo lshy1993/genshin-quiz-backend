@@ -32,10 +32,31 @@ func (h *Handler) GetUsers(
 	ctx context.Context,
 	req oapi.GetUsersRequestObject,
 ) (oapi.GetUsersResponseObject, error) {
-	return (oapi.GetUsers200JSONResponse{
-		Limit:  ptr(0),
-		Offset: ptr(0),
-		Total:  ptr(0),
-		Users:  &[]oapi.User{},
-	}), nil
+	res, err := services.GetUsers(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return *res, nil
+}
+
+func (h *Handler) GetUser(
+	ctx context.Context,
+	req oapi.GetUserRequestObject,
+) (oapi.GetUserResponseObject, error) {
+	res, err := services.GetUser(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return (oapi.GetUser200JSONResponse)(*res), nil
+}
+
+func (h *Handler) GetCurrentUser(
+	ctx context.Context,
+	req oapi.GetCurrentUserRequestObject,
+) (oapi.GetCurrentUserResponseObject, error) {
+	res, err := services.GetMe(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return (oapi.GetCurrentUser200JSONResponse)(*res), nil
 }

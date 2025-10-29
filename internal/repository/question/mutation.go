@@ -65,10 +65,6 @@ func InsertQuestionOptions(
 	db qrm.DB,
 	options []model.QuestionOptions,
 ) (*[]model.QuestionOptions, error) {
-	if len(options) == 0 {
-		return nil, nil
-	}
-
 	tbl := table.QuestionOptions
 	insertStmt := tbl.INSERT(
 		tbl.QuestionID,

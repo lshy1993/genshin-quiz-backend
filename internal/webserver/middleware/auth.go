@@ -104,7 +104,6 @@ func GetUserFromContext(r *http.Request) (*UserClaims, bool) {
 	return GetUserFromContextOnly(r.Context())
 }
 
-// GetUserFromContextOnly - 从 context 获取用户信息（通用函数）
 func GetUserFromContextOnly(ctx context.Context) (*UserClaims, bool) {
 	user, ok := ctx.Value(userContextKey{}).(UserClaims)
 	return &user, ok
@@ -133,7 +132,6 @@ func AdminOnly(next http.Handler) http.Handler {
 	})
 }
 
-// GenerateJWT 生成 JWT token
 func GenerateJWT(userID int64, email, secret string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID,
