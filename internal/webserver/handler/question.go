@@ -27,3 +27,14 @@ func (h *Handler) GetQuestion(
 	}
 	return *res, nil
 }
+
+func (h *Handler) PostCreateQuestion(
+	ctx context.Context,
+	req oapi.PostCreateQuestionRequestObject,
+) (oapi.PostCreateQuestionResponseObject, error) {
+	res, err := services.PostCreateQuestion(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}

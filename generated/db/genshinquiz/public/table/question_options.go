@@ -22,7 +22,7 @@ type questionOptionsTable struct {
 	QuestionID    postgres.ColumnInteger
 	OptionType    postgres.ColumnString
 	ImgURL        postgres.ColumnString
-	IsAnswered    postgres.ColumnBool
+	IsAnswer      postgres.ColumnBool
 	CreatedAt     postgres.ColumnTimestampz
 	SelectedCount postgres.ColumnInteger
 
@@ -71,12 +71,12 @@ func newQuestionOptionsTableImpl(schemaName, tableName, alias string) questionOp
 		QuestionIDColumn    = postgres.IntegerColumn("question_id")
 		OptionTypeColumn    = postgres.StringColumn("option_type")
 		ImgURLColumn        = postgres.StringColumn("img_url")
-		IsAnsweredColumn    = postgres.BoolColumn("is_answered")
+		IsAnswerColumn      = postgres.BoolColumn("is_answer")
 		CreatedAtColumn     = postgres.TimestampzColumn("created_at")
 		SelectedCountColumn = postgres.IntegerColumn("selected_count")
-		allColumns          = postgres.ColumnList{IDColumn, OptionUUIDColumn, QuestionIDColumn, OptionTypeColumn, ImgURLColumn, IsAnsweredColumn, CreatedAtColumn, SelectedCountColumn}
-		mutableColumns      = postgres.ColumnList{OptionUUIDColumn, QuestionIDColumn, OptionTypeColumn, ImgURLColumn, IsAnsweredColumn, CreatedAtColumn, SelectedCountColumn}
-		defaultColumns      = postgres.ColumnList{IDColumn, OptionUUIDColumn, OptionTypeColumn, IsAnsweredColumn, CreatedAtColumn, SelectedCountColumn}
+		allColumns          = postgres.ColumnList{IDColumn, OptionUUIDColumn, QuestionIDColumn, OptionTypeColumn, ImgURLColumn, IsAnswerColumn, CreatedAtColumn, SelectedCountColumn}
+		mutableColumns      = postgres.ColumnList{OptionUUIDColumn, QuestionIDColumn, OptionTypeColumn, ImgURLColumn, IsAnswerColumn, CreatedAtColumn, SelectedCountColumn}
+		defaultColumns      = postgres.ColumnList{IDColumn, OptionUUIDColumn, OptionTypeColumn, IsAnswerColumn, CreatedAtColumn, SelectedCountColumn}
 	)
 
 	return questionOptionsTable{
@@ -88,7 +88,7 @@ func newQuestionOptionsTableImpl(schemaName, tableName, alias string) questionOp
 		QuestionID:    QuestionIDColumn,
 		OptionType:    OptionTypeColumn,
 		ImgURL:        ImgURLColumn,
-		IsAnswered:    IsAnsweredColumn,
+		IsAnswer:      IsAnswerColumn,
 		CreatedAt:     CreatedAtColumn,
 		SelectedCount: SelectedCountColumn,
 

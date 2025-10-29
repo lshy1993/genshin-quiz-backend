@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"genshin-quiz/config"
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
@@ -11,7 +12,7 @@ import (
 
 	"genshin-quiz/internal/common"
 
-	"github.com/go-errors/errors"
+	go_errors "github.com/go-errors/errors"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -27,7 +28,7 @@ func RegisterUser(
 
 	// 检测用户是否存在
 	user, err := user_repo.GetUserByEmail(ctx, app.DB, string(email))
-	if err != common.ErrUserNotFound {
+	if err != nil && !errors.Is(err, common.ErrUserNotFound) {
 		// 其他错误
 		return nil, err
 	} else if user != nil {
@@ -35,9 +36,9 @@ func RegisterUser(
 	}
 
 	// 创建用户
-	tx, err := app.DB.BeginTx(ctx, nil)
+	tx, err := app.DB.Begin()
 	if err != nil {
-		return nil, errors.WrapPrefix(err, "failed to begin transaction", 0)
+		return nil, go_errors.WrapPrefix(err, "failed to begin transaction", 0)
 	}
 	res, err := user_repo.InsertUser(ctx, tx, string(email))
 	if err != nil {
@@ -57,7 +58,7 @@ func RegisterUser(
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, errors.WrapPrefix(err, "failed to commit transaction", 0)
+		return nil, go_errors.WrapPrefix(err, "failed to commit transaction", 0)
 	}
 
 	return response, nil

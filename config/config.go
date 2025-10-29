@@ -181,7 +181,12 @@ func (app *App) initializeDatabase() (*sql.DB, error) {
 }
 
 func (app *App) initializeSentry() error {
-	// 只在设置了 Sentry DSN 时才初始化
+	// 只在非 debug 环境（生产环境）且设置了 Sentry DSN 时才初始化
+	if app.Config.Environment != PROD {
+		app.Logger.Info("Sentry disabled in non-production environment")
+		return nil
+	}
+
 	if app.Config.SentryDSN == "" {
 		app.Logger.Info("Sentry DSN not configured, skipping Sentry initialization")
 		return nil

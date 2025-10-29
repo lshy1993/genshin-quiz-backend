@@ -29,8 +29,8 @@ func NewServer(app *config.App) *Server {
 	// Setup router
 	r := chi.NewRouter()
 
-	// Sentry 中间件 - 用于自动错误跟踪
-	if app.Config.SentryDSN != "" {
+	// Sentry 中间件 - 只在生产环境启用
+	if app.Config.Environment == "production" && app.Config.SentryDSN != "" {
 		sentryHandler := sentryhttp.New(sentryhttp.Options{
 			Repanic: true,
 		})
@@ -43,7 +43,7 @@ func NewServer(app *config.App) *Server {
 	r.Use(mw.Logger(app.Logger))
 
 	// 使用自定义的错误处理中间件，替代 chi 的 Recoverer
-	r.Use(mw.Handler(app.Logger))
+	r.Use(mw.Handler(app))
 
 	r.Use(middleware.Timeout(60 * time.Second))
 

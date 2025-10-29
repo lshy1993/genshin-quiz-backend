@@ -37,7 +37,7 @@ func ToSimpleQuestion(
 func ToDetailQuestion(
 	res dao.DetailedQuestion,
 ) oapi.Question {
-	answered := 0
+	answerCount := 0
 	// var answers []uuid.UUID
 	// if res.Solved {
 	// 	for _, opt := range res.Options {
@@ -56,7 +56,7 @@ func ToDetailQuestion(
 		options = append(options, dto)
 	}
 	return oapi.Question{
-		AnswerCount:  &answered,
+		AnswerCount:  &answerCount,
 		Category:     oapi.QuestionCategory(res.Question.Category),
 		CorrectCount: &correct,
 		CreatedAt:    res.Question.CreatedAt,
@@ -80,11 +80,15 @@ func ToQuestionOption(
 	translation model.OptionTranslations,
 ) oapi.QuestionOption {
 	count := 1
+
+	text := map[string]string{}
+	text[translation.Language] = translation.OptionText
+
 	return oapi.QuestionOption{
-		Id:    option.OptionUUID,
+		Id:    &option.OptionUUID,
 		Count: &count,
 		Image: option.ImgURL,
-		Text:  &translation.OptionText,
+		Text:  &text,
 		Type:  oapi.QuestionOptionType(option.OptionType),
 	}
 }

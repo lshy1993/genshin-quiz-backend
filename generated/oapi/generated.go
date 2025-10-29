@@ -169,8 +169,8 @@ type QuestionDifficulty string
 // QuestionOption defines model for QuestionOption.
 type QuestionOption struct {
 	// Count 选中次数
-	Count *int               `json:"count,omitempty"`
-	Id    openapi_types.UUID `json:"id"`
+	Count *int                `json:"count,omitempty"`
+	Id    *openapi_types.UUID `json:"id,omitempty"`
 
 	// Image 选项图片URL
 	Image *string `json:"image,omitempty"`
@@ -179,7 +179,7 @@ type QuestionOption struct {
 	IsAnswer *bool `json:"is_answer,omitempty"`
 
 	// Text 选项文本
-	Text *string `json:"text,omitempty"`
+	Text *map[string]string `json:"text,omitempty"`
 
 	// Type 选项类型
 	Type QuestionOptionType `json:"type"`
@@ -187,16 +187,6 @@ type QuestionOption struct {
 
 // QuestionOptionType 选项类型
 type QuestionOptionType string
-
-// QuestionTranslation defines model for QuestionTranslation.
-type QuestionTranslation struct {
-	Explanation string `json:"explanation"`
-	Options     []struct {
-		IsAnswer bool   `json:"is_answer"`
-		Text     string `json:"text"`
-	} `json:"options"`
-	QuestionText string `json:"question_text"`
-}
 
 // QuestionType 题目类型
 type QuestionType string
@@ -208,14 +198,19 @@ type QuestionWithAnswer struct {
 
 	// Difficulty 难度等级
 	Difficulty QuestionDifficulty `json:"difficulty"`
-	Public     bool               `json:"public"`
+
+	// Explanation 多语言解释
+	Explanation *map[string]string `json:"explanation,omitempty"`
+
+	// Options 问题的选项
+	Options []QuestionOption `json:"options"`
+	Public  bool             `json:"public"`
+
+	// QuestionText 多语言题干
+	QuestionText map[string]string `json:"question_text"`
 
 	// QuestionType 题目类型
 	QuestionType QuestionType `json:"question_type"`
-	Translations []struct {
-		Language string              `json:"language"`
-		Text     QuestionTranslation `json:"text"`
-	} `json:"translations"`
 }
 
 // User defines model for User.
@@ -224,6 +219,7 @@ type User struct {
 	CorrectAnswers   int                `json:"correct_answers"`
 	Country          string             `json:"country"`
 	Ip               string             `json:"ip"`
+	Language         *string            `json:"language,omitempty"`
 	LastLoginAt      time.Time          `json:"last_login_at"`
 	Nickname         string             `json:"nickname"`
 	QuestionsCreated int                `json:"questions_created"`
