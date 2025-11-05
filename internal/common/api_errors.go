@@ -48,4 +48,5 @@ var (
 	ErrUserNotFound       = NewNotFoundError("用户不存在")
 	ErrUserAlreadyExists  = NewBadRequestError("用户已存在")
 	ErrInvalidCredentials = NewUnauthorizedError("邮箱或密码错误")
+	ErrQuestionNotFound   = NewNotFoundError("问题未找到")
 )

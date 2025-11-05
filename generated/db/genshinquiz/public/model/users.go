@@ -14,15 +14,19 @@ import (
 )
 
 type Users struct {
-	ID          int64 `sql:"primary_key"`
-	UserUUID    uuid.UUID
-	Email       string
-	DisplayName *string
-	AvatarURL   *string
-	Location    *string
-	Timezone    *string
-	Language    *string
-	ShowEmail   *bool
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID                 int64 `sql:"primary_key"`
+	UserUUID           uuid.UUID
+	Email              string
+	DisplayName        *string
+	AvatarURL          *string
+	Location           *string
+	Timezone           *string
+	Language           *string
+	ShowEmail          *bool
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+	TotalSubmissions   int64
+	CorrectSubmissions int64
+	QuestionsCreated   int64
+	TotalVotes         int64
 }

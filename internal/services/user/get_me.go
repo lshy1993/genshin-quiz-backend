@@ -47,9 +47,9 @@ func GetMe(
 		LastLoginAt:      userInfo.CreatedAt,
 		Nickname:         displayName,
 		RegisteredAt:     userInfo.CreatedAt,
-		QuestionsCreated: 0,
-		TotalAnswers:     0,
-		CorrectAnswers:   0,
-		Votes:            0,
+		QuestionsCreated: int(userInfo.QuestionsCreated),
+		TotalAnswers:     int(userInfo.TotalSubmissions),
+		CorrectAnswers:   int(userInfo.CorrectSubmissions),
+		Votes:            int(userInfo.TotalVotes),
 	}, nil
 }

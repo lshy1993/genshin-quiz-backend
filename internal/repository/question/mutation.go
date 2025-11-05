@@ -6,6 +6,7 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
+	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 )
 
@@ -102,5 +103,56 @@ func InsertOptionTranslations(
 	).MODELS(optionTranslations)
 
 	_, err := insertStmt.ExecContext(ctx, db)
+	return err
+}
+
+func InsertSubmission(
+	ctx context.Context,
+	db qrm.DB,
+	submission model.QuestionSubmissions,
+) error {
+	tbl := table.QuestionSubmissions
+
+	insertStmt := tbl.INSERT(
+		tbl.SubmissionUUID,
+		tbl.QuestionID,
+		tbl.UserID,
+		tbl.IsPractice,
+		// tbl.SelectedOptionIDs,
+		tbl.IsCorrect,
+		tbl.CreatedAt,
+	).MODEL(submission)
+
+	_, err := insertStmt.ExecContext(ctx, db)
+	return err
+}
+
+func UpdateQuestionSolved(
+	ctx context.Context,
+	db qrm.DB,
+	questionID int64,
+	correct bool,
+) error {
+	tbl := table.Questions
+
+	var updateStmt pg.UpdateStatement
+	if correct {
+		updateStmt = tbl.UPDATE().
+			SET(
+				tbl.SubmitCount, tbl.SubmitCount.ADD(pg.Int(1)),
+				tbl.CorrectCount, tbl.CorrectCount.ADD(pg.Int(1)),
+			).WHERE(
+			tbl.ID.EQ(pg.Int64(questionID)),
+		)
+	} else {
+		updateStmt = tbl.UPDATE().
+			SET(
+				tbl.SubmitCount, tbl.SubmitCount.ADD(pg.Int(1)),
+			).WHERE(
+			tbl.ID.EQ(pg.Int64(questionID)),
+		)
+	}
+
+	_, err := updateStmt.ExecContext(ctx, db)
 	return err
 }

@@ -213,6 +213,22 @@ type QuestionWithAnswer struct {
 	QuestionType QuestionType `json:"question_type"`
 }
 
+// Submission defines model for Submission.
+type Submission struct {
+	// Id 提交记录ID
+	Id openapi_types.UUID `json:"id"`
+
+	// IsCorrect 答案是否正确
+	IsCorrect         bool                 `json:"is_correct"`
+	SelectedOptionIds []openapi_types.UUID `json:"selected_option_ids"`
+
+	// SubmittedAt 提交时间
+	SubmittedAt time.Time `json:"submitted_at"`
+
+	// TimeSpent 答题用时（秒）
+	TimeSpent int `json:"time_spent"`
+}
+
 // User defines model for User.
 type User struct {
 	AvatarUrl        string             `json:"avatar_url"`
@@ -342,6 +358,13 @@ type GetQuestionsParams struct {
 	SortDesc   *bool                 `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
 }
 
+// PostSubmitAnswerJSONBody defines parameters for PostSubmitAnswer.
+type PostSubmitAnswerJSONBody struct {
+	ExamId            *openapi_types.UUID  `json:"exam_id,omitempty"`
+	SelectedOptionIds []openapi_types.UUID `json:"selected_option_ids"`
+	TimeSpent         int                  `json:"time_spent"`
+}
+
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	Ids    *[]openapi_types.UUID `form:"ids,omitempty" json:"ids,omitempty"`
@@ -389,6 +412,9 @@ type PostCreateQuestionJSONRequestBody = QuestionWithAnswer
 
 // UpdateQuestionJSONRequestBody defines body for UpdateQuestion for application/json ContentType.
 type UpdateQuestionJSONRequestBody = QuestionWithAnswer
+
+// PostSubmitAnswerJSONRequestBody defines body for PostSubmitAnswer for application/json ContentType.
+type PostSubmitAnswerJSONRequestBody PostSubmitAnswerJSONBody
 
 // UpdateUserJSONRequestBody defines body for UpdateUser for application/json ContentType.
 type UpdateUserJSONRequestBody = User
@@ -527,6 +553,14 @@ type ClientInterface interface {
 	UpdateQuestionWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdateQuestion(ctx context.Context, id openapi_types.UUID, body UpdateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetQuestionSubmissions request
+	GetQuestionSubmissions(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostSubmitAnswerWithBody request with any body
+	PostSubmitAnswerWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostSubmitAnswer(ctx context.Context, id openapi_types.UUID, body PostSubmitAnswerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetUsers request
 	GetUsers(ctx context.Context, params *GetUsersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -801,6 +835,42 @@ func (c *Client) UpdateQuestionWithBody(ctx context.Context, id openapi_types.UU
 
 func (c *Client) UpdateQuestion(ctx context.Context, id openapi_types.UUID, body UpdateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateQuestionRequest(c.Server, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetQuestionSubmissions(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetQuestionSubmissionsRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSubmitAnswerWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSubmitAnswerRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSubmitAnswer(ctx context.Context, id openapi_types.UUID, body PostSubmitAnswerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSubmitAnswerRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1706,6 +1776,87 @@ func NewUpdateQuestionRequestWithBody(server string, id openapi_types.UUID, cont
 	return req, nil
 }
 
+// NewGetQuestionSubmissionsRequest generates requests for GetQuestionSubmissions
+func NewGetQuestionSubmissionsRequest(server string, id openapi_types.UUID) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/questions/%s/submissions", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostSubmitAnswerRequest calls the generic PostSubmitAnswer builder with application/json body
+func NewPostSubmitAnswerRequest(server string, id openapi_types.UUID, body PostSubmitAnswerJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostSubmitAnswerRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewPostSubmitAnswerRequestWithBody generates requests for PostSubmitAnswer with any type of body
+func NewPostSubmitAnswerRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/questions/%s/submit", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewGetUsersRequest generates requests for GetUsers
 func NewGetUsersRequest(server string, params *GetUsersParams) (*http.Request, error) {
 	var err error
@@ -2251,6 +2402,14 @@ type ClientWithResponsesInterface interface {
 
 	UpdateQuestionWithResponse(ctx context.Context, id openapi_types.UUID, body UpdateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateQuestionResponse, error)
 
+	// GetQuestionSubmissionsWithResponse request
+	GetQuestionSubmissionsWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetQuestionSubmissionsResponse, error)
+
+	// PostSubmitAnswerWithBodyWithResponse request with any body
+	PostSubmitAnswerWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSubmitAnswerResponse, error)
+
+	PostSubmitAnswerWithResponse(ctx context.Context, id openapi_types.UUID, body PostSubmitAnswerJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSubmitAnswerResponse, error)
+
 	// GetUsersWithResponse request
 	GetUsersWithResponse(ctx context.Context, params *GetUsersParams, reqEditors ...RequestEditorFn) (*GetUsersResponse, error)
 
@@ -2627,6 +2786,60 @@ func (r UpdateQuestionResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpdateQuestionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetQuestionSubmissionsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]Submission
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetQuestionSubmissionsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetQuestionSubmissionsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostSubmitAnswerResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Correct *bool `json:"correct,omitempty"`
+	}
+	JSON400 *BadRequest
+	JSON401 *Unauthorized
+	JSON404 *NotFound
+	JSON500 *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostSubmitAnswerResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostSubmitAnswerResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -3017,6 +3230,32 @@ func (c *ClientWithResponses) UpdateQuestionWithResponse(ctx context.Context, id
 		return nil, err
 	}
 	return ParseUpdateQuestionResponse(rsp)
+}
+
+// GetQuestionSubmissionsWithResponse request returning *GetQuestionSubmissionsResponse
+func (c *ClientWithResponses) GetQuestionSubmissionsWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetQuestionSubmissionsResponse, error) {
+	rsp, err := c.GetQuestionSubmissions(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetQuestionSubmissionsResponse(rsp)
+}
+
+// PostSubmitAnswerWithBodyWithResponse request with arbitrary body returning *PostSubmitAnswerResponse
+func (c *ClientWithResponses) PostSubmitAnswerWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSubmitAnswerResponse, error) {
+	rsp, err := c.PostSubmitAnswerWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSubmitAnswerResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostSubmitAnswerWithResponse(ctx context.Context, id openapi_types.UUID, body PostSubmitAnswerJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSubmitAnswerResponse, error) {
+	rsp, err := c.PostSubmitAnswer(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSubmitAnswerResponse(rsp)
 }
 
 // GetUsersWithResponse request returning *GetUsersResponse
@@ -3744,6 +3983,116 @@ func ParseUpdateQuestionResponse(rsp *http.Response) (*UpdateQuestionResponse, e
 	return response, nil
 }
 
+// ParseGetQuestionSubmissionsResponse parses an HTTP response from a GetQuestionSubmissionsWithResponse call
+func ParseGetQuestionSubmissionsResponse(rsp *http.Response) (*GetQuestionSubmissionsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetQuestionSubmissionsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []Submission
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostSubmitAnswerResponse parses an HTTP response from a PostSubmitAnswerWithResponse call
+func ParsePostSubmitAnswerResponse(rsp *http.Response) (*PostSubmitAnswerResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostSubmitAnswerResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Correct *bool `json:"correct,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetUsersResponse parses an HTTP response from a GetUsersWithResponse call
 func ParseGetUsersResponse(rsp *http.Response) (*GetUsersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -4156,6 +4505,12 @@ type ServerInterface interface {
 	// Update question
 	// (PUT /questions/{id})
 	UpdateQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Get submissions for a question
+	// (GET /questions/{id}/submissions)
+	GetQuestionSubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Submit answer for a question
+	// (POST /questions/{id}/submit)
+	PostSubmitAnswer(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Get all users
 	// (GET /users)
 	GetUsers(w http.ResponseWriter, r *http.Request, params GetUsersParams)
@@ -4267,6 +4622,18 @@ func (_ Unimplemented) GetQuestion(w http.ResponseWriter, r *http.Request, id op
 // Update question
 // (PUT /questions/{id})
 func (_ Unimplemented) UpdateQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get submissions for a question
+// (GET /questions/{id}/submissions)
+func (_ Unimplemented) GetQuestionSubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Submit answer for a question
+// (POST /questions/{id}/submit)
+func (_ Unimplemented) PostSubmitAnswer(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -4719,6 +5086,56 @@ func (siw *ServerInterfaceWrapper) UpdateQuestion(w http.ResponseWriter, r *http
 	handler.ServeHTTP(w, r)
 }
 
+// GetQuestionSubmissions operation middleware
+func (siw *ServerInterfaceWrapper) GetQuestionSubmissions(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetQuestionSubmissions(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostSubmitAnswer operation middleware
+func (siw *ServerInterfaceWrapper) PostSubmitAnswer(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostSubmitAnswer(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // GetUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetUsers(w http.ResponseWriter, r *http.Request) {
 
@@ -5122,6 +5539,12 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Put(options.BaseURL+"/questions/{id}", wrapper.UpdateQuestion)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/questions/{id}/submissions", wrapper.GetQuestionSubmissions)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/questions/{id}/submit", wrapper.PostSubmitAnswer)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/users", wrapper.GetUsers)
@@ -5797,6 +6220,119 @@ func (response UpdateQuestion500JSONResponse) VisitUpdateQuestionResponse(w http
 	return json.NewEncoder(w).Encode(response)
 }
 
+type GetQuestionSubmissionsRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type GetQuestionSubmissionsResponseObject interface {
+	VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error
+}
+
+type GetQuestionSubmissions200JSONResponse []Submission
+
+func (response GetQuestionSubmissions200JSONResponse) VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestionSubmissions400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response GetQuestionSubmissions400JSONResponse) VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestionSubmissions401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response GetQuestionSubmissions401JSONResponse) VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestionSubmissions404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response GetQuestionSubmissions404JSONResponse) VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestionSubmissions500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetQuestionSubmissions500JSONResponse) VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostSubmitAnswerRequestObject struct {
+	Id   openapi_types.UUID `json:"id"`
+	Body *PostSubmitAnswerJSONRequestBody
+}
+
+type PostSubmitAnswerResponseObject interface {
+	VisitPostSubmitAnswerResponse(w http.ResponseWriter) error
+}
+
+type PostSubmitAnswer200JSONResponse struct {
+	Correct *bool `json:"correct,omitempty"`
+}
+
+func (response PostSubmitAnswer200JSONResponse) VisitPostSubmitAnswerResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostSubmitAnswer400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostSubmitAnswer400JSONResponse) VisitPostSubmitAnswerResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostSubmitAnswer401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response PostSubmitAnswer401JSONResponse) VisitPostSubmitAnswerResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostSubmitAnswer404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response PostSubmitAnswer404JSONResponse) VisitPostSubmitAnswerResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostSubmitAnswer500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostSubmitAnswer500JSONResponse) VisitPostSubmitAnswerResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type GetUsersRequestObject struct {
 	Params GetUsersParams
 }
@@ -6215,6 +6751,12 @@ type StrictServerInterface interface {
 	// Update question
 	// (PUT /questions/{id})
 	UpdateQuestion(ctx context.Context, request UpdateQuestionRequestObject) (UpdateQuestionResponseObject, error)
+	// Get submissions for a question
+	// (GET /questions/{id}/submissions)
+	GetQuestionSubmissions(ctx context.Context, request GetQuestionSubmissionsRequestObject) (GetQuestionSubmissionsResponseObject, error)
+	// Submit answer for a question
+	// (POST /questions/{id}/submit)
+	PostSubmitAnswer(ctx context.Context, request PostSubmitAnswerRequestObject) (PostSubmitAnswerResponseObject, error)
 	// Get all users
 	// (GET /users)
 	GetUsers(ctx context.Context, request GetUsersRequestObject) (GetUsersResponseObject, error)
@@ -6664,6 +7206,65 @@ func (sh *strictHandler) UpdateQuestion(w http.ResponseWriter, r *http.Request, 
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(UpdateQuestionResponseObject); ok {
 		if err := validResponse.VisitUpdateQuestionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetQuestionSubmissions operation middleware
+func (sh *strictHandler) GetQuestionSubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request GetQuestionSubmissionsRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetQuestionSubmissions(ctx, request.(GetQuestionSubmissionsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetQuestionSubmissions")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetQuestionSubmissionsResponseObject); ok {
+		if err := validResponse.VisitGetQuestionSubmissionsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostSubmitAnswer operation middleware
+func (sh *strictHandler) PostSubmitAnswer(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request PostSubmitAnswerRequestObject
+
+	request.Id = id
+
+	var body PostSubmitAnswerJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostSubmitAnswer(ctx, request.(PostSubmitAnswerRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostSubmitAnswer")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostSubmitAnswerResponseObject); ok {
+		if err := validResponse.VisitPostSubmitAnswerResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

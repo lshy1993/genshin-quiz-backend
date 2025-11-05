@@ -10,6 +10,8 @@ import (
 	dao "genshin-quiz/internal/dao"
 	"genshin-quiz/internal/dao/transformer"
 
+	"genshin-quiz/internal/common"
+
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
@@ -51,7 +53,8 @@ func GetQuestions(
 	).
 		WHERE(
 			baseCondition(params),
-		).ORDER_BY(baseOrder(params)).
+		).
+		ORDER_BY(baseOrder(params)).
 		LIMIT(int64(params.NumPerPage)).
 		OFFSET(int64(offset))
 
@@ -92,7 +95,7 @@ func baseCondition(params dao.QuestionListParams) pg.BoolExpression {
 	// 添加分类过滤
 	if params.Category != nil {
 		cat := string(*params.Category)
-		condition = condition.AND(tbl.Category.EQ(pg.String(cat)))
+		condition = condition.AND(tbl.Category.EQ(pg.NewEnumValue(cat)))
 	}
 
 	// 添加难度过滤
@@ -100,7 +103,7 @@ func baseCondition(params dao.QuestionListParams) pg.BoolExpression {
 		diffExp := []pg.Expression{}
 		for _, diff := range *params.Difficulty {
 			diffStr := string(diff)
-			diffExp = append(diffExp, pg.String(diffStr))
+			diffExp = append(diffExp, pg.NewEnumValue(diffStr))
 		}
 		condition = condition.AND(tbl.Difficulty.IN(diffExp...))
 	}
@@ -182,13 +185,42 @@ func GetQuestionByUUID(
 		tbl.QuestionUUID.EQ(pg.UUID(uuid)),
 	)
 
-	var result dao.SimpleQuestion
+	var result []dao.SimpleQuestion
 	err := stmt.QueryContext(ctx, db, &result)
 	if err != nil {
 		return nil, err
 	}
 
-	return &result, nil
+	if len(result) == 0 {
+		return nil, common.ErrQuestionNotFound
+	}
+
+	return &result[0], nil
+}
+
+func GetQuestionIDByUUID(
+	ctx context.Context,
+	db qrm.DB,
+	uuid uuid.UUID,
+) (*int64, error) {
+	tbl := table.Questions
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl).
+		WHERE(
+			tbl.QuestionUUID.EQ(pg.UUID(uuid)),
+		)
+
+	var dbID []model.Questions
+	err := stmt.QueryContext(ctx, db, &dbID)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(dbID) == 0 {
+		return nil, common.ErrQuestionNotFound
+	}
+
+	return &dbID[0].ID, nil
 }
 
 func GetQuestionTranslation(
@@ -238,6 +270,34 @@ func GetQuestionOptions(
 	return &options, nil
 }
 
+func GetQuestionCorrectOptions(
+	ctx context.Context,
+	db qrm.DB,
+	questionID int64,
+) (*[]uuid.UUID, error) {
+	tbl := table.QuestionOptions
+	questionTbl := table.Questions
+
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl.LEFT_JOIN(questionTbl, tbl.QuestionID.EQ(questionTbl.ID))).
+		WHERE(
+			tbl.IsAnswer.EQ(pg.Bool(true)).AND(questionTbl.ID.EQ(pg.Int64(questionID))),
+		)
+
+	var options []model.QuestionOptions
+	err := stmt.QueryContext(ctx, db, &options)
+	if err != nil {
+		return nil, err
+	}
+
+	correctOptionIDs := make([]uuid.UUID, 0, len(options))
+	for _, opt := range options {
+		correctOptionIDs = append(correctOptionIDs, opt.OptionUUID)
+	}
+
+	return &correctOptionIDs, nil
+}
+
 func GetQuestionOptionTranslations(
 	ctx context.Context,
 	db qrm.DB,
@@ -263,6 +323,27 @@ func GetQuestionOptionTranslations(
 	}
 
 	return &dto, nil
+}
+
+func GetQuestionSubmissions(
+	ctx context.Context,
+	db qrm.DB,
+	questionUUID uuid.UUID,
+	params *model.QuestionSubmissions,
+) (*[]model.QuestionSubmissions, error) {
+	tbl := table.QuestionSubmissions
+	questionTbl := table.Questions
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl.LEFT_JOIN(questionTbl, questionTbl.ID.EQ(tbl.QuestionID))).
+		WHERE(questionTbl.QuestionUUID.EQ(pg.UUID(questionUUID)).AND(tbl.IsPractice.EQ(pg.Bool(false))))
+
+	var result []model.QuestionSubmissions
+	err := stmt.QueryContext(ctx, db, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
 func GetQuestionSubmissionCount(

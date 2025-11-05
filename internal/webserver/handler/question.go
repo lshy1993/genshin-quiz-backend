@@ -38,3 +38,26 @@ func (h *Handler) PostCreateQuestion(
 	}
 	return res, nil
 }
+
+func (h *Handler) GetQuestionSubmissions(
+	ctx context.Context,
+	req oapi.GetQuestionSubmissionsRequestObject,
+) (oapi.GetQuestionSubmissionsResponseObject, error) {
+	res, err := services.GetQuestionSubmissions(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return (oapi.GetQuestionSubmissions200JSONResponse)(*res), nil
+}
+
+func (h *Handler) PostSubmitAnswer(
+	ctx context.Context,
+	req oapi.PostSubmitAnswerRequestObject,
+) (oapi.PostSubmitAnswerResponseObject, error) {
+	res, err := services.PostSubmitAnswer(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
