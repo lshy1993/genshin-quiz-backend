@@ -8,6 +8,7 @@ import (
 
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
+	"github.com/google/uuid"
 )
 
 func InsertQuestion(
@@ -106,6 +107,28 @@ func InsertOptionTranslations(
 	return err
 }
 
+func UpdateOptionSelected(
+	ctx context.Context,
+	db qrm.DB,
+	optionUUIDs []uuid.UUID,
+) error {
+	tbl := table.QuestionOptions
+
+	uuidSlice := make([]pg.Expression, 0, len(optionUUIDs))
+	for _, id := range optionUUIDs {
+		uuidSlice = append(uuidSlice, pg.UUID(id))
+	}
+
+	updateStmt := tbl.UPDATE().
+		SET(
+			tbl.SelectedCount.SET(tbl.SelectedCount.ADD(pg.Int(1))),
+		).WHERE(
+		tbl.OptionUUID.IN(uuidSlice...),
+	)
+	_, err := updateStmt.ExecContext(ctx, db)
+	return err
+}
+
 func InsertSubmission(
 	ctx context.Context,
 	db qrm.DB,
@@ -139,19 +162,45 @@ func UpdateQuestionSolved(
 	if correct {
 		updateStmt = tbl.UPDATE().
 			SET(
-				tbl.SubmitCount, tbl.SubmitCount.ADD(pg.Int(1)),
-				tbl.CorrectCount, tbl.CorrectCount.ADD(pg.Int(1)),
+				tbl.SubmitCount.SET(tbl.SubmitCount.ADD(pg.Int(1))),
+				tbl.CorrectCount.SET(tbl.CorrectCount.ADD(pg.Int(1))),
 			).WHERE(
 			tbl.ID.EQ(pg.Int64(questionID)),
 		)
 	} else {
 		updateStmt = tbl.UPDATE().
 			SET(
-				tbl.SubmitCount, tbl.SubmitCount.ADD(pg.Int(1)),
+				tbl.SubmitCount.SET(tbl.SubmitCount.ADD(pg.Int(1))),
 			).WHERE(
 			tbl.ID.EQ(pg.Int64(questionID)),
 		)
 	}
+
+	_, err := updateStmt.ExecContext(ctx, db)
+	return err
+}
+
+func UpdateQuestionLikeCount(
+	ctx context.Context,
+	db qrm.DB,
+	questionUUID uuid.UUID,
+	value int16,
+) error {
+	tbl := table.Questions
+
+	// 更新问题的总点赞数
+	likeCount := int64(1)
+	if value != 1 {
+		// 取消点赞
+		likeCount = int64(-1)
+	}
+
+	updateStmt := tbl.UPDATE().
+		SET(
+			tbl.Likes.SET(tbl.Likes.ADD(pg.Int(likeCount))),
+		).WHERE(
+		tbl.QuestionUUID.EQ(pg.UUID(questionUUID)),
+	)
 
 	_, err := updateStmt.ExecContext(ctx, db)
 	return err

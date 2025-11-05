@@ -32,6 +32,7 @@ type usersTable struct {
 	CorrectSubmissions postgres.ColumnInteger
 	QuestionsCreated   postgres.ColumnInteger
 	TotalVotes         postgres.ColumnInteger
+	UserRole           postgres.ColumnInteger // User role: 0=regular user, 1=admin, 2=moderator
 
 	AllColumns     postgres.ColumnList
 	MutableColumns postgres.ColumnList
@@ -88,9 +89,10 @@ func newUsersTableImpl(schemaName, tableName, alias string) usersTable {
 		CorrectSubmissionsColumn = postgres.IntegerColumn("correct_submissions")
 		QuestionsCreatedColumn   = postgres.IntegerColumn("questions_created")
 		TotalVotesColumn         = postgres.IntegerColumn("total_votes")
-		allColumns               = postgres.ColumnList{IDColumn, UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, LocationColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn}
-		mutableColumns           = postgres.ColumnList{UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, LocationColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn}
-		defaultColumns           = postgres.ColumnList{IDColumn, UserUUIDColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn}
+		UserRoleColumn           = postgres.IntegerColumn("user_role")
+		allColumns               = postgres.ColumnList{IDColumn, UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, LocationColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn, UserRoleColumn}
+		mutableColumns           = postgres.ColumnList{UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, LocationColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn, UserRoleColumn}
+		defaultColumns           = postgres.ColumnList{IDColumn, UserUUIDColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn, UserRoleColumn}
 	)
 
 	return usersTable{
@@ -112,6 +114,7 @@ func newUsersTableImpl(schemaName, tableName, alias string) usersTable {
 		CorrectSubmissions: CorrectSubmissionsColumn,
 		QuestionsCreated:   QuestionsCreatedColumn,
 		TotalVotes:         TotalVotesColumn,
+		UserRole:           UserRoleColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

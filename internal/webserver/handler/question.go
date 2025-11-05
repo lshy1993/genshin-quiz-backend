@@ -61,3 +61,14 @@ func (h *Handler) PostSubmitAnswer(
 	}
 	return res, nil
 }
+
+func (h *Handler) PostLikeQuestion(
+	ctx context.Context,
+	req oapi.PostLikeQuestionRequestObject,
+) (oapi.PostLikeQuestionResponseObject, error) {
+	err := services.PostLikeQuestion(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return oapi.PostLikeQuestion201Response{}, nil
+}

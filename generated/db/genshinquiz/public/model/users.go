@@ -29,4 +29,5 @@ type Users struct {
 	CorrectSubmissions int64
 	QuestionsCreated   int64
 	TotalVotes         int64
+	UserRole           *int32 // User role: 0=regular user, 1=admin, 2=moderator
 }

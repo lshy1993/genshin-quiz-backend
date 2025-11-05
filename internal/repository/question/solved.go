@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// CheckQuestionSolved 检查用户是否已解答指定题目.
+// CheckQuestionSolved 检查用户是否已正确解决指定题目.
 func CheckQuestionSolved(
 	ctx context.Context,
 	db qrm.DB,
@@ -26,7 +26,8 @@ func CheckQuestionSolved(
 	).WHERE(
 		submissionTbl.UserID.EQ(pg.Int64(userID)).
 			AND(submissionTbl.QuestionID.EQ(pg.Int64(questionID))).
-			AND(submissionTbl.IsPractice.EQ(pg.Bool(false))),
+			AND(submissionTbl.IsCorrect.IS_TRUE()).
+			AND(submissionTbl.IsPractice.IS_FALSE()),
 	)
 
 	var result struct {

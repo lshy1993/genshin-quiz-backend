@@ -44,7 +44,7 @@ func GetQuestion(
 
 	// 检查用户是否已解答此题（如果用户已登录）
 	solved := false
-	var likeStatus *int16
+	var likeStatus int16 = 0
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if ok {
 		// 检查是否已解答
@@ -59,7 +59,7 @@ func GetQuestion(
 		}
 
 		// 检查用户的点赞状态
-		likeStatus, err = question_repo.GetQuestionLikeStatus(
+		userLikeStatus, err := question_repo.GetQuestionLikeStatus(
 			ctx,
 			app.DB,
 			userClaims.UserID,
@@ -67,6 +67,10 @@ func GetQuestion(
 		)
 		if err != nil {
 			return nil, err
+		}
+		// 如果有点赞记录，使用实际值；否则保持默认值0
+		if userLikeStatus != nil {
+			likeStatus = *userLikeStatus
 		}
 	}
 
@@ -77,7 +81,7 @@ func GetQuestion(
 		Options:            *options,
 		OptionTranslations: *optionTranslations,
 		SubmissionCount:    *count,
-	}, solved, *likeStatus)
+	}, solved, likeStatus)
 
 	return &dto, nil
 }

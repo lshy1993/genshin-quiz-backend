@@ -45,12 +45,18 @@ func ConvertDetailToQuestion(
 	likes := int(res.Question.Likes)
 	likeStatus := oapi.QuestionLikeStatus(userLikeStatus)
 	options := make([]oapi.QuestionOption, 0, len(res.Options))
-	languages := make([]string, 0, len(res.OptionTranslations))
+	languageSet := make(map[string]bool)
 	for i, translation := range res.OptionTranslations {
 		opt := res.Options[i]
 		dto := ToQuestionOption(opt, translation)
 		options = append(options, dto)
-		languages = append(languages, translation.Language)
+		languageSet[translation.Language] = true
+	}
+
+	// 将 map 转换为 slice
+	languages := make([]string, 0, len(languageSet))
+	for lang := range languageSet {
+		languages = append(languages, lang)
 	}
 
 	return oapi.Question{

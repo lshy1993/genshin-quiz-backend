@@ -37,18 +37,22 @@ func PostSubmitAnswer(
 	}
 
 	// 比较提交的答案与正确答案
-	optionUUIDs := req.Body.SelectedOptionIds
-	correct := uuidSliceEqual(optionUUIDs, *correctAnswerUUIDs)
+	submitOptionUUIDs := req.Body.SelectedOptionIds
+	correct := uuidSliceEqual(submitOptionUUIDs, *correctAnswerUUIDs)
 
-	tx, err := app.DB.BeginTx(ctx, nil)
+	// 检查用户是否已经解决过这道题
+	alreadySolved, err := question_repo.CheckQuestionSolved(
+		ctx,
+		app.DB,
+		userClaims.UserID,
+		*questionID,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	// 更新问题统计
-	err = question_repo.UpdateQuestionSolved(ctx, tx, *questionID, correct)
+	tx, err := app.DB.BeginTx(ctx, nil)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
@@ -60,7 +64,7 @@ func PostSubmitAnswer(
 		QuestionID:     *questionID,
 		UserID:         userClaims.UserID,
 		TimeTaken:      &timeTaken,
-		IsPractice:     false,
+		IsPractice:     alreadySolved,
 		IsCorrect:      correct,
 		CreatedAt:      now,
 		// SelectedOptionIDs: optionIDs,
@@ -71,11 +75,26 @@ func PostSubmitAnswer(
 		return nil, err
 	}
 
-	// 实时更新用户统计信息
-	err = user_repo.UpdateUserSubmissionStats(ctx, tx, userClaims.UserID, correct)
-	if err != nil {
-		tx.Rollback()
-		return nil, err
+	if !alreadySolved {
+		// 更新问题统计
+		err = question_repo.UpdateQuestionSolved(ctx, tx, *questionID, correct)
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+		// 更新选项统计
+		err = question_repo.UpdateOptionSelected(ctx, tx, submitOptionUUIDs)
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+
+		// 实时更新用户统计信息
+		err = user_repo.UpdateUserSubmissionStats(ctx, tx, userClaims.UserID, correct)
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
 	}
 	// 提交事务
 	err = tx.Commit()
