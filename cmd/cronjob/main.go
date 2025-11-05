@@ -38,7 +38,6 @@ func main() {
 	}
 }
 
-// runEveryFiveMinutes 每5分钟执行一次（测试用）
 func runEveryFiveMinutes(cronJob *cronjob.Cronjob) {
 	c := cron.New()
 
@@ -66,7 +65,6 @@ func runEveryFiveMinutes(cronJob *cronjob.Cronjob) {
 	startCronAndWait(c)
 }
 
-// runOnce 立即执行一次（测试用）
 func runOnce(cronJob *cronjob.Cronjob) {
 	fmt.Println("Running statistics recalibration once...")
 
@@ -83,7 +81,6 @@ func runOnce(cronJob *cronjob.Cronjob) {
 	fmt.Println("Statistics recalibration completed.")
 }
 
-// startCronAndWait 启动 cron 并等待信号
 func startCronAndWait(c *cron.Cron) {
 	c.Start()
 

@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"errors"
-	"fmt"
 	"genshin-quiz/internal/common"
 	user_repo "genshin-quiz/internal/repository/user"
 	"genshin-quiz/internal/util"
@@ -102,7 +101,7 @@ func parseAndValidateToken(
 		if errors.Is(err, common.ErrUserNotFound) {
 			return nil, common.ErrUserNotFound
 		}
-		return nil, fmt.Errorf("%w: %v", common.ErrDatabaseError, err)
+		return nil, err
 	}
 
 	if requireAdmin && util.IsAdmin(*userInfo.UserRole) {

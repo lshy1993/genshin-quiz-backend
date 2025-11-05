@@ -44,7 +44,7 @@ func GetQuestion(
 
 	// 检查用户是否已解答此题（如果用户已登录）
 	solved := false
-	var likeStatus int16 = 0
+	var likeStatus int16
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if ok {
 		// 检查是否已解答

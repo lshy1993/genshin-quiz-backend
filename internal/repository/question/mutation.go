@@ -111,20 +111,20 @@ func InsertOptionTranslations(
 func UpdateOptionSelected(
 	ctx context.Context,
 	db qrm.DB,
-	optionUUIDs []uuid.UUID,
+	optionIDs []int64,
 ) error {
 	tbl := table.QuestionOptions
 
-	uuidSlice := make([]pg.Expression, 0, len(optionUUIDs))
-	for _, id := range optionUUIDs {
-		uuidSlice = append(uuidSlice, pg.UUID(id))
+	uuidSlice := make([]pg.Expression, 0, len(optionIDs))
+	for _, id := range optionIDs {
+		uuidSlice = append(uuidSlice, pg.Int64(id))
 	}
 
 	updateStmt := tbl.UPDATE().
 		SET(
 			tbl.SelectedCount.SET(tbl.SelectedCount.ADD(pg.Int(1))),
 		).WHERE(
-		tbl.OptionUUID.IN(uuidSlice...),
+		tbl.ID.IN(uuidSlice...),
 	)
 	_, err := updateStmt.ExecContext(ctx, db)
 	return err
@@ -134,7 +134,7 @@ func InsertSubmission(
 	ctx context.Context,
 	db qrm.DB,
 	submission model.QuestionSubmissions,
-) error {
+) (*model.QuestionSubmissions, error) {
 	tbl := table.QuestionSubmissions
 
 	insertStmt := tbl.INSERT(
@@ -145,7 +145,42 @@ func InsertSubmission(
 		// tbl.SelectedOptionIDs,
 		tbl.IsCorrect,
 		tbl.CreatedAt,
-	).MODEL(submission)
+	).MODEL(submission).
+		RETURNING(tbl.AllColumns)
+
+	var result model.QuestionSubmissions
+	err := insertStmt.QueryContext(ctx, db, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func InsertSubmissionOptions(
+	ctx context.Context,
+	db qrm.DB,
+	submissionID int64,
+	optionIDs []int64,
+) error {
+	if len(optionIDs) == 0 {
+		return nil
+	}
+
+	tbl := table.QuestionSubmissionOptions
+	var models []model.QuestionSubmissionOptions
+
+	for _, optionID := range optionIDs {
+		models = append(models, model.QuestionSubmissionOptions{
+			SubmissionID: submissionID,
+			OptionID:     optionID,
+		})
+	}
+
+	insertStmt := tbl.INSERT(
+		tbl.SubmissionID,
+		tbl.OptionID,
+	).MODELS(models)
 
 	_, err := insertStmt.ExecContext(ctx, db)
 	return err

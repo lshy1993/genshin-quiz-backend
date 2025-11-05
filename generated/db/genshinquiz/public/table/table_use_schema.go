@@ -20,6 +20,7 @@ func UseSchema(schema string) {
 	QuestionComments = QuestionComments.FromSchema(schema)
 	QuestionLikes = QuestionLikes.FromSchema(schema)
 	QuestionOptions = QuestionOptions.FromSchema(schema)
+	QuestionSubmissionOptions = QuestionSubmissionOptions.FromSchema(schema)
 	QuestionSubmissions = QuestionSubmissions.FromSchema(schema)
 	QuestionTranslations = QuestionTranslations.FromSchema(schema)
 	Questions = Questions.FromSchema(schema)

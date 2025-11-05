@@ -19,7 +19,6 @@ func NewCronjob(app *config.App) *Cronjob {
 	}
 }
 
-// RecalibrateUserStats 定期校准用户统计数据
 func (c *Cronjob) RecalibrateUserStats() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
@@ -36,7 +35,6 @@ func (c *Cronjob) RecalibrateUserStats() error {
 	return nil
 }
 
-// RecalibrateQuestionStats 定期校准每个问题的统计数据（包括点赞和提交统计）
 func (c *Cronjob) RecalibrateQuestionStats() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()

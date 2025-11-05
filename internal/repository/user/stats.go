@@ -26,15 +26,15 @@ func UpdateUserSubmissionStats(
 
 		_, err := updateStmt.ExecContext(ctx, db)
 		return err
-	} else {
-		// 如果答案错误，只更新总提交数
-		updateStmt := tbl.UPDATE().SET(
-			tbl.TotalSubmissions.SET(tbl.TotalSubmissions.ADD(pg.Int(1))),
-		).WHERE(tbl.ID.EQ(pg.Int64(userID)))
-
-		_, err := updateStmt.ExecContext(ctx, db)
-		return err
 	}
+
+	// 如果答案错误，只更新总提交数
+	updateStmt := tbl.UPDATE().SET(
+		tbl.TotalSubmissions.SET(tbl.TotalSubmissions.ADD(pg.Int(1))),
+	).WHERE(tbl.ID.EQ(pg.Int64(userID)))
+
+	_, err := updateStmt.ExecContext(ctx, db)
+	return err
 }
 
 func RecalculateUserStats(

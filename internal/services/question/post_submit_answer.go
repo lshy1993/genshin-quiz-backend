@@ -31,14 +31,17 @@ func PostSubmitAnswer(
 		return nil, err
 	}
 	// 获取问题的正确答案
-	correctAnswerUUIDs, err := question_repo.GetQuestionCorrectOptions(ctx, app.DB, *questionID)
+	correctAnswerIDs, err := question_repo.GetQuestionCorrectOptions(ctx, app.DB, *questionID)
 	if err != nil {
 		return nil, err
 	}
-
+	// 获取用户选择的选项ID
+	optionIDs, err := question_repo.GetOptionIDsByUUIDs(ctx, app.DB, req.Body.SelectedOptionIds)
+	if err != nil {
+		return nil, err
+	}
 	// 比较提交的答案与正确答案
-	submitOptionUUIDs := req.Body.SelectedOptionIds
-	correct := uuidSliceEqual(submitOptionUUIDs, *correctAnswerUUIDs)
+	correct := sliceEqual(optionIDs, *correctAnswerIDs)
 
 	// 检查用户是否已经解决过这道题
 	alreadySolved, err := question_repo.CheckQuestionSolved(
@@ -67,9 +70,15 @@ func PostSubmitAnswer(
 		IsPractice:     alreadySolved,
 		IsCorrect:      correct,
 		CreatedAt:      now,
-		// SelectedOptionIDs: optionIDs,
 	}
-	err = question_repo.InsertSubmission(ctx, tx, insertData)
+	submissionResult, err := question_repo.InsertSubmission(ctx, tx, insertData)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// 记录用户选择的选项
+	err = question_repo.InsertSubmissionOptions(ctx, tx, submissionResult.ID, optionIDs)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -83,7 +92,7 @@ func PostSubmitAnswer(
 			return nil, err
 		}
 		// 更新选项统计
-		err = question_repo.UpdateOptionSelected(ctx, tx, submitOptionUUIDs)
+		err = question_repo.UpdateOptionSelected(ctx, tx, optionIDs)
 		if err != nil {
 			tx.Rollback()
 			return nil, err
@@ -105,19 +114,19 @@ func PostSubmitAnswer(
 	return &oapi.PostSubmitAnswer200JSONResponse{Correct: &correct}, nil
 }
 
-func uuidSliceEqual(a, b []uuid.UUID) bool {
+func sliceEqual[T comparable](a, b []T) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	m := make(map[uuid.UUID]int)
-	for _, id := range a {
-		m[id]++
+	m := make(map[T]int)
+	for _, item := range a {
+		m[item]++
 	}
-	for _, id := range b {
-		if m[id] == 0 {
+	for _, item := range b {
+		if m[item] == 0 {
 			return false
 		}
-		m[id]--
+		m[item]--
 	}
 	for _, v := range m {
 		if v != 0 {

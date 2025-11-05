@@ -267,7 +267,7 @@ func GetQuestionOptions(
 	return &options, nil
 }
 
-func GetQuestionCorrectOptions(
+func GetQuestionCorrectOptionUUIDs(
 	ctx context.Context,
 	db qrm.DB,
 	questionID int64,
@@ -287,9 +287,37 @@ func GetQuestionCorrectOptions(
 		return nil, err
 	}
 
-	correctOptionIDs := make([]uuid.UUID, 0, len(options))
+	correctOptionUUIDs := make([]uuid.UUID, 0, len(options))
 	for _, opt := range options {
-		correctOptionIDs = append(correctOptionIDs, opt.OptionUUID)
+		correctOptionUUIDs = append(correctOptionUUIDs, opt.OptionUUID)
+	}
+
+	return &correctOptionUUIDs, nil
+}
+
+func GetQuestionCorrectOptions(
+	ctx context.Context,
+	db qrm.DB,
+	questionID int64,
+) (*[]int64, error) {
+	tbl := table.QuestionOptions
+	questionTbl := table.Questions
+
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl.LEFT_JOIN(questionTbl, tbl.QuestionID.EQ(questionTbl.ID))).
+		WHERE(
+			tbl.IsAnswer.EQ(pg.Bool(true)).AND(questionTbl.ID.EQ(pg.Int64(questionID))),
+		)
+
+	var options []model.QuestionOptions
+	err := stmt.QueryContext(ctx, db, &options)
+	if err != nil {
+		return nil, err
+	}
+
+	correctOptionIDs := make([]int64, 0, len(options))
+	for _, opt := range options {
+		correctOptionIDs = append(correctOptionIDs, opt.ID)
 	}
 
 	return &correctOptionIDs, nil
@@ -332,7 +360,7 @@ func GetQuestionSubmissions(
 	questionTbl := table.Questions
 	stmt := pg.SELECT(tbl.AllColumns).
 		FROM(tbl.LEFT_JOIN(questionTbl, questionTbl.ID.EQ(tbl.QuestionID))).
-		WHERE(questionTbl.QuestionUUID.EQ(pg.UUID(questionUUID)).AND(tbl.IsPractice.EQ(pg.Bool(false))))
+		WHERE(questionTbl.QuestionUUID.EQ(pg.UUID(questionUUID)))
 
 	var result []model.QuestionSubmissions
 	err := stmt.QueryContext(ctx, db, &result)
@@ -363,4 +391,47 @@ func GetQuestionSubmissionCount(
 	}
 
 	return &result.Count, nil
+}
+
+func GetOptionIDsByUUIDs(
+	ctx context.Context,
+	db qrm.DB,
+	optionUUIDs []uuid.UUID,
+) ([]int64, error) {
+	if len(optionUUIDs) == 0 {
+		return []int64{}, nil
+	}
+
+	tbl := table.QuestionOptions
+
+	var uuidExpressions []pg.Expression
+	for _, optionUUID := range optionUUIDs {
+		uuidExpressions = append(uuidExpressions, pg.UUID(optionUUID))
+	}
+
+	stmt := pg.SELECT(
+		tbl.ID,
+	).FROM(
+		tbl,
+	).WHERE(
+		tbl.OptionUUID.IN(uuidExpressions...),
+	).ORDER_BY(
+		tbl.ID,
+	)
+
+	var optionIDs []struct {
+		ID int64
+	}
+
+	err := stmt.QueryContext(ctx, db, &optionIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []int64
+	for _, option := range optionIDs {
+		result = append(result, option.ID)
+	}
+
+	return result, nil
 }

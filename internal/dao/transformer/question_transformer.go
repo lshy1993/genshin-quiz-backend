@@ -44,11 +44,16 @@ func ConvertDetailToQuestion(
 	correct := int(res.Question.CorrectCount)
 	likes := int(res.Question.Likes)
 	likeStatus := oapi.QuestionLikeStatus(userLikeStatus)
+
+	optionMap := make(map[int64]model.QuestionOptions)
+	for _, opt := range res.Options {
+		optionMap[opt.ID] = opt
+	}
+
 	options := make([]oapi.QuestionOption, 0, len(res.Options))
 	languageSet := make(map[string]bool)
-	for i, translation := range res.OptionTranslations {
-		opt := res.Options[i]
-		dto := ToQuestionOption(opt, translation)
+	for _, translation := range res.OptionTranslations {
+		dto := ToQuestionOption(optionMap[translation.OptionID], translation, solved)
 		options = append(options, dto)
 		languageSet[translation.Language] = true
 	}
@@ -82,15 +87,22 @@ func ConvertDetailToQuestion(
 func ToQuestionOption(
 	option model.QuestionOptions,
 	translation model.OptionTranslations,
+	solved bool,
 ) oapi.QuestionOption {
 	count := int(option.SelectedCount)
 	text := map[string]string{}
 	text[translation.Language] = translation.OptionText
-	return oapi.QuestionOption{
+
+	dto := oapi.QuestionOption{
 		Id:    &option.OptionUUID,
 		Count: &count,
 		Image: option.ImgURL,
 		Text:  &text,
 		Type:  oapi.QuestionOptionType(option.OptionType),
 	}
+	if solved {
+		dto.IsAnswer = &option.IsAnswer
+	}
+
+	return dto
 }
