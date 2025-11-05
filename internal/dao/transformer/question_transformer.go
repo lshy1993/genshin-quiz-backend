@@ -9,11 +9,12 @@ import (
 func ConvertSimpleToQuestion(
 	res dao.SimpleQuestion,
 	solved bool,
+	userLikeStatus int16,
 ) oapi.Question {
 	answered := 0
 	correct := int(res.Question.CorrectCount)
 	likes := int(res.Question.Likes)
-	likeStatus := oapi.QuestionLikeStatus(0)
+	likeStatus := oapi.QuestionLikeStatus(userLikeStatus)
 
 	return oapi.Question{
 		AnswerCount:  &answered,
@@ -22,11 +23,11 @@ func ConvertSimpleToQuestion(
 		CreatedAt:    res.Question.CreatedAt,
 		CreatedBy:    res.User.UserUUID,
 		Difficulty:   oapi.QuestionDifficulty(res.Question.Difficulty),
-		Explanation:  nil,
+		Explanation:  nil, // 简单模式不返回解释
 		Id:           res.Question.QuestionUUID,
 		LikeStatus:   &likeStatus,
 		Likes:        &likes,
-		Options:      nil,
+		Options:      nil, // 简单模式不返回选项
 		Public:       res.Question.Public,
 		QuestionText: res.Translation.QuestionText,
 		QuestionType: oapi.QuestionType(res.Question.QuestionType),
@@ -36,17 +37,20 @@ func ConvertSimpleToQuestion(
 
 func ConvertDetailToQuestion(
 	res dao.DetailedQuestion,
+	solved bool,
+	userLikeStatus int16,
 ) oapi.Question {
 	answer := int(res.SubmissionCount)
 	correct := int(res.Question.CorrectCount)
 	likes := int(res.Question.Likes)
-	likeStatus := oapi.QuestionLikeStatus(0) // TODO: 根据用户数据设置喜欢状态
+	likeStatus := oapi.QuestionLikeStatus(userLikeStatus)
 	options := make([]oapi.QuestionOption, 0, len(res.Options))
-	solved := false
+	languages := make([]string, 0, len(res.OptionTranslations))
 	for i, translation := range res.OptionTranslations {
 		opt := res.Options[i]
 		dto := ToQuestionOption(opt, translation)
 		options = append(options, dto)
+		languages = append(languages, translation.Language)
 	}
 
 	return oapi.Question{
@@ -58,7 +62,7 @@ func ConvertDetailToQuestion(
 		Difficulty:   oapi.QuestionDifficulty(res.Question.Difficulty),
 		Explanation:  res.Translation.Explanation,
 		Id:           res.Question.QuestionUUID,
-		Languages:    []string{},
+		Languages:    languages,
 		LikeStatus:   &likeStatus,
 		Likes:        &likes,
 		Options:      options,

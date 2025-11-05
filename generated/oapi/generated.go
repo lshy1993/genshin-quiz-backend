@@ -22,9 +22,9 @@ import (
 
 // Defines values for QuestionLikeStatus.
 const (
-	Minus1 QuestionLikeStatus = -1
-	N0     QuestionLikeStatus = 0
-	N1     QuestionLikeStatus = 1
+	QuestionLikeStatusMinus1 QuestionLikeStatus = -1
+	QuestionLikeStatusN0     QuestionLikeStatus = 0
+	QuestionLikeStatusN1     QuestionLikeStatus = 1
 )
 
 // Defines values for QuestionCategory.
@@ -67,6 +67,13 @@ const (
 	VoteOptionTypeImage VoteOptionType = "image"
 	VoteOptionTypeMusic VoteOptionType = "music"
 	VoteOptionTypeText  VoteOptionType = "text"
+)
+
+// Defines values for PostLikeQuestionJSONBodyLike.
+const (
+	PostLikeQuestionJSONBodyLikeMinus1 PostLikeQuestionJSONBodyLike = -1
+	PostLikeQuestionJSONBodyLikeN0     PostLikeQuestionJSONBodyLike = 0
+	PostLikeQuestionJSONBodyLikeN1     PostLikeQuestionJSONBodyLike = 1
 )
 
 // Defines values for GetVotesParamsType.
@@ -358,6 +365,15 @@ type GetQuestionsParams struct {
 	SortDesc   *bool                 `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
 }
 
+// PostLikeQuestionJSONBody defines parameters for PostLikeQuestion.
+type PostLikeQuestionJSONBody struct {
+	// Like 点赞状态：1=点赞，0=取消操作，-1=点踩
+	Like PostLikeQuestionJSONBodyLike `json:"like"`
+}
+
+// PostLikeQuestionJSONBodyLike defines parameters for PostLikeQuestion.
+type PostLikeQuestionJSONBodyLike int
+
 // PostSubmitAnswerJSONBody defines parameters for PostSubmitAnswer.
 type PostSubmitAnswerJSONBody struct {
 	ExamId            *openapi_types.UUID  `json:"exam_id,omitempty"`
@@ -412,6 +428,9 @@ type PostCreateQuestionJSONRequestBody = QuestionWithAnswer
 
 // UpdateQuestionJSONRequestBody defines body for UpdateQuestion for application/json ContentType.
 type UpdateQuestionJSONRequestBody = QuestionWithAnswer
+
+// PostLikeQuestionJSONRequestBody defines body for PostLikeQuestion for application/json ContentType.
+type PostLikeQuestionJSONRequestBody PostLikeQuestionJSONBody
 
 // PostSubmitAnswerJSONRequestBody defines body for PostSubmitAnswer for application/json ContentType.
 type PostSubmitAnswerJSONRequestBody PostSubmitAnswerJSONBody
@@ -553,6 +572,11 @@ type ClientInterface interface {
 	UpdateQuestionWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdateQuestion(ctx context.Context, id openapi_types.UUID, body UpdateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostLikeQuestionWithBody request with any body
+	PostLikeQuestionWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostLikeQuestion(ctx context.Context, id openapi_types.UUID, body PostLikeQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetQuestionSubmissions request
 	GetQuestionSubmissions(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -835,6 +859,30 @@ func (c *Client) UpdateQuestionWithBody(ctx context.Context, id openapi_types.UU
 
 func (c *Client) UpdateQuestion(ctx context.Context, id openapi_types.UUID, body UpdateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateQuestionRequest(c.Server, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostLikeQuestionWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostLikeQuestionRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostLikeQuestion(ctx context.Context, id openapi_types.UUID, body PostLikeQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostLikeQuestionRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1776,6 +1824,53 @@ func NewUpdateQuestionRequestWithBody(server string, id openapi_types.UUID, cont
 	return req, nil
 }
 
+// NewPostLikeQuestionRequest calls the generic PostLikeQuestion builder with application/json body
+func NewPostLikeQuestionRequest(server string, id openapi_types.UUID, body PostLikeQuestionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostLikeQuestionRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewPostLikeQuestionRequestWithBody generates requests for PostLikeQuestion with any type of body
+func NewPostLikeQuestionRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/questions/%s/like", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewGetQuestionSubmissionsRequest generates requests for GetQuestionSubmissions
 func NewGetQuestionSubmissionsRequest(server string, id openapi_types.UUID) (*http.Request, error) {
 	var err error
@@ -2402,6 +2497,11 @@ type ClientWithResponsesInterface interface {
 
 	UpdateQuestionWithResponse(ctx context.Context, id openapi_types.UUID, body UpdateQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateQuestionResponse, error)
 
+	// PostLikeQuestionWithBodyWithResponse request with any body
+	PostLikeQuestionWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostLikeQuestionResponse, error)
+
+	PostLikeQuestionWithResponse(ctx context.Context, id openapi_types.UUID, body PostLikeQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLikeQuestionResponse, error)
+
 	// GetQuestionSubmissionsWithResponse request
 	GetQuestionSubmissionsWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetQuestionSubmissionsResponse, error)
 
@@ -2786,6 +2886,31 @@ func (r UpdateQuestionResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpdateQuestionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostLikeQuestionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostLikeQuestionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostLikeQuestionResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -3230,6 +3355,23 @@ func (c *ClientWithResponses) UpdateQuestionWithResponse(ctx context.Context, id
 		return nil, err
 	}
 	return ParseUpdateQuestionResponse(rsp)
+}
+
+// PostLikeQuestionWithBodyWithResponse request with arbitrary body returning *PostLikeQuestionResponse
+func (c *ClientWithResponses) PostLikeQuestionWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostLikeQuestionResponse, error) {
+	rsp, err := c.PostLikeQuestionWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostLikeQuestionResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostLikeQuestionWithResponse(ctx context.Context, id openapi_types.UUID, body PostLikeQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLikeQuestionResponse, error) {
+	rsp, err := c.PostLikeQuestion(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostLikeQuestionResponse(rsp)
 }
 
 // GetQuestionSubmissionsWithResponse request returning *GetQuestionSubmissionsResponse
@@ -3983,6 +4125,53 @@ func ParseUpdateQuestionResponse(rsp *http.Response) (*UpdateQuestionResponse, e
 	return response, nil
 }
 
+// ParsePostLikeQuestionResponse parses an HTTP response from a PostLikeQuestionWithResponse call
+func ParsePostLikeQuestionResponse(rsp *http.Response) (*PostLikeQuestionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostLikeQuestionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetQuestionSubmissionsResponse parses an HTTP response from a GetQuestionSubmissionsWithResponse call
 func ParseGetQuestionSubmissionsResponse(rsp *http.Response) (*GetQuestionSubmissionsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -4505,6 +4694,9 @@ type ServerInterface interface {
 	// Update question
 	// (PUT /questions/{id})
 	UpdateQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Like or dislike a question
+	// (POST /questions/{id}/like)
+	PostLikeQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Get submissions for a question
 	// (GET /questions/{id}/submissions)
 	GetQuestionSubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
@@ -4622,6 +4814,12 @@ func (_ Unimplemented) GetQuestion(w http.ResponseWriter, r *http.Request, id op
 // Update question
 // (PUT /questions/{id})
 func (_ Unimplemented) UpdateQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Like or dislike a question
+// (POST /questions/{id}/like)
+func (_ Unimplemented) PostLikeQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -5086,6 +5284,31 @@ func (siw *ServerInterfaceWrapper) UpdateQuestion(w http.ResponseWriter, r *http
 	handler.ServeHTTP(w, r)
 }
 
+// PostLikeQuestion operation middleware
+func (siw *ServerInterfaceWrapper) PostLikeQuestion(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostLikeQuestion(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // GetQuestionSubmissions operation middleware
 func (siw *ServerInterfaceWrapper) GetQuestionSubmissions(w http.ResponseWriter, r *http.Request) {
 
@@ -5539,6 +5762,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Put(options.BaseURL+"/questions/{id}", wrapper.UpdateQuestion)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/questions/{id}/like", wrapper.PostLikeQuestion)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/questions/{id}/submissions", wrapper.GetQuestionSubmissions)
@@ -6220,6 +6446,61 @@ func (response UpdateQuestion500JSONResponse) VisitUpdateQuestionResponse(w http
 	return json.NewEncoder(w).Encode(response)
 }
 
+type PostLikeQuestionRequestObject struct {
+	Id   openapi_types.UUID `json:"id"`
+	Body *PostLikeQuestionJSONRequestBody
+}
+
+type PostLikeQuestionResponseObject interface {
+	VisitPostLikeQuestionResponse(w http.ResponseWriter) error
+}
+
+type PostLikeQuestion201Response struct {
+}
+
+func (response PostLikeQuestion201Response) VisitPostLikeQuestionResponse(w http.ResponseWriter) error {
+	w.WriteHeader(201)
+	return nil
+}
+
+type PostLikeQuestion400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostLikeQuestion400JSONResponse) VisitPostLikeQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostLikeQuestion401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response PostLikeQuestion401JSONResponse) VisitPostLikeQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostLikeQuestion404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response PostLikeQuestion404JSONResponse) VisitPostLikeQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostLikeQuestion500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostLikeQuestion500JSONResponse) VisitPostLikeQuestionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type GetQuestionSubmissionsRequestObject struct {
 	Id openapi_types.UUID `json:"id"`
 }
@@ -6751,6 +7032,9 @@ type StrictServerInterface interface {
 	// Update question
 	// (PUT /questions/{id})
 	UpdateQuestion(ctx context.Context, request UpdateQuestionRequestObject) (UpdateQuestionResponseObject, error)
+	// Like or dislike a question
+	// (POST /questions/{id}/like)
+	PostLikeQuestion(ctx context.Context, request PostLikeQuestionRequestObject) (PostLikeQuestionResponseObject, error)
 	// Get submissions for a question
 	// (GET /questions/{id}/submissions)
 	GetQuestionSubmissions(ctx context.Context, request GetQuestionSubmissionsRequestObject) (GetQuestionSubmissionsResponseObject, error)
@@ -7206,6 +7490,39 @@ func (sh *strictHandler) UpdateQuestion(w http.ResponseWriter, r *http.Request, 
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(UpdateQuestionResponseObject); ok {
 		if err := validResponse.VisitUpdateQuestionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostLikeQuestion operation middleware
+func (sh *strictHandler) PostLikeQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request PostLikeQuestionRequestObject
+
+	request.Id = id
+
+	var body PostLikeQuestionJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostLikeQuestion(ctx, request.(PostLikeQuestionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostLikeQuestion")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostLikeQuestionResponseObject); ok {
+		if err := validResponse.VisitPostLikeQuestionResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

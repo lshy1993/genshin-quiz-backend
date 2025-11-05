@@ -78,7 +78,7 @@ func GetQuestions(
 
 	dtos := make([]oapi.Question, 0, len(questions))
 	for _, q := range questions {
-		dtos = append(dtos, transformer.ConvertSimpleToQuestion(q, false))
+		dtos = append(dtos, transformer.ConvertSimpleToQuestion(q, false, 0))
 	}
 
 	return &dao.QuestionListResult{
