@@ -73,6 +73,7 @@ func InsertQuestionOptions(
 		tbl.OptionUUID,
 		tbl.OptionType,
 		tbl.ImgURL,
+		tbl.IsAnswer,
 		tbl.CreatedAt,
 	).MODELS(options).RETURNING(tbl.AllColumns)
 

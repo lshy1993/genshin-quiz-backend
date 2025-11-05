@@ -24,7 +24,6 @@ func GetQuestions(
 ) (*dao.QuestionListResult, error) {
 	tbl := table.Questions
 	transTbl := table.QuestionTranslations
-	subTbl := table.QuestionSubmissions
 	userTbl := table.Users
 
 	offset := (params.Page - 1) * params.NumPerPage
@@ -42,13 +41,11 @@ func GetQuestions(
 		tbl.AllColumns,
 		transTbl.AllColumns,
 		userTbl.AllColumns,
-		subTbl.AllColumns,
 	).FROM(
 		tbl.LEFT_JOIN(
 			transTbl,
 			tbl.ID.EQ(transTbl.QuestionID).AND(transTbl.Language.EQ(pg.String(defaultLang))),
 		).
-			LEFT_JOIN(subTbl, tbl.ID.EQ(subTbl.QuestionID)).
 			LEFT_JOIN(userTbl, tbl.CreatedBy.EQ(userTbl.ID)),
 	).
 		WHERE(

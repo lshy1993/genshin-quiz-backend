@@ -11,7 +11,7 @@ func ConvertSimpleToQuestion(
 	solved bool,
 	userLikeStatus int16,
 ) oapi.Question {
-	answered := 0
+	answered := int(res.Question.SubmitCount)
 	correct := int(res.Question.CorrectCount)
 	likes := int(res.Question.Likes)
 	likeStatus := oapi.QuestionLikeStatus(userLikeStatus)

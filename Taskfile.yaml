@@ -270,7 +270,13 @@ tasks:
       - ./bin/asynqmon
 
   run-cronjob:
-    desc: 'Run the cronjob'
+    desc: 'Run the cronjob (every 5 minutes for testing)'
     silent: true
     cmds:
       - go run ./cmd/cronjob/main.go cronjob:every-five-minutes
+
+  run-cronjob-once:
+    desc: 'Run statistics recalibration once immediately'
+    silent: true
+    cmds:
+      - go run ./cmd/cronjob/main.go cronjob:run-once

@@ -80,12 +80,17 @@ func PostCreateQuestion(
 	// 选项生成数据
 	optionModels := make([]model.QuestionOptions, 0, len(req.Body.Options))
 	for _, option := range req.Body.Options {
+		isAnswer := false
+		if option.IsAnswer != nil {
+			isAnswer = *option.IsAnswer
+		}
+
 		optionModel := model.QuestionOptions{
 			QuestionID: createdQuestion.ID,
 			OptionUUID: uuid.New(),
 			OptionType: model.QuestionOptionType(option.Type),
 			ImgURL:     option.Image,
-			IsAnswer:   *option.IsAnswer,
+			IsAnswer:   isAnswer,
 			CreatedAt:  now,
 		}
 		optionModels = append(optionModels, optionModel)

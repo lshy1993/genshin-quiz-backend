@@ -31,7 +31,7 @@ func GetQuestions(
 	if page <= 0 {
 		page = 1
 	}
-	if limit <= 0 || limit > 100 {
+	if limit <= 1 || limit > 100 {
 		limit = 25
 	}
 

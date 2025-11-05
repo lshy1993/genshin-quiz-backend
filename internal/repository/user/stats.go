@@ -17,22 +17,24 @@ func UpdateUserSubmissionStats(
 	tbl := table.Users
 
 	// 构建更新语句
-	updateStmt := tbl.UPDATE(
-		tbl.TotalSubmissions,
-		tbl.CorrectSubmissions,
-	).SET(
-		tbl.TotalSubmissions.SET(tbl.TotalSubmissions.ADD(pg.Int(1))),
-	).WHERE(tbl.ID.EQ(pg.Int64(userID)))
-
-	// 如果答案正确，同时更新正确答案数
 	if isCorrect {
-		updateStmt = updateStmt.SET(
+		// 如果答案正确，同时更新总提交数和正确答案数
+		updateStmt := tbl.UPDATE().SET(
+			tbl.TotalSubmissions.SET(tbl.TotalSubmissions.ADD(pg.Int(1))),
 			tbl.CorrectSubmissions.SET(tbl.CorrectSubmissions.ADD(pg.Int(1))),
-		)
-	}
+		).WHERE(tbl.ID.EQ(pg.Int64(userID)))
 
-	_, err := updateStmt.ExecContext(ctx, db)
-	return err
+		_, err := updateStmt.ExecContext(ctx, db)
+		return err
+	} else {
+		// 如果答案错误，只更新总提交数
+		updateStmt := tbl.UPDATE().SET(
+			tbl.TotalSubmissions.SET(tbl.TotalSubmissions.ADD(pg.Int(1))),
+		).WHERE(tbl.ID.EQ(pg.Int64(userID)))
+
+		_, err := updateStmt.ExecContext(ctx, db)
+		return err
+	}
 }
 
 func RecalculateUserStats(
@@ -48,10 +50,7 @@ func RecalculateUserStats(
 	submissionStats := pg.SELECT(
 		pg.COUNT(pg.STAR).AS("total_submissions"),
 		pg.SUM(
-			pg.CASE().
-				WHEN(submissionTbl.IsCorrect.EQ(pg.Bool(true))).
-				THEN(pg.Int(1)).
-				ELSE(pg.Int(0)),
+			pg.CAST(submissionTbl.IsCorrect).AS("INTEGER"),
 		).AS("correct_submissions"),
 	).FROM(submissionTbl).
 		WHERE(
@@ -84,14 +83,10 @@ func RecalculateUserStats(
 	}
 
 	// 更新用户统计信息
-	updateStmt := userTbl.UPDATE(
-		userTbl.TotalSubmissions,
-		userTbl.CorrectSubmissions,
-		userTbl.QuestionsCreated,
-	).SET(
-		submissionResult.TotalSubmissions,
-		submissionResult.CorrectSubmissions,
-		questionResult.QuestionsCreated,
+	updateStmt := userTbl.UPDATE().SET(
+		userTbl.TotalSubmissions.SET(pg.Int64(submissionResult.TotalSubmissions)),
+		userTbl.CorrectSubmissions.SET(pg.Int64(submissionResult.CorrectSubmissions)),
+		userTbl.QuestionsCreated.SET(pg.Int64(questionResult.QuestionsCreated)),
 	).WHERE(userTbl.ID.EQ(pg.Int64(userID)))
 
 	_, err = updateStmt.ExecContext(ctx, db)
