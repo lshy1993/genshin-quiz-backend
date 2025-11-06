@@ -33,7 +33,7 @@ type QuestionListParams struct {
 }
 
 type QuestionListResult struct {
-	Questions []oapi.Question
+	Questions []SimpleQuestion
 	Total     int
 }
 

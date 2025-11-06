@@ -6,9 +6,7 @@ import (
 
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
-	"genshin-quiz/generated/oapi"
 	dao "genshin-quiz/internal/dao"
-	"genshin-quiz/internal/dao/transformer"
 
 	"genshin-quiz/internal/common"
 
@@ -73,13 +71,8 @@ func GetQuestions(
 		return nil, err
 	}
 
-	dtos := make([]oapi.Question, 0, len(questions))
-	for _, q := range questions {
-		dtos = append(dtos, transformer.ConvertSimpleToQuestion(q, false, 0))
-	}
-
 	return &dao.QuestionListResult{
-		Questions: dtos,
+		Questions: questions,
 		Total:     int(countResult.Count),
 	}, nil
 }

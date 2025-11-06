@@ -7,7 +7,6 @@ import (
 
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
-	"github.com/google/uuid"
 )
 
 // CheckQuestionSolved 检查用户是否已正确解决指定题目.
@@ -46,33 +45,33 @@ func CheckMultipleQuestionsSolved(
 	ctx context.Context,
 	db qrm.DB,
 	userID int64,
-	questionUUIDs []uuid.UUID,
-) (map[uuid.UUID]bool, error) {
-	if len(questionUUIDs) == 0 {
-		return make(map[uuid.UUID]bool), nil
+	questionIDs []int64,
+) (map[int64]bool, error) {
+	if len(questionIDs) == 0 {
+		return make(map[int64]bool), nil
 	}
 
 	questionTbl := table.Questions
 	submissionTbl := table.QuestionSubmissions
 
-	// 构建 UUID 列表
-	uuidList := make([]pg.Expression, 0, len(questionUUIDs))
-	for _, uuid := range questionUUIDs {
-		uuidList = append(uuidList, pg.UUID(uuid))
+	// 构建 ID 列表
+	idList := make([]pg.Expression, 0, len(questionIDs))
+	for _, id := range questionIDs {
+		idList = append(idList, pg.Int64(id))
 	}
 
 	stmt := pg.SELECT(
-		questionTbl.QuestionUUID,
+		questionTbl.ID,
 	).FROM(
 		submissionTbl.INNER_JOIN(questionTbl, questionTbl.ID.EQ(submissionTbl.QuestionID)),
 	).WHERE(
 		submissionTbl.UserID.EQ(pg.Int64(userID)).
-			AND(questionTbl.QuestionUUID.IN(uuidList...)).
+			AND(questionTbl.ID.IN(idList...)).
 			AND(submissionTbl.IsPractice.EQ(pg.Bool(false))),
-	).GROUP_BY(questionTbl.QuestionUUID)
+	).GROUP_BY(questionTbl.ID)
 
 	var results []struct {
-		QuestionUUID uuid.UUID `alias:"questions.question_uuid"`
+		QuestionID int64 `alias:"questions.id"`
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
@@ -80,16 +79,16 @@ func CheckMultipleQuestionsSolved(
 	}
 
 	// 构建结果 map
-	solvedMap := make(map[uuid.UUID]bool)
+	solvedMap := make(map[int64]bool)
 
 	// 初始化所有题目为未解答
-	for _, uuid := range questionUUIDs {
-		solvedMap[uuid] = false
+	for _, id := range questionIDs {
+		solvedMap[id] = false
 	}
 
 	// 标记已解答的题目
 	for _, result := range results {
-		solvedMap[result.QuestionUUID] = true
+		solvedMap[result.QuestionID] = true
 	}
 
 	return solvedMap, nil

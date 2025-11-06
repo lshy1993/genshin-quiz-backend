@@ -17,6 +17,9 @@ func GetQuestionMySubmissions(
 	if err != nil {
 		return nil, err
 	}
+	if len(*submissions) == 0 {
+		return &[]oapi.MySubmission{}, nil
+	}
 
 	submissionIDs := make([]int64, 0, len(*submissions))
 	for _, submission := range *submissions {
