@@ -39,16 +39,28 @@ func (h *Handler) PostCreateQuestion(
 	return res, nil
 }
 
-func (h *Handler) GetQuestionSubmissions(
+func (h *Handler) GetQuestionMySubmissions(
 	ctx context.Context,
-	req oapi.GetQuestionSubmissionsRequestObject,
-) (oapi.GetQuestionSubmissionsResponseObject, error) {
-	res, err := services.GetQuestionSubmissions(ctx, h.app, req)
+	req oapi.GetQuestionMySubmissionsRequestObject,
+) (oapi.GetQuestionMySubmissionsResponseObject, error) {
+	res, err := services.GetQuestionMySubmissions(ctx, h.app, req)
 	if err != nil {
 		return nil, err
 	}
 
-	return (oapi.GetQuestionSubmissions200JSONResponse)(*res), nil
+	return (oapi.GetQuestionMySubmissions200JSONResponse)(*res), nil
+}
+
+func (h *Handler) GetQuestionRecentSubmissions(
+	ctx context.Context,
+	req oapi.GetQuestionRecentSubmissionsRequestObject,
+) (oapi.GetQuestionRecentSubmissionsResponseObject, error) {
+	res, err := services.GetQuestionRecentSubmissions(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return (oapi.GetQuestionRecentSubmissions200JSONResponse)(*res), nil
 }
 
 func (h *Handler) PostSubmitAnswer(

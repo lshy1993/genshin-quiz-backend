@@ -125,6 +125,19 @@ type Exam struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// MySubmission defines model for MySubmission.
+type MySubmission struct {
+	// IsCorrect 答案是否正确
+	IsCorrect         bool                 `json:"is_correct"`
+	SelectedOptionIds []openapi_types.UUID `json:"selected_option_ids"`
+
+	// SubmittedAt 提交时间
+	SubmittedAt time.Time `json:"submitted_at"`
+
+	// TimeSpent 答题用时（秒）
+	TimeSpent int `json:"time_spent"`
+}
+
 // Question defines model for Question.
 type Question struct {
 	// AnswerCount 总答题人数
@@ -220,20 +233,19 @@ type QuestionWithAnswer struct {
 	QuestionType QuestionType `json:"question_type"`
 }
 
-// Submission defines model for Submission.
-type Submission struct {
-	// Id 提交记录ID
-	Id openapi_types.UUID `json:"id"`
-
+// RecentSubmission defines model for RecentSubmission.
+type RecentSubmission struct {
 	// IsCorrect 答案是否正确
-	IsCorrect         bool                 `json:"is_correct"`
-	SelectedOptionIds []openapi_types.UUID `json:"selected_option_ids"`
+	IsCorrect bool `json:"is_correct"`
 
 	// SubmittedAt 提交时间
 	SubmittedAt time.Time `json:"submitted_at"`
 
 	// TimeSpent 答题用时（秒）
 	TimeSpent int `json:"time_spent"`
+
+	// UserName 提交用户昵称
+	UserName string `json:"user_name"`
 }
 
 // User defines model for User.
@@ -578,8 +590,11 @@ type ClientInterface interface {
 
 	PostLikeQuestion(ctx context.Context, id openapi_types.UUID, body PostLikeQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetQuestionSubmissions request
-	GetQuestionSubmissions(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetQuestionMySubmissions request
+	GetQuestionMySubmissions(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetQuestionRecentSubmissions request
+	GetQuestionRecentSubmissions(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostSubmitAnswerWithBody request with any body
 	PostSubmitAnswerWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -893,8 +908,20 @@ func (c *Client) PostLikeQuestion(ctx context.Context, id openapi_types.UUID, bo
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetQuestionSubmissions(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetQuestionSubmissionsRequest(c.Server, id)
+func (c *Client) GetQuestionMySubmissions(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetQuestionMySubmissionsRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetQuestionRecentSubmissions(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetQuestionRecentSubmissionsRequest(c.Server, id)
 	if err != nil {
 		return nil, err
 	}
@@ -1871,8 +1898,8 @@ func NewPostLikeQuestionRequestWithBody(server string, id openapi_types.UUID, co
 	return req, nil
 }
 
-// NewGetQuestionSubmissionsRequest generates requests for GetQuestionSubmissions
-func NewGetQuestionSubmissionsRequest(server string, id openapi_types.UUID) (*http.Request, error) {
+// NewGetQuestionMySubmissionsRequest generates requests for GetQuestionMySubmissions
+func NewGetQuestionMySubmissionsRequest(server string, id openapi_types.UUID) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1887,7 +1914,41 @@ func NewGetQuestionSubmissionsRequest(server string, id openapi_types.UUID) (*ht
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/questions/%s/submissions", pathParam0)
+	operationPath := fmt.Sprintf("/questions/%s/my-answers", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetQuestionRecentSubmissionsRequest generates requests for GetQuestionRecentSubmissions
+func NewGetQuestionRecentSubmissionsRequest(server string, id openapi_types.UUID) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/questions/%s/recent", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2502,8 +2563,11 @@ type ClientWithResponsesInterface interface {
 
 	PostLikeQuestionWithResponse(ctx context.Context, id openapi_types.UUID, body PostLikeQuestionJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLikeQuestionResponse, error)
 
-	// GetQuestionSubmissionsWithResponse request
-	GetQuestionSubmissionsWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetQuestionSubmissionsResponse, error)
+	// GetQuestionMySubmissionsWithResponse request
+	GetQuestionMySubmissionsWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetQuestionMySubmissionsResponse, error)
+
+	// GetQuestionRecentSubmissionsWithResponse request
+	GetQuestionRecentSubmissionsWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetQuestionRecentSubmissionsResponse, error)
 
 	// PostSubmitAnswerWithBodyWithResponse request with any body
 	PostSubmitAnswerWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSubmitAnswerResponse, error)
@@ -2917,10 +2981,10 @@ func (r PostLikeQuestionResponse) StatusCode() int {
 	return 0
 }
 
-type GetQuestionSubmissionsResponse struct {
+type GetQuestionMySubmissionsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *[]Submission
+	JSON200      *[]MySubmission
 	JSON400      *BadRequest
 	JSON401      *Unauthorized
 	JSON404      *NotFound
@@ -2928,7 +2992,7 @@ type GetQuestionSubmissionsResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetQuestionSubmissionsResponse) Status() string {
+func (r GetQuestionMySubmissionsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2936,7 +3000,33 @@ func (r GetQuestionSubmissionsResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetQuestionSubmissionsResponse) StatusCode() int {
+func (r GetQuestionMySubmissionsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetQuestionRecentSubmissionsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]RecentSubmission
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetQuestionRecentSubmissionsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetQuestionRecentSubmissionsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2947,7 +3037,7 @@ type PostSubmitAnswerResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Correct *bool `json:"correct,omitempty"`
+		Correct bool `json:"correct"`
 	}
 	JSON400 *BadRequest
 	JSON401 *Unauthorized
@@ -3374,13 +3464,22 @@ func (c *ClientWithResponses) PostLikeQuestionWithResponse(ctx context.Context, 
 	return ParsePostLikeQuestionResponse(rsp)
 }
 
-// GetQuestionSubmissionsWithResponse request returning *GetQuestionSubmissionsResponse
-func (c *ClientWithResponses) GetQuestionSubmissionsWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetQuestionSubmissionsResponse, error) {
-	rsp, err := c.GetQuestionSubmissions(ctx, id, reqEditors...)
+// GetQuestionMySubmissionsWithResponse request returning *GetQuestionMySubmissionsResponse
+func (c *ClientWithResponses) GetQuestionMySubmissionsWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetQuestionMySubmissionsResponse, error) {
+	rsp, err := c.GetQuestionMySubmissions(ctx, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetQuestionSubmissionsResponse(rsp)
+	return ParseGetQuestionMySubmissionsResponse(rsp)
+}
+
+// GetQuestionRecentSubmissionsWithResponse request returning *GetQuestionRecentSubmissionsResponse
+func (c *ClientWithResponses) GetQuestionRecentSubmissionsWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetQuestionRecentSubmissionsResponse, error) {
+	rsp, err := c.GetQuestionRecentSubmissions(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetQuestionRecentSubmissionsResponse(rsp)
 }
 
 // PostSubmitAnswerWithBodyWithResponse request with arbitrary body returning *PostSubmitAnswerResponse
@@ -4172,22 +4271,76 @@ func ParsePostLikeQuestionResponse(rsp *http.Response) (*PostLikeQuestionRespons
 	return response, nil
 }
 
-// ParseGetQuestionSubmissionsResponse parses an HTTP response from a GetQuestionSubmissionsWithResponse call
-func ParseGetQuestionSubmissionsResponse(rsp *http.Response) (*GetQuestionSubmissionsResponse, error) {
+// ParseGetQuestionMySubmissionsResponse parses an HTTP response from a GetQuestionMySubmissionsWithResponse call
+func ParseGetQuestionMySubmissionsResponse(rsp *http.Response) (*GetQuestionMySubmissionsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetQuestionSubmissionsResponse{
+	response := &GetQuestionMySubmissionsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []Submission
+		var dest []MySubmission
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetQuestionRecentSubmissionsResponse parses an HTTP response from a GetQuestionRecentSubmissionsWithResponse call
+func ParseGetQuestionRecentSubmissionsResponse(rsp *http.Response) (*GetQuestionRecentSubmissionsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetQuestionRecentSubmissionsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []RecentSubmission
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -4242,7 +4395,7 @@ func ParsePostSubmitAnswerResponse(rsp *http.Response) (*PostSubmitAnswerRespons
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Correct *bool `json:"correct,omitempty"`
+			Correct bool `json:"correct"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -4697,9 +4850,12 @@ type ServerInterface interface {
 	// Like or dislike a question
 	// (POST /questions/{id}/like)
 	PostLikeQuestion(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
-	// Get submissions for a question
-	// (GET /questions/{id}/submissions)
-	GetQuestionSubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Get my submissions for a question
+	// (GET /questions/{id}/my-answers)
+	GetQuestionMySubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Get recent submissions from other users
+	// (GET /questions/{id}/recent)
+	GetQuestionRecentSubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Submit answer for a question
 	// (POST /questions/{id}/submit)
 	PostSubmitAnswer(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
@@ -4823,9 +4979,15 @@ func (_ Unimplemented) PostLikeQuestion(w http.ResponseWriter, r *http.Request, 
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Get submissions for a question
-// (GET /questions/{id}/submissions)
-func (_ Unimplemented) GetQuestionSubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+// Get my submissions for a question
+// (GET /questions/{id}/my-answers)
+func (_ Unimplemented) GetQuestionMySubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get recent submissions from other users
+// (GET /questions/{id}/recent)
+func (_ Unimplemented) GetQuestionRecentSubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -5309,8 +5471,8 @@ func (siw *ServerInterfaceWrapper) PostLikeQuestion(w http.ResponseWriter, r *ht
 	handler.ServeHTTP(w, r)
 }
 
-// GetQuestionSubmissions operation middleware
-func (siw *ServerInterfaceWrapper) GetQuestionSubmissions(w http.ResponseWriter, r *http.Request) {
+// GetQuestionMySubmissions operation middleware
+func (siw *ServerInterfaceWrapper) GetQuestionMySubmissions(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
@@ -5324,7 +5486,32 @@ func (siw *ServerInterfaceWrapper) GetQuestionSubmissions(w http.ResponseWriter,
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetQuestionSubmissions(w, r, id)
+		siw.Handler.GetQuestionMySubmissions(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetQuestionRecentSubmissions operation middleware
+func (siw *ServerInterfaceWrapper) GetQuestionRecentSubmissions(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetQuestionRecentSubmissions(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -5767,7 +5954,10 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Post(options.BaseURL+"/questions/{id}/like", wrapper.PostLikeQuestion)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/questions/{id}/submissions", wrapper.GetQuestionSubmissions)
+		r.Get(options.BaseURL+"/questions/{id}/my-answers", wrapper.GetQuestionMySubmissions)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/questions/{id}/recent", wrapper.GetQuestionRecentSubmissions)
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/questions/{id}/submit", wrapper.PostSubmitAnswer)
@@ -6501,55 +6691,110 @@ func (response PostLikeQuestion500JSONResponse) VisitPostLikeQuestionResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetQuestionSubmissionsRequestObject struct {
+type GetQuestionMySubmissionsRequestObject struct {
 	Id openapi_types.UUID `json:"id"`
 }
 
-type GetQuestionSubmissionsResponseObject interface {
-	VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error
+type GetQuestionMySubmissionsResponseObject interface {
+	VisitGetQuestionMySubmissionsResponse(w http.ResponseWriter) error
 }
 
-type GetQuestionSubmissions200JSONResponse []Submission
+type GetQuestionMySubmissions200JSONResponse []MySubmission
 
-func (response GetQuestionSubmissions200JSONResponse) VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error {
+func (response GetQuestionMySubmissions200JSONResponse) VisitGetQuestionMySubmissionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetQuestionSubmissions400JSONResponse struct{ BadRequestJSONResponse }
+type GetQuestionMySubmissions400JSONResponse struct{ BadRequestJSONResponse }
 
-func (response GetQuestionSubmissions400JSONResponse) VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error {
+func (response GetQuestionMySubmissions400JSONResponse) VisitGetQuestionMySubmissionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetQuestionSubmissions401JSONResponse struct{ UnauthorizedJSONResponse }
+type GetQuestionMySubmissions401JSONResponse struct{ UnauthorizedJSONResponse }
 
-func (response GetQuestionSubmissions401JSONResponse) VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error {
+func (response GetQuestionMySubmissions401JSONResponse) VisitGetQuestionMySubmissionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetQuestionSubmissions404JSONResponse struct{ NotFoundJSONResponse }
+type GetQuestionMySubmissions404JSONResponse struct{ NotFoundJSONResponse }
 
-func (response GetQuestionSubmissions404JSONResponse) VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error {
+func (response GetQuestionMySubmissions404JSONResponse) VisitGetQuestionMySubmissionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetQuestionSubmissions500JSONResponse struct {
+type GetQuestionMySubmissions500JSONResponse struct {
 	InternalServerErrorJSONResponse
 }
 
-func (response GetQuestionSubmissions500JSONResponse) VisitGetQuestionSubmissionsResponse(w http.ResponseWriter) error {
+func (response GetQuestionMySubmissions500JSONResponse) VisitGetQuestionMySubmissionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestionRecentSubmissionsRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type GetQuestionRecentSubmissionsResponseObject interface {
+	VisitGetQuestionRecentSubmissionsResponse(w http.ResponseWriter) error
+}
+
+type GetQuestionRecentSubmissions200JSONResponse []RecentSubmission
+
+func (response GetQuestionRecentSubmissions200JSONResponse) VisitGetQuestionRecentSubmissionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestionRecentSubmissions400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response GetQuestionRecentSubmissions400JSONResponse) VisitGetQuestionRecentSubmissionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestionRecentSubmissions401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response GetQuestionRecentSubmissions401JSONResponse) VisitGetQuestionRecentSubmissionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestionRecentSubmissions404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response GetQuestionRecentSubmissions404JSONResponse) VisitGetQuestionRecentSubmissionsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetQuestionRecentSubmissions500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetQuestionRecentSubmissions500JSONResponse) VisitGetQuestionRecentSubmissionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -6566,7 +6811,7 @@ type PostSubmitAnswerResponseObject interface {
 }
 
 type PostSubmitAnswer200JSONResponse struct {
-	Correct *bool `json:"correct,omitempty"`
+	Correct bool `json:"correct"`
 }
 
 func (response PostSubmitAnswer200JSONResponse) VisitPostSubmitAnswerResponse(w http.ResponseWriter) error {
@@ -7035,9 +7280,12 @@ type StrictServerInterface interface {
 	// Like or dislike a question
 	// (POST /questions/{id}/like)
 	PostLikeQuestion(ctx context.Context, request PostLikeQuestionRequestObject) (PostLikeQuestionResponseObject, error)
-	// Get submissions for a question
-	// (GET /questions/{id}/submissions)
-	GetQuestionSubmissions(ctx context.Context, request GetQuestionSubmissionsRequestObject) (GetQuestionSubmissionsResponseObject, error)
+	// Get my submissions for a question
+	// (GET /questions/{id}/my-answers)
+	GetQuestionMySubmissions(ctx context.Context, request GetQuestionMySubmissionsRequestObject) (GetQuestionMySubmissionsResponseObject, error)
+	// Get recent submissions from other users
+	// (GET /questions/{id}/recent)
+	GetQuestionRecentSubmissions(ctx context.Context, request GetQuestionRecentSubmissionsRequestObject) (GetQuestionRecentSubmissionsResponseObject, error)
 	// Submit answer for a question
 	// (POST /questions/{id}/submit)
 	PostSubmitAnswer(ctx context.Context, request PostSubmitAnswerRequestObject) (PostSubmitAnswerResponseObject, error)
@@ -7530,25 +7778,51 @@ func (sh *strictHandler) PostLikeQuestion(w http.ResponseWriter, r *http.Request
 	}
 }
 
-// GetQuestionSubmissions operation middleware
-func (sh *strictHandler) GetQuestionSubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
-	var request GetQuestionSubmissionsRequestObject
+// GetQuestionMySubmissions operation middleware
+func (sh *strictHandler) GetQuestionMySubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request GetQuestionMySubmissionsRequestObject
 
 	request.Id = id
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.GetQuestionSubmissions(ctx, request.(GetQuestionSubmissionsRequestObject))
+		return sh.ssi.GetQuestionMySubmissions(ctx, request.(GetQuestionMySubmissionsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetQuestionSubmissions")
+		handler = middleware(handler, "GetQuestionMySubmissions")
 	}
 
 	response, err := handler(r.Context(), w, r, request)
 
 	if err != nil {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(GetQuestionSubmissionsResponseObject); ok {
-		if err := validResponse.VisitGetQuestionSubmissionsResponse(w); err != nil {
+	} else if validResponse, ok := response.(GetQuestionMySubmissionsResponseObject); ok {
+		if err := validResponse.VisitGetQuestionMySubmissionsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetQuestionRecentSubmissions operation middleware
+func (sh *strictHandler) GetQuestionRecentSubmissions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request GetQuestionRecentSubmissionsRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetQuestionRecentSubmissions(ctx, request.(GetQuestionRecentSubmissionsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetQuestionRecentSubmissions")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetQuestionRecentSubmissionsResponseObject); ok {
+		if err := validResponse.VisitGetQuestionRecentSubmissionsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

@@ -354,21 +354,74 @@ func GetQuestionSubmissions(
 	ctx context.Context,
 	db qrm.DB,
 	questionUUID uuid.UUID,
-	params *model.QuestionSubmissions,
 ) (*[]model.QuestionSubmissions, error) {
-	tbl := table.QuestionSubmissions
-	questionTbl := table.Questions
-	stmt := pg.SELECT(tbl.AllColumns).
-		FROM(tbl.LEFT_JOIN(questionTbl, questionTbl.ID.EQ(tbl.QuestionID))).
-		WHERE(questionTbl.QuestionUUID.EQ(pg.UUID(questionUUID)))
+	submissionsTbl := table.QuestionSubmissions
+	questionsTbl := table.Questions
 
-	var result []model.QuestionSubmissions
-	err := stmt.QueryContext(ctx, db, &result)
+	stmt := pg.SELECT(
+		submissionsTbl.AllColumns,
+	).FROM(
+		submissionsTbl.
+			INNER_JOIN(questionsTbl, submissionsTbl.QuestionID.EQ(questionsTbl.ID)),
+	).WHERE(
+		questionsTbl.QuestionUUID.EQ(pg.UUID(questionUUID)),
+	).ORDER_BY(
+		submissionsTbl.CreatedAt.DESC(),
+	)
+
+	var results []model.QuestionSubmissions
+	err := stmt.QueryContext(ctx, db, &results)
+	if err != nil {
+		return nil, err
+	}
+	return &results, nil
+}
+
+func GetQuestionSubmissionsWithOptions(
+	ctx context.Context,
+	db qrm.DB,
+	submissionIDs []int64,
+) (*map[int64][]uuid.UUID, error) {
+	submissionOptionTbl := table.QuestionSubmissionOptions
+	optionTbl := table.QuestionOptions
+
+	submissionExps := make([]pg.Expression, 0, len(submissionIDs))
+	for _, id := range submissionIDs {
+		submissionExps = append(submissionExps, pg.Int64(id))
+	}
+
+	stmt := pg.SELECT(
+		submissionOptionTbl.OptionID.AS("option_id"),
+		submissionOptionTbl.SubmissionID.AS("submission_id"),
+		optionTbl.OptionUUID.AS("option_uuid"),
+	).FROM(
+		submissionOptionTbl.LEFT_JOIN(optionTbl, submissionOptionTbl.OptionID.EQ(optionTbl.ID)),
+	).WHERE(
+		submissionOptionTbl.SubmissionID.IN(submissionExps...),
+	)
+
+	var results []struct {
+		SubmissionID int64     `db:"submission_id"`
+		OptionID     int64     `db:"option_id"`
+		OptionUUID   uuid.UUID `db:"option_uuid"`
+	}
+	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
 		return nil, err
 	}
 
-	return &result, nil
+	// 将选项信息映射到提交
+	submissionMap := make(map[int64][]uuid.UUID)
+	for _, submission := range results {
+		key := submission.SubmissionID
+		if _, ok := submissionMap[key]; !ok {
+			// 不存在，初始化一个空的切片
+			submissionMap[key] = []uuid.UUID{}
+		}
+		submissionMap[key] = append(submissionMap[key], submission.OptionUUID)
+	}
+
+	return &submissionMap, nil
 }
 
 func GetQuestionSubmissionCount(
@@ -398,31 +451,19 @@ func GetOptionIDsByUUIDs(
 	db qrm.DB,
 	optionUUIDs []uuid.UUID,
 ) ([]int64, error) {
-	if len(optionUUIDs) == 0 {
-		return []int64{}, nil
-	}
-
 	tbl := table.QuestionOptions
 
-	var uuidExpressions []pg.Expression
+	uuidExpressions := make([]pg.Expression, 0, len(optionUUIDs))
 	for _, optionUUID := range optionUUIDs {
 		uuidExpressions = append(uuidExpressions, pg.UUID(optionUUID))
 	}
 
-	stmt := pg.SELECT(
-		tbl.ID,
-	).FROM(
-		tbl,
-	).WHERE(
-		tbl.OptionUUID.IN(uuidExpressions...),
-	).ORDER_BY(
-		tbl.ID,
-	)
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl).
+		WHERE(tbl.OptionUUID.IN(uuidExpressions...)).
+		ORDER_BY(tbl.ID)
 
-	var optionIDs []struct {
-		ID int64
-	}
-
+	var optionIDs []model.QuestionOptions
 	err := stmt.QueryContext(ctx, db, &optionIDs)
 	if err != nil {
 		return nil, err

@@ -111,7 +111,7 @@ func PostSubmitAnswer(
 		return nil, err
 	}
 
-	return &oapi.PostSubmitAnswer200JSONResponse{Correct: &correct}, nil
+	return &oapi.PostSubmitAnswer200JSONResponse{Correct: correct}, nil
 }
 
 func sliceEqual[T comparable](a, b []T) bool {
