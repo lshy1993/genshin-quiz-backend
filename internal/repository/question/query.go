@@ -324,7 +324,6 @@ func GetQuestionOptionTranslations(
 ) (*[]model.OptionTranslations, error) {
 	tbl := table.OptionTranslations
 
-	// 直接构建 IN 表达式
 	optionIDExpressions := make([]pg.Expression, 0, len(optionIDs))
 	for _, id := range optionIDs {
 		optionIDExpressions = append(optionIDExpressions, pg.Int64(id))
@@ -347,27 +346,46 @@ func GetQuestionSubmissions(
 	ctx context.Context,
 	db qrm.DB,
 	questionUUID uuid.UUID,
-) (*[]model.QuestionSubmissions, error) {
+) (*[]dao.SubmissionWithUserName, error) {
 	submissionsTbl := table.QuestionSubmissions
 	questionsTbl := table.Questions
+	userTbl := table.Users
 
 	stmt := pg.SELECT(
 		submissionsTbl.AllColumns,
+		userTbl.DisplayName.AS("user_name"),
 	).FROM(
 		submissionsTbl.
-			INNER_JOIN(questionsTbl, submissionsTbl.QuestionID.EQ(questionsTbl.ID)),
+			INNER_JOIN(questionsTbl, submissionsTbl.QuestionID.EQ(questionsTbl.ID)).
+			INNER_JOIN(userTbl, submissionsTbl.UserID.EQ(userTbl.ID)),
 	).WHERE(
 		questionsTbl.QuestionUUID.EQ(pg.UUID(questionUUID)),
 	).ORDER_BY(
 		submissionsTbl.CreatedAt.DESC(),
 	)
 
-	var results []model.QuestionSubmissions
+	var results []struct {
+		model.QuestionSubmissions
+		UserName string `db:"user_name"`
+	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
 		return nil, err
 	}
-	return &results, nil
+
+	daos := make([]dao.SubmissionWithUserName, 0, len(results))
+	for _, submission := range results {
+		dto := dao.SubmissionWithUserName{
+			ID:        submission.ID,
+			IsCorrect: submission.IsCorrect,
+			CreatedAt: submission.CreatedAt,
+			TimeTaken: submission.TimeTaken,
+			UserName:  submission.UserName,
+		}
+		daos = append(daos, dto)
+	}
+
+	return &daos, nil
 }
 
 func GetQuestionSubmissionsWithOptions(

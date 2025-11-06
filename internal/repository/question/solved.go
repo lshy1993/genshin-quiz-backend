@@ -67,7 +67,8 @@ func CheckMultipleQuestionsSolved(
 	).WHERE(
 		submissionTbl.UserID.EQ(pg.Int64(userID)).
 			AND(questionTbl.ID.IN(idList...)).
-			AND(submissionTbl.IsPractice.EQ(pg.Bool(false))),
+			AND(submissionTbl.IsCorrect.IS_TRUE()).
+			AND(submissionTbl.IsPractice.IS_FALSE()),
 	).GROUP_BY(questionTbl.ID)
 
 	var results []struct {

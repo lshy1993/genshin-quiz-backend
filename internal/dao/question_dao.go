@@ -3,6 +3,7 @@ package dao
 import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
+	"time"
 )
 
 type SimpleQuestion struct {
@@ -35,6 +36,14 @@ type QuestionListParams struct {
 type QuestionListResult struct {
 	Questions []SimpleQuestion
 	Total     int
+}
+
+type SubmissionWithUserName struct {
+	ID        int64
+	IsCorrect bool
+	CreatedAt time.Time
+	TimeTaken *int32
+	UserName  string
 }
 
 // const (

@@ -17,13 +17,9 @@ func GetQuestionRecentSubmissions(
 	if err != nil {
 		return nil, err
 	}
+
 	if len(*submissions) == 0 {
 		return &[]oapi.RecentSubmission{}, nil
-	}
-
-	submissionIDs := make([]int64, 0, len(*submissions))
-	for _, submission := range *submissions {
-		submissionIDs = append(submissionIDs, submission.ID)
 	}
 
 	dtos := make([]oapi.RecentSubmission, 0, len(*submissions))
@@ -36,6 +32,7 @@ func GetQuestionRecentSubmissions(
 			IsCorrect:   submission.IsCorrect,
 			SubmittedAt: submission.CreatedAt,
 			TimeSpent:   timeSpent,
+			UserName:    submission.UserName,
 		}
 		dtos = append(dtos, dto)
 	}
