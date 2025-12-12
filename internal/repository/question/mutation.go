@@ -89,13 +89,13 @@ func InsertQuestionOptions(
 func InsertOptionTranslations(
 	ctx context.Context,
 	db qrm.DB,
-	optionTranslations []model.OptionTranslations,
+	optionTranslations []model.QuestionOptionTranslations,
 ) error {
 	if len(optionTranslations) == 0 {
 		return nil
 	}
 
-	tbl := table.OptionTranslations
+	tbl := table.QuestionOptionTranslations
 	insertStmt := tbl.INSERT(
 		tbl.OptionID,
 		tbl.Language,

@@ -321,8 +321,8 @@ func GetQuestionOptionTranslations(
 	db qrm.DB,
 	optionIDs []int64,
 	language *[]string,
-) (*[]model.OptionTranslations, error) {
-	tbl := table.OptionTranslations
+) (*[]model.QuestionOptionTranslations, error) {
+	tbl := table.QuestionOptionTranslations
 
 	optionIDExpressions := make([]pg.Expression, 0, len(optionIDs))
 	for _, id := range optionIDs {
@@ -333,7 +333,7 @@ func GetQuestionOptionTranslations(
 		FROM(tbl).
 		WHERE(tbl.OptionID.IN(optionIDExpressions...))
 
-	var dto []model.OptionTranslations
+	var dto []model.QuestionOptionTranslations
 	err := stmt.QueryContext(ctx, db, &dto)
 	if err != nil {
 		return nil, err

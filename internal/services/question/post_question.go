@@ -31,7 +31,7 @@ func PostCreateQuestion(
 	}
 
 	now := time.Now()
-	fmt.Println("Creating question by user ID:", req.Body.QuestionType)
+	fmt.Println("Creating question by user ID:", userClaims.UserID)
 	// 提问表主体
 	insertModel := model.Questions{
 		QuestionUUID: uuid.New(),
@@ -104,7 +104,7 @@ func PostCreateQuestion(
 
 	// 翻译生成数据
 	optionTransModels := make(
-		[]model.OptionTranslations,
+		[]model.QuestionOptionTranslations,
 		0,
 		len(req.Body.Options)*len(req.Body.QuestionText),
 	)
@@ -112,7 +112,7 @@ func PostCreateQuestion(
 		source := req.Body.Options[i]
 		// 为每个选项创建翻译记录
 		for lang, text := range *source.Text {
-			optionTransModel := model.OptionTranslations{
+			optionTransModel := model.QuestionOptionTranslations{
 				OptionID:   option.ID,
 				Language:   lang,
 				OptionText: text,

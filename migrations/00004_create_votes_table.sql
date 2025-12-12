@@ -41,6 +41,17 @@ CREATE TABLE vote_options (
     vote_count BIGINT NOT NULL DEFAULT 0
 );
 
+-- Create vote option translations table
+CREATE TABLE vote_option_translations (
+    id BIGSERIAL PRIMARY KEY,
+    option_id BIGINT NOT NULL REFERENCES vote_options(id) ON DELETE CASCADE,
+    language VARCHAR(10) NOT NULL,
+    option_text TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(option_id, language)
+);
+
 -- Create user votes table (tracks individual user votes)
 CREATE TABLE user_votes (
     id BIGSERIAL PRIMARY KEY,
@@ -72,10 +83,18 @@ CREATE INDEX idx_votes_start_expires ON votes(start_at, expires_at);
 CREATE INDEX idx_votes_created_by ON votes(created_by);
 CREATE INDEX idx_votes_created_at ON votes(created_at);
 
+-- Vote translations indexes
+CREATE INDEX idx_vote_translations_vote_id ON vote_translations(vote_id);
+CREATE INDEX idx_vote_translations_language ON vote_translations(vote_id, language);
+
 -- Vote options indexes
 CREATE INDEX idx_vote_options_uuid ON vote_options(option_uuid);
 CREATE INDEX idx_vote_options_vote_id ON vote_options(vote_id);
 CREATE INDEX idx_vote_options_vote_order ON vote_options(vote_id, option_order);
+
+-- Vote option translations indexes
+CREATE INDEX idx_vote_option_translations_option_id ON vote_option_translations(option_id);
+CREATE INDEX idx_vote_option_translations_language ON vote_option_translations(option_id, language);
 
 -- User votes indexes
 CREATE INDEX idx_user_votes_vote_id ON user_votes(vote_id);
@@ -95,9 +114,13 @@ DROP INDEX IF EXISTS idx_user_votes_user_vote;
 DROP INDEX IF EXISTS idx_user_votes_option_id;
 DROP INDEX IF EXISTS idx_user_votes_user_id;
 DROP INDEX IF EXISTS idx_user_votes_vote_id;
+DROP INDEX IF EXISTS idx_vote_option_translations_language;
+DROP INDEX IF EXISTS idx_vote_option_translations_option_id;
 DROP INDEX IF EXISTS idx_vote_options_vote_order;
 DROP INDEX IF EXISTS idx_vote_options_vote_id;
 DROP INDEX IF EXISTS idx_vote_options_uuid;
+DROP INDEX IF EXISTS idx_vote_translations_language;
+DROP INDEX IF EXISTS idx_vote_translations_vote_id;
 DROP INDEX IF EXISTS idx_votes_created_at;
 DROP INDEX IF EXISTS idx_votes_created_by;
 DROP INDEX IF EXISTS idx_votes_start_expires;
@@ -107,5 +130,7 @@ DROP INDEX IF EXISTS idx_votes_uuid;
 -- Drop tables in reverse dependency order
 DROP TABLE IF EXISTS vote_likes;
 DROP TABLE IF EXISTS user_votes;
+DROP TABLE IF EXISTS vote_option_translations;
 DROP TABLE IF EXISTS vote_options;
+DROP TABLE IF EXISTS vote_translations;
 DROP TABLE IF EXISTS votes;

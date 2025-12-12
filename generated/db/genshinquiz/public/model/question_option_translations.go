@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type OptionTranslations struct {
+type QuestionOptionTranslations struct {
 	ID         int64 `sql:"primary_key"`
 	OptionID   int64
 	Language   string

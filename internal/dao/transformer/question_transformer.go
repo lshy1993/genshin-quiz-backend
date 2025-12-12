@@ -86,7 +86,7 @@ func ConvertDetailToQuestion(
 
 func ToQuestionOption(
 	option model.QuestionOptions,
-	translation model.OptionTranslations,
+	translation model.QuestionOptionTranslations,
 	solved bool,
 ) oapi.QuestionOption {
 	count := int(option.SelectedCount)

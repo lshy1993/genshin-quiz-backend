@@ -18,7 +18,7 @@ type DetailedQuestion struct {
 	User               model.Users
 	Translation        model.QuestionTranslations
 	Options            []model.QuestionOptions
-	OptionTranslations []model.OptionTranslations
+	OptionTranslations []model.QuestionOptionTranslations
 	SubmissionCount    int64
 }
 
