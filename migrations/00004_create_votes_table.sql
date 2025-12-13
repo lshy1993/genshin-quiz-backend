@@ -34,7 +34,6 @@ CREATE TABLE vote_options (
     id BIGSERIAL PRIMARY KEY,
     option_uuid UUID NOT NULL DEFAULT gen_random_uuid(),
     vote_id BIGINT NOT NULL REFERENCES votes(id) ON DELETE CASCADE,
-    option_text TEXT NOT NULL,
     option_order INTEGER NOT NULL DEFAULT 0, -- display order
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     -- 冗余统计字段
