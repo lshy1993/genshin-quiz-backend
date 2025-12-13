@@ -267,24 +267,28 @@ type User struct {
 // Vote defines model for Vote.
 type Vote struct {
 	// Category 题目分类
-	Category    QuestionCategory   `json:"category"`
-	CreatedAt   time.Time          `json:"created_at"`
-	CreatedBy   openapi_types.UUID `json:"created_by"`
-	Description *string            `json:"description,omitempty"`
+	Category  QuestionCategory   `json:"category"`
+	CreatedAt time.Time          `json:"created_at"`
+	CreatedBy openapi_types.UUID `json:"created_by"`
+
+	// Description 多语言描述
+	Description *map[string]string `json:"description,omitempty"`
+	ExpireAt    *time.Time         `json:"expire_at,omitempty"`
 
 	// Expired 投票是否已过期
-	Expired   bool               `json:"expired"`
-	ExpiresAt *time.Time         `json:"expires_at,omitempty"`
-	Id        openapi_types.UUID `json:"id"`
-	Likes     *int               `json:"likes,omitempty"`
-	Options   []VoteOption       `json:"options"`
+	Expired bool               `json:"expired"`
+	Id      openapi_types.UUID `json:"id"`
+	Likes   *int               `json:"likes,omitempty"`
+	Options []VoteOption       `json:"options"`
 
 	// Participants 参与投票的用户数
 	Participants *int      `json:"participants,omitempty"`
 	Public       bool      `json:"public"`
 	StartAt      time.Time `json:"start_at"`
 	Tags         *[]string `json:"tags,omitempty"`
-	Title        string    `json:"title"`
+
+	// Title 多语言标题
+	Title map[string]string `json:"title"`
 
 	// TotalVotes 总投票数
 	TotalVotes *int `json:"total_votes,omitempty"`
@@ -293,7 +297,7 @@ type Vote struct {
 	VotedOptions map[string]int `json:"voted_options"`
 
 	// VotesPerOption 每个选项的最大可投票数，0表示无限制
-	VotesPerOption *int `json:"votes_per_option,omitempty"`
+	VotesPerOption int `json:"votes_per_option"`
 
 	// VotesPerUser 每个用户最多可投票数
 	VotesPerUser int `json:"votes_per_user"`
@@ -302,8 +306,8 @@ type Vote struct {
 // VoteOption defines model for VoteOption.
 type VoteOption struct {
 	// Description 选项描述
-	Description *string            `json:"description,omitempty"`
-	Id          openapi_types.UUID `json:"id"`
+	Description *string             `json:"description,omitempty"`
+	Id          *openapi_types.UUID `json:"id,omitempty"`
 
 	// ImageUrl 选项图片URL
 	ImageUrl *string `json:"image_url,omitempty"`
@@ -312,7 +316,7 @@ type VoteOption struct {
 	MusicUrl *string `json:"music_url,omitempty"`
 
 	// Text 选项文本
-	Text *string `json:"text,omitempty"`
+	Text *map[string]string `json:"text,omitempty"`
 
 	// Type 选项类型（文本、图片、音乐）
 	Type  VoteOptionType `json:"type"`
@@ -321,6 +325,34 @@ type VoteOption struct {
 
 // VoteOptionType 选项类型（文本、图片、音乐）
 type VoteOptionType string
+
+// VoteWithOption defines model for VoteWithOption.
+type VoteWithOption struct {
+	// Category 题目分类
+	Category QuestionCategory `json:"category"`
+
+	// Description 多语言描述
+	Description *map[string]string `json:"description,omitempty"`
+	ExpireAt    *time.Time         `json:"expire_at,omitempty"`
+	Options     []VoteOption       `json:"options"`
+
+	// Password 投票密码
+	Password *string `json:"password,omitempty"`
+
+	// Public 是否公开可见(需要密码才能参与投票)
+	Public  bool      `json:"public"`
+	StartAt time.Time `json:"start_at"`
+	Tags    *[]string `json:"tags,omitempty"`
+
+	// Title 多语言标题
+	Title map[string]string `json:"title"`
+
+	// VotesPerOption 每个选项的最大可投票数，0表示无限制
+	VotesPerOption *int `json:"votes_per_option,omitempty"`
+
+	// VotesPerUser 每个用户最多可投票数
+	VotesPerUser int `json:"votes_per_user"`
+}
 
 // BadRequest defines model for BadRequest.
 type BadRequest = CommonError
@@ -406,6 +438,7 @@ type GetVotesParams struct {
 	Limit    *int                `form:"limit,omitempty" json:"limit,omitempty"`
 	Type     *GetVotesParamsType `form:"type,omitempty" json:"type,omitempty"`
 	Query    *string             `form:"query,omitempty" json:"query,omitempty"`
+	Language *[]string           `form:"language,omitempty" json:"language,omitempty"`
 	SortBy   *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
 	SortDesc *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
 }
@@ -451,7 +484,7 @@ type PostSubmitAnswerJSONRequestBody PostSubmitAnswerJSONBody
 type UpdateUserJSONRequestBody = User
 
 // PostCreateVoteJSONRequestBody defines body for PostCreateVote for application/json ContentType.
-type PostCreateVoteJSONRequestBody = Vote
+type PostCreateVoteJSONRequestBody = VoteWithOption
 
 // PostVoteJSONRequestBody defines body for PostVote for application/json ContentType.
 type PostVoteJSONRequestBody PostVoteJSONBody
@@ -2295,6 +2328,22 @@ func NewGetVotesRequest(server string, params *GetVotesParams) (*http.Request, e
 
 		}
 
+		if params.Language != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "language", runtime.ParamLocationQuery, *params.Language); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.SortBy != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortBy", runtime.ParamLocationQuery, *params.SortBy); err != nil {
@@ -3168,8 +3217,8 @@ type GetVotesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Total *int    `json:"total,omitempty"`
-		Votes *[]Vote `json:"votes,omitempty"`
+		Total int    `json:"total"`
+		Votes []Vote `json:"votes"`
 	}
 	JSON500 *InternalServerError
 }
@@ -4642,8 +4691,8 @@ func ParseGetVotesResponse(rsp *http.Response) (*GetVotesResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Total *int    `json:"total,omitempty"`
-			Votes *[]Vote `json:"votes,omitempty"`
+			Total int    `json:"total"`
+			Votes []Vote `json:"votes"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -5701,6 +5750,14 @@ func (siw *ServerInterfaceWrapper) GetVotes(w http.ResponseWriter, r *http.Reque
 	err = runtime.BindQueryParameter("form", true, false, "query", r.URL.Query(), &params.Query)
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "query", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "language" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "language", r.URL.Query(), &params.Language)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "language", Err: err})
 		return
 	}
 
@@ -7064,8 +7121,8 @@ type GetVotesResponseObject interface {
 }
 
 type GetVotes200JSONResponse struct {
-	Total *int    `json:"total,omitempty"`
-	Votes *[]Vote `json:"votes,omitempty"`
+	Total int    `json:"total"`
+	Votes []Vote `json:"votes"`
 }
 
 func (response GetVotes200JSONResponse) VisitGetVotesResponse(w http.ResponseWriter) error {
