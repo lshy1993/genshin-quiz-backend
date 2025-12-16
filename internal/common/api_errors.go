@@ -49,6 +49,7 @@ var (
 	ErrUserAlreadyExists  = NewBadRequestError("用户已存在")
 	ErrInvalidCredentials = NewUnauthorizedError("邮箱或密码错误")
 	ErrQuestionNotFound   = NewNotFoundError("问题未找到")
+	ErrVoteNotFound       = NewNotFoundError("投票未找到")
 	ErrInvalidToken       = NewUnauthorizedError("Invalid or expired token")
 	ErrInvalidTokenFormat = NewUnauthorizedError("Invalid authorization header format")
 	ErrDatabaseError      = NewInternalServerError("Database error")

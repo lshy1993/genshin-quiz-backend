@@ -42,9 +42,19 @@ func GetQuestion(
 		return nil, err
 	}
 
+	// 构建 DetailedQuestion
+	detailedQuestion := dao.DetailedQuestion{
+		Question:           res.Question,
+		User:               res.User,
+		Translation:        res.Translation,
+		Options:            *options,
+		OptionTranslations: *optionTranslations,
+		SubmissionCount:    *count,
+	}
+
 	// 检查用户是否已解答此题（如果用户已登录）
 	solved := false
-	var likeStatus int16
+	likeStatus := int16(0)
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if ok {
 		// 检查是否已解答
@@ -74,14 +84,7 @@ func GetQuestion(
 		}
 	}
 
-	dto := transformer.ConvertDetailToQuestion(dao.DetailedQuestion{
-		Question:           res.Question,
-		User:               res.User,
-		Translation:        res.Translation,
-		Options:            *options,
-		OptionTranslations: *optionTranslations,
-		SubmissionCount:    *count,
-	}, solved, likeStatus)
+	dto := transformer.ConvertDetailToQuestion(detailedQuestion, solved, likeStatus)
 
 	return &dto, nil
 }

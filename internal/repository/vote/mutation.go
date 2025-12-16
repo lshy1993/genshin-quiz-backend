@@ -87,7 +87,7 @@ func InsertOptionTranslations(
 		return nil
 	}
 
-	tbl := table.QuestionOptionTranslations
+	tbl := table.VoteOptionTranslations
 	insertStmt := tbl.INSERT(
 		tbl.OptionID,
 		tbl.Language,
@@ -105,7 +105,7 @@ func UpdateOptionSelected(
 	db qrm.DB,
 	optionIDs []int64,
 ) error {
-	tbl := table.QuestionOptions
+	tbl := table.VoteOptions
 
 	uuidSlice := make([]pg.Expression, 0, len(optionIDs))
 	for _, id := range optionIDs {
@@ -114,7 +114,7 @@ func UpdateOptionSelected(
 
 	updateStmt := tbl.UPDATE().
 		SET(
-			tbl.SelectedCount.SET(tbl.SelectedCount.ADD(pg.Int(1))),
+			tbl.VoteCount.SET(tbl.VoteCount.ADD(pg.Int(1))),
 		).WHERE(
 		tbl.ID.IN(uuidSlice...),
 	)

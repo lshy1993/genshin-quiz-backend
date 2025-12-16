@@ -9,6 +9,7 @@ import (
 	dao "genshin-quiz/internal/dao"
 
 	"genshin-quiz/internal/common"
+	"genshin-quiz/internal/util"
 
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
@@ -29,11 +30,8 @@ func GetQuestions(
 		offset = 0
 	}
 
-	// 基础查询 - 使用语言过滤的JOIN
-	defaultLang := "zh" // 默认语言
-	if params.Language != nil {
-		defaultLang = (*params.Language)[0] // 使用第一个指定语言
-	}
+	// 获取默认语言
+	defaultLang := util.GetDefaultLanguage(params.Language)
 
 	stmt := pg.SELECT(
 		tbl.AllColumns,
@@ -47,16 +45,16 @@ func GetQuestions(
 			LEFT_JOIN(userTbl, tbl.CreatedBy.EQ(userTbl.ID)),
 	).
 		WHERE(
-			baseCondition(params),
+			buildQuestionCondition(params),
 		).
-		ORDER_BY(baseOrder(params)).
+		ORDER_BY(buildQuestionOrder(params)).
 		LIMIT(int64(params.NumPerPage)).
 		OFFSET(int64(offset))
 
 	// 先获取总数
 	countStmt := pg.SELECT(pg.COUNT(pg.STAR)).
 		FROM(tbl).
-		WHERE(baseCondition(params))
+		WHERE(buildQuestionCondition(params))
 	var countResult struct {
 		Count int64 `alias:"count"`
 	}
@@ -77,7 +75,7 @@ func GetQuestions(
 	}, nil
 }
 
-func baseCondition(params dao.QuestionListParams) pg.BoolExpression {
+func buildQuestionCondition(params dao.QuestionListParams) pg.BoolExpression {
 	tbl := table.Questions
 	translationTbl := table.QuestionTranslations
 	condition := tbl.Public.IS_TRUE().AND(tbl.IsPublished.IS_TRUE())
@@ -106,46 +104,34 @@ func baseCondition(params dao.QuestionListParams) pg.BoolExpression {
 	return condition
 }
 
-func baseOrder(params dao.QuestionListParams) pg.OrderByClause {
+func buildQuestionOrder(params dao.QuestionListParams) pg.OrderByClause {
 	tbl := table.Questions
+	var orderExpr pg.Expression
+
 	switch *params.SortBy {
 	case "PublishDate": // 上线时间
-		if params.SortDesc {
-			return tbl.PublishedAt.DESC()
-		}
-		return tbl.PublishedAt.ASC()
+		orderExpr = tbl.PublishedAt
 	case "Difficulty":
 		// 难度排序：easy < medium < hard
-		difficultyOrder := pg.CASE().
+		orderExpr = pg.CASE().
 			WHEN(tbl.Difficulty.EQ(pg.String("easy"))).THEN(pg.Int(1)).
 			WHEN(tbl.Difficulty.EQ(pg.String("medium"))).THEN(pg.Int(2)).
 			WHEN(tbl.Difficulty.EQ(pg.String("hard"))).THEN(pg.Int(3)).
 			ELSE(pg.Int(0))
-		if params.SortDesc {
-			return difficultyOrder.DESC()
-		}
-		return difficultyOrder.ASC()
 	case "Likes": // 点赞数
-		if params.SortDesc {
-			return tbl.Likes.DESC()
-		}
-		return tbl.Likes.ASC()
+		orderExpr = tbl.Likes
 	case "Submissions": // 参与人数
-		if params.SortDesc {
-			return tbl.SubmitCount.DESC()
-		}
-		return tbl.SubmitCount.ASC()
+		orderExpr = tbl.SubmitCount
 	case "CorrectRate":
-		if params.SortDesc {
-			return tbl.CorrectCount.DESC()
-		}
-		return tbl.CorrectCount.ASC()
+		orderExpr = tbl.CorrectCount
 	default:
-		if params.SortDesc {
-			return tbl.PublishedAt.DESC()
-		}
-		return tbl.PublishedAt.ASC()
+		orderExpr = tbl.PublishedAt
 	}
+
+	if params.SortDesc {
+		return orderExpr.DESC()
+	}
+	return orderExpr.ASC()
 }
 
 func GetQuestionByUUID(
@@ -158,10 +144,8 @@ func GetQuestionByUUID(
 	transTbl := table.QuestionTranslations
 	userTbl := table.Users
 
-	defaultLang := "zh" // 默认语言
-	if language != nil {
-		defaultLang = *language // 使用指定语言
-	}
+	// 获取默认语言
+	defaultLang := util.GetDefaultLanguageFromString(language)
 
 	stmt := pg.SELECT(
 		tbl.AllColumns,
@@ -324,10 +308,7 @@ func GetQuestionOptionTranslations(
 ) (*[]model.QuestionOptionTranslations, error) {
 	tbl := table.QuestionOptionTranslations
 
-	optionIDExpressions := make([]pg.Expression, 0, len(optionIDs))
-	for _, id := range optionIDs {
-		optionIDExpressions = append(optionIDExpressions, pg.Int64(id))
-	}
+	optionIDExpressions := util.BuildInt64Expressions(optionIDs)
 
 	stmt := pg.SELECT(tbl.AllColumns).
 		FROM(tbl).
@@ -396,10 +377,7 @@ func GetQuestionSubmissionsWithOptions(
 	submissionOptionTbl := table.QuestionSubmissionOptions
 	optionTbl := table.QuestionOptions
 
-	submissionExps := make([]pg.Expression, 0, len(submissionIDs))
-	for _, id := range submissionIDs {
-		submissionExps = append(submissionExps, pg.Int64(id))
-	}
+	submissionExps := util.BuildInt64Expressions(submissionIDs)
 
 	stmt := pg.SELECT(
 		submissionOptionTbl.OptionID.AS("option_id"),
@@ -464,10 +442,7 @@ func GetOptionIDsByUUIDs(
 ) ([]int64, error) {
 	tbl := table.QuestionOptions
 
-	uuidExpressions := make([]pg.Expression, 0, len(optionUUIDs))
-	for _, optionUUID := range optionUUIDs {
-		uuidExpressions = append(uuidExpressions, pg.UUID(optionUUID))
-	}
+	uuidExpressions := util.BuildUUIDExpressions(optionUUIDs)
 
 	stmt := pg.SELECT(tbl.AllColumns).
 		FROM(tbl).

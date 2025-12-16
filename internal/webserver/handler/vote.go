@@ -18,6 +18,17 @@ func (h *Handler) GetVotes(
 	return res, nil
 }
 
+func (h *Handler) GetVote(
+	ctx context.Context,
+	req oapi.GetVoteRequestObject,
+) (oapi.GetVoteResponseObject, error) {
+	res, err := services.GetVote(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (h *Handler) PostCreateVote(
 	ctx context.Context,
 	req oapi.PostCreateVoteRequestObject,
