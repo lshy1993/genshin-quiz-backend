@@ -61,7 +61,7 @@ func ConvertSimpleVoteToDTO(
 
 func ConvertDetailedVoteToDTO(
 	vote dao.DetailedVote,
-	votedOptions map[string]int,
+	votedOptions []oapi.VoteSubmissionOption,
 	likeStatus int16,
 ) oapi.Vote {
 	// 判断是否已过期

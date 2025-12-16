@@ -121,3 +121,50 @@ func UpdateOptionSelected(
 	_, err := updateStmt.ExecContext(ctx, db)
 	return err
 }
+
+// InsertUserVote 插入单条用户投票记录
+func InsertUserVote(
+	ctx context.Context,
+	db qrm.DB,
+	userVote model.UserVotes,
+) error {
+	tbl := table.UserVotes
+	insertStmt := tbl.INSERT(
+		tbl.VoteID,
+		tbl.UserID,
+		tbl.OptionID,
+		tbl.VoteCount,
+		tbl.CreatedAt,
+		tbl.UpdatedAt,
+	).MODEL(userVote)
+
+	_, err := insertStmt.ExecContext(ctx, db)
+	return err
+}
+
+// UpsertUserVote 插入或更新用户投票记录（如果已存在则更新票数）
+func UpsertUserVote(
+	ctx context.Context,
+	db qrm.DB,
+	userVote model.UserVotes,
+) error {
+	tbl := table.UserVotes
+	insertStmt := tbl.INSERT(
+		tbl.VoteID,
+		tbl.UserID,
+		tbl.OptionID,
+		tbl.VoteCount,
+		tbl.CreatedAt,
+		tbl.UpdatedAt,
+	).MODEL(userVote).
+		ON_CONFLICT(tbl.VoteID, tbl.UserID, tbl.OptionID).
+		DO_UPDATE(
+			pg.SET(
+				tbl.VoteCount.SET(pg.Int32(userVote.VoteCount)),
+				tbl.UpdatedAt.SET(pg.CURRENT_TIMESTAMP()),
+			),
+		)
+
+	_, err := insertStmt.ExecContext(ctx, db)
+	return err
+}

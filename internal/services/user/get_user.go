@@ -18,18 +18,39 @@ func GetUser(
 		return nil, err
 	}
 
+	// 处理可选字段，避免空指针解引用
+	avatarURL := ""
+	if userInfo.AvatarURL != nil {
+		avatarURL = *userInfo.AvatarURL
+	}
+
+	country := ""
+	if userInfo.Location != nil {
+		country = *userInfo.Location
+	}
+
+	nickname := ""
+	if userInfo.DisplayName != nil {
+		nickname = *userInfo.DisplayName
+	}
+
+	var language *string
+	if userInfo.Language != nil {
+		language = userInfo.Language
+	}
+
 	return &oapi.User{
 		Uuid:             userInfo.UserUUID,
-		AvatarUrl:        *userInfo.AvatarURL,
-		Country:          *userInfo.Location,
+		AvatarUrl:        avatarURL,
+		Country:          country,
 		Ip:               "",
-		Language:         userInfo.Language,
+		Language:         language,
 		LastLoginAt:      userInfo.CreatedAt,
-		Nickname:         *userInfo.DisplayName,
+		Nickname:         nickname,
 		RegisteredAt:     userInfo.CreatedAt,
-		QuestionsCreated: 0,
-		TotalAnswers:     0,
-		CorrectAnswers:   0,
-		Votes:            0,
+		QuestionsCreated: int(userInfo.QuestionsCreated),
+		TotalAnswers:     int(userInfo.TotalSubmissions),
+		CorrectAnswers:   int(userInfo.CorrectSubmissions),
+		Votes:            int(userInfo.TotalVotes),
 	}, nil
 }

@@ -39,3 +39,14 @@ func (h *Handler) PostCreateVote(
 	}
 	return res, nil
 }
+
+func (h *Handler) PostVote(
+	ctx context.Context,
+	req oapi.PostVoteRequestObject,
+) (oapi.PostVoteResponseObject, error) {
+	res, err := services.PostVote(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}

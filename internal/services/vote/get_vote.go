@@ -9,6 +9,8 @@ import (
 	"genshin-quiz/internal/dao/transformer"
 	vote_repo "genshin-quiz/internal/repository/vote"
 	"genshin-quiz/internal/webserver/middleware"
+
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 func GetVote(
@@ -51,7 +53,7 @@ func GetVote(
 	}
 
 	// 检查用户是否已登录，如果已登录则获取用户的投票记录和点赞状态
-	votedOptions := make(map[string]int)
+	votedOptions := []oapi.VoteSubmissionOption{}
 	likeStatus := int16(0)
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if ok {
@@ -61,15 +63,19 @@ func GetVote(
 			return nil, err
 		}
 
-		// 构建选项UUID到投票数的映射
-		optionIDToUUID := make(map[int64]string)
+		// 构建选项ID到选项UUID的映射
+		optionIDToUUID := make(map[int64]openapi_types.UUID)
 		for _, opt := range *options {
-			optionIDToUUID[opt.ID] = opt.OptionUUID.String()
+			optionIDToUUID[opt.ID] = opt.OptionUUID
 		}
 
+		// 构建VoteSubmissionOption数组
 		for _, uv := range *userVotes {
 			if optionUUID, exists := optionIDToUUID[uv.OptionID]; exists {
-				votedOptions[optionUUID] = int(uv.VoteCount)
+				votedOptions = append(votedOptions, oapi.VoteSubmissionOption{
+					OptionId: optionUUID,
+					Votes:    int(uv.VoteCount),
+				})
 			}
 		}
 

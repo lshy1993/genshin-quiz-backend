@@ -293,8 +293,8 @@ type Vote struct {
 	// TotalVotes 总投票数
 	TotalVotes *int `json:"total_votes,omitempty"`
 
-	// VotedOptions 当前用户已投票的选项及票数，key为选项ID
-	VotedOptions map[string]int `json:"voted_options"`
+	// VotedOptions 当前用户已投票的选项及票数
+	VotedOptions []VoteSubmissionOption `json:"voted_options"`
 
 	// VotesPerOption 每个选项的最大可投票数，0表示无限制
 	VotesPerOption int `json:"votes_per_option"`
@@ -319,12 +319,23 @@ type VoteOption struct {
 	Text *map[string]string `json:"text,omitempty"`
 
 	// Type 选项类型（文本、图片、音乐）
-	Type  VoteOptionType `json:"type"`
-	Votes *int           `json:"votes,omitempty"`
+	Type VoteOptionType `json:"type"`
+
+	// Votes 获得的累计票数
+	Votes *int `json:"votes,omitempty"`
 }
 
 // VoteOptionType 选项类型（文本、图片、音乐）
 type VoteOptionType string
+
+// VoteSubmissionOption 投票时单个选项的投票信息
+type VoteSubmissionOption struct {
+	// OptionId 选项ID
+	OptionId openapi_types.UUID `json:"option_id"`
+
+	// Votes 给该选项投的票数
+	Votes int `json:"votes"`
+}
 
 // VoteWithOption defines model for VoteWithOption.
 type VoteWithOption struct {
@@ -449,8 +460,10 @@ type GetVotesParamsType string
 // PostVoteJSONBody defines parameters for PostVote.
 type PostVoteJSONBody struct {
 	// Anonymous 是否匿名投票
-	Anonymous *bool                `json:"anonymous,omitempty"`
-	OptionIds []openapi_types.UUID `json:"option_ids"`
+	Anonymous *bool `json:"anonymous,omitempty"`
+
+	// Options 投票选项列表，每个选项可以投不同数量的票
+	Options []VoteSubmissionOption `json:"options"`
 }
 
 // PostForgotPasswordJSONRequestBody defines body for PostForgotPassword for application/json ContentType.
