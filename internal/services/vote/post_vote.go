@@ -32,7 +32,6 @@ func PostCreateVote(
 	defer tx.Rollback()
 
 	now := time.Now()
-	fmt.Println("Creating vote by user ID:", userClaims.UserID)
 	insertModel := genInsertModel(req, userClaims.UserID, now)
 	createdVote, err := vote_repo.InsertVote(ctx, tx, insertModel)
 	if err != nil {
@@ -91,6 +90,7 @@ func genInsertModel(
 		votesPerOption = new(int32)
 		*votesPerOption = int32(*req.Body.VotesPerOption)
 	}
+
 	// 投票主体
 	insertModel := model.Votes{
 		VoteUUID:       uuid.New(),

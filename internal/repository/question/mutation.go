@@ -17,17 +17,8 @@ func InsertQuestion(
 	insertModel model.Questions,
 ) (*model.Questions, error) {
 	tbl := table.Questions
-	insertStmt := tbl.INSERT(
-		tbl.QuestionUUID,
-		tbl.Public,
-		tbl.QuestionType,
-		tbl.Category,
-		tbl.Difficulty,
-		tbl.IsPublished,
-		tbl.PublishedAt,
-		tbl.CreatedBy,
-		tbl.CreatedAt,
-	).MODEL(insertModel).
+	insertStmt := tbl.INSERT(tbl.MutableColumns).
+		MODEL(insertModel).
 		RETURNING(tbl.AllColumns)
 
 	var question model.Questions

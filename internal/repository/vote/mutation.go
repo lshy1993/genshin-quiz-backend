@@ -16,13 +16,8 @@ func InsertVote(
 	insertModel model.Votes,
 ) (*model.Votes, error) {
 	tbl := table.Votes
-	insertStmt := tbl.INSERT(
-		tbl.VoteUUID,
-		tbl.Public,
-		tbl.Category,
-		tbl.CreatedBy,
-		tbl.CreatedAt,
-	).MODEL(insertModel).
+	insertStmt := tbl.INSERT(tbl.MutableColumns).
+		MODEL(insertModel).
 		RETURNING(tbl.AllColumns)
 
 	var vote model.Votes
