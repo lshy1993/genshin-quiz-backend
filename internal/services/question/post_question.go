@@ -8,6 +8,7 @@ import (
 	"genshin-quiz/config"
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
+	"genshin-quiz/internal/common"
 	question_repo "genshin-quiz/internal/repository/question"
 	"genshin-quiz/internal/webserver/middleware"
 
@@ -22,7 +23,7 @@ func PostCreateQuestion(
 	// 从 context 中获取用户信息
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if !ok {
-		return nil, fmt.Errorf("user not found in context")
+		return nil, common.ErrUserNotInContext
 	}
 
 	tx, err := app.DB.BeginTx(ctx, nil)

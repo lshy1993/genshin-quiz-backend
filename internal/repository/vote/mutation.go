@@ -117,7 +117,6 @@ func UpdateOptionSelected(
 	return err
 }
 
-// InsertUserVote 插入单条用户投票记录
 func InsertUserVote(
 	ctx context.Context,
 	db qrm.DB,
@@ -137,7 +136,6 @@ func InsertUserVote(
 	return err
 }
 
-// UpsertUserVote 插入或更新用户投票记录（如果已存在则更新票数）
 func UpsertUserVote(
 	ctx context.Context,
 	db qrm.DB,

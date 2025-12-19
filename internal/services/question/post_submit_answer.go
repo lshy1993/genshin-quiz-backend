@@ -2,12 +2,12 @@ package services
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"genshin-quiz/config"
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
+	"genshin-quiz/internal/common"
 	question_repo "genshin-quiz/internal/repository/question"
 	user_repo "genshin-quiz/internal/repository/user"
 	"genshin-quiz/internal/webserver/middleware"
@@ -22,7 +22,7 @@ func PostSubmitAnswer(
 ) (*oapi.PostSubmitAnswer200JSONResponse, error) {
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if !ok {
-		return nil, errors.New("user not found in context")
+		return nil, common.ErrUserNotInContext
 	}
 
 	// 调用仓库层获取问题详情

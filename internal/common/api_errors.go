@@ -52,6 +52,7 @@ var (
 	ErrVoteNotFound       = NewNotFoundError("投票未找到")
 	ErrInvalidToken       = NewUnauthorizedError("Invalid or expired token")
 	ErrInvalidTokenFormat = NewUnauthorizedError("Invalid authorization header format")
+	ErrUserNotInContext   = NewUnauthorizedError("用户未登录或认证失败")
 	ErrDatabaseError      = NewInternalServerError("Database error")
 	ErrAdminAuthError     = NewInternalServerError("Admin access required")
 )

@@ -2,12 +2,12 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"genshin-quiz/config"
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
+	"genshin-quiz/internal/common"
 	vote_repo "genshin-quiz/internal/repository/vote"
 	"genshin-quiz/internal/webserver/middleware"
 
@@ -22,7 +22,7 @@ func PostCreateVote(
 	// 从 context 中获取用户信息
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if !ok {
-		return nil, fmt.Errorf("user not found in context")
+		return nil, common.ErrUserNotInContext
 	}
 
 	tx, err := app.DB.BeginTx(ctx, nil)

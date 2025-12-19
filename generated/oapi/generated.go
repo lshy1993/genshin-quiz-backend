@@ -62,6 +62,13 @@ const (
 	TrueFalse      QuestionType = "true_false"
 )
 
+// Defines values for VoteLikeStatus.
+const (
+	VoteLikeStatusMinus1 VoteLikeStatus = -1
+	VoteLikeStatusN0     VoteLikeStatus = 0
+	VoteLikeStatusN1     VoteLikeStatus = 1
+)
+
 // Defines values for VoteOptionType.
 const (
 	VoteOptionTypeImage VoteOptionType = "image"
@@ -81,6 +88,13 @@ const (
 	All       GetVotesParamsType = "all"
 	Available GetVotesParamsType = "available"
 	Expired   GetVotesParamsType = "expired"
+)
+
+// Defines values for PostLikeVoteJSONBodyLike.
+const (
+	PostLikeVoteJSONBodyLikeMinus1 PostLikeVoteJSONBodyLike = -1
+	PostLikeVoteJSONBodyLikeN0     PostLikeVoteJSONBodyLike = 0
+	PostLikeVoteJSONBodyLikeN1     PostLikeVoteJSONBodyLike = 1
 )
 
 // AuthResponse defines model for AuthResponse.
@@ -278,8 +292,11 @@ type Vote struct {
 	// Expired 投票是否已过期
 	Expired bool               `json:"expired"`
 	Id      openapi_types.UUID `json:"id"`
-	Likes   *int               `json:"likes,omitempty"`
-	Options []VoteOption       `json:"options"`
+
+	// LikeStatus 点赞状态：-1踩, 0未操作, 1赞
+	LikeStatus *VoteLikeStatus `json:"likeStatus,omitempty"`
+	Likes      *int            `json:"likes,omitempty"`
+	Options    []VoteOption    `json:"options"`
 
 	// Participants 参与投票的用户数
 	Participants *int      `json:"participants,omitempty"`
@@ -293,6 +310,9 @@ type Vote struct {
 	// TotalVotes 总投票数
 	TotalVotes *int `json:"total_votes,omitempty"`
 
+	// Voted 当前用户是否已参与投票
+	Voted bool `json:"voted"`
+
 	// VotedOptions 当前用户已投票的选项及票数
 	VotedOptions []VoteSubmissionOption `json:"voted_options"`
 
@@ -302,6 +322,9 @@ type Vote struct {
 	// VotesPerUser 每个用户最多可投票数
 	VotesPerUser int `json:"votes_per_user"`
 }
+
+// VoteLikeStatus 点赞状态：-1踩, 0未操作, 1赞
+type VoteLikeStatus int
 
 // VoteOption defines model for VoteOption.
 type VoteOption struct {
@@ -457,6 +480,15 @@ type GetVotesParams struct {
 // GetVotesParamsType defines parameters for GetVotes.
 type GetVotesParamsType string
 
+// PostLikeVoteJSONBody defines parameters for PostLikeVote.
+type PostLikeVoteJSONBody struct {
+	// Like 点赞状态：1=点赞，0=取消操作，-1=点踩
+	Like PostLikeVoteJSONBodyLike `json:"like"`
+}
+
+// PostLikeVoteJSONBodyLike defines parameters for PostLikeVote.
+type PostLikeVoteJSONBodyLike int
+
 // PostVoteJSONBody defines parameters for PostVote.
 type PostVoteJSONBody struct {
 	// Anonymous 是否匿名投票
@@ -498,6 +530,9 @@ type UpdateUserJSONRequestBody = User
 
 // PostCreateVoteJSONRequestBody defines body for PostCreateVote for application/json ContentType.
 type PostCreateVoteJSONRequestBody = VoteWithOption
+
+// PostLikeVoteJSONRequestBody defines body for PostLikeVote for application/json ContentType.
+type PostLikeVoteJSONRequestBody PostLikeVoteJSONBody
 
 // PostVoteJSONRequestBody defines body for PostVote for application/json ContentType.
 type PostVoteJSONRequestBody PostVoteJSONBody
@@ -671,6 +706,11 @@ type ClientInterface interface {
 
 	// GetVote request
 	GetVote(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostLikeVoteWithBody request with any body
+	PostLikeVoteWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostLikeVote(ctx context.Context, id openapi_types.UUID, body PostLikeVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostVoteWithBody request with any body
 	PostVoteWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1100,6 +1140,30 @@ func (c *Client) PostCreateVote(ctx context.Context, body PostCreateVoteJSONRequ
 
 func (c *Client) GetVote(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetVoteRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostLikeVoteWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostLikeVoteRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostLikeVote(ctx context.Context, id openapi_types.UUID, body PostLikeVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostLikeVoteRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2474,6 +2538,53 @@ func NewGetVoteRequest(server string, id openapi_types.UUID) (*http.Request, err
 	return req, nil
 }
 
+// NewPostLikeVoteRequest calls the generic PostLikeVote builder with application/json body
+func NewPostLikeVoteRequest(server string, id openapi_types.UUID, body PostLikeVoteJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostLikeVoteRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewPostLikeVoteRequestWithBody generates requests for PostLikeVote with any type of body
+func NewPostLikeVoteRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/votes/%s/like", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewPostVoteRequest calls the generic PostVote builder with application/json body
 func NewPostVoteRequest(server string, id openapi_types.UUID, body PostVoteJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -2660,6 +2771,11 @@ type ClientWithResponsesInterface interface {
 
 	// GetVoteWithResponse request
 	GetVoteWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetVoteResponse, error)
+
+	// PostLikeVoteWithBodyWithResponse request with any body
+	PostLikeVoteWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostLikeVoteResponse, error)
+
+	PostLikeVoteWithResponse(ctx context.Context, id openapi_types.UUID, body PostLikeVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLikeVoteResponse, error)
 
 	// PostVoteWithBodyWithResponse request with any body
 	PostVoteWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostVoteResponse, error)
@@ -3302,6 +3418,31 @@ func (r GetVoteResponse) StatusCode() int {
 	return 0
 }
 
+type PostLikeVoteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostLikeVoteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostLikeVoteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type PostVoteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -3638,6 +3779,23 @@ func (c *ClientWithResponses) GetVoteWithResponse(ctx context.Context, id openap
 		return nil, err
 	}
 	return ParseGetVoteResponse(rsp)
+}
+
+// PostLikeVoteWithBodyWithResponse request with arbitrary body returning *PostLikeVoteResponse
+func (c *ClientWithResponses) PostLikeVoteWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostLikeVoteResponse, error) {
+	rsp, err := c.PostLikeVoteWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostLikeVoteResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostLikeVoteWithResponse(ctx context.Context, id openapi_types.UUID, body PostLikeVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLikeVoteResponse, error) {
+	rsp, err := c.PostLikeVote(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostLikeVoteResponse(rsp)
 }
 
 // PostVoteWithBodyWithResponse request with arbitrary body returning *PostVoteResponse
@@ -4818,6 +4976,53 @@ func ParseGetVoteResponse(rsp *http.Response) (*GetVoteResponse, error) {
 	return response, nil
 }
 
+// ParsePostLikeVoteResponse parses an HTTP response from a PostLikeVoteWithResponse call
+func ParsePostLikeVoteResponse(rsp *http.Response) (*PostLikeVoteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostLikeVoteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParsePostVoteResponse parses an HTTP response from a PostVoteWithResponse call
 func ParsePostVoteResponse(rsp *http.Response) (*PostVoteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -4942,6 +5147,9 @@ type ServerInterface interface {
 	// 获取投票详情（含当前结果）
 	// (GET /votes/{id})
 	GetVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// 点赞投票
+	// (POST /votes/{id}/like)
+	PostLikeVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// 投票
 	// (POST /votes/{id}/vote)
 	PostVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
@@ -5098,6 +5306,12 @@ func (_ Unimplemented) PostCreateVote(w http.ResponseWriter, r *http.Request) {
 // 获取投票详情（含当前结果）
 // (GET /votes/{id})
 func (_ Unimplemented) GetVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// 点赞投票
+// (POST /votes/{id}/like)
+func (_ Unimplemented) PostLikeVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -5840,6 +6054,31 @@ func (siw *ServerInterfaceWrapper) GetVote(w http.ResponseWriter, r *http.Reques
 	handler.ServeHTTP(w, r)
 }
 
+// PostLikeVote operation middleware
+func (siw *ServerInterfaceWrapper) PostLikeVote(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostLikeVote(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // PostVote operation middleware
 func (siw *ServerInterfaceWrapper) PostVote(w http.ResponseWriter, r *http.Request) {
 
@@ -6052,6 +6291,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/votes/{id}", wrapper.GetVote)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/votes/{id}/like", wrapper.PostLikeVote)
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/votes/{id}/vote", wrapper.PostVote)
@@ -7248,6 +7490,61 @@ func (response GetVote500JSONResponse) VisitGetVoteResponse(w http.ResponseWrite
 	return json.NewEncoder(w).Encode(response)
 }
 
+type PostLikeVoteRequestObject struct {
+	Id   openapi_types.UUID `json:"id"`
+	Body *PostLikeVoteJSONRequestBody
+}
+
+type PostLikeVoteResponseObject interface {
+	VisitPostLikeVoteResponse(w http.ResponseWriter) error
+}
+
+type PostLikeVote201Response struct {
+}
+
+func (response PostLikeVote201Response) VisitPostLikeVoteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(201)
+	return nil
+}
+
+type PostLikeVote400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostLikeVote400JSONResponse) VisitPostLikeVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostLikeVote401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response PostLikeVote401JSONResponse) VisitPostLikeVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostLikeVote404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response PostLikeVote404JSONResponse) VisitPostLikeVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostLikeVote500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostLikeVote500JSONResponse) VisitPostLikeVoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type PostVoteRequestObject struct {
 	Id   openapi_types.UUID `json:"id"`
 	Body *PostVoteJSONRequestBody
@@ -7380,6 +7677,9 @@ type StrictServerInterface interface {
 	// 获取投票详情（含当前结果）
 	// (GET /votes/{id})
 	GetVote(ctx context.Context, request GetVoteRequestObject) (GetVoteResponseObject, error)
+	// 点赞投票
+	// (POST /votes/{id}/like)
+	PostLikeVote(ctx context.Context, request PostLikeVoteRequestObject) (PostLikeVoteResponseObject, error)
 	// 投票
 	// (POST /votes/{id}/vote)
 	PostVote(ctx context.Context, request PostVoteRequestObject) (PostVoteResponseObject, error)
@@ -8120,6 +8420,39 @@ func (sh *strictHandler) GetVote(w http.ResponseWriter, r *http.Request, id open
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetVoteResponseObject); ok {
 		if err := validResponse.VisitGetVoteResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostLikeVote operation middleware
+func (sh *strictHandler) PostLikeVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request PostLikeVoteRequestObject
+
+	request.Id = id
+
+	var body PostLikeVoteJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostLikeVote(ctx, request.(PostLikeVoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostLikeVote")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostLikeVoteResponseObject); ok {
+		if err := validResponse.VisitPostLikeVoteResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

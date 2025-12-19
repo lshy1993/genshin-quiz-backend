@@ -2,9 +2,9 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
+	"genshin-quiz/internal/common"
 	user_repo "genshin-quiz/internal/repository/user"
 	"genshin-quiz/internal/webserver/middleware"
 )
@@ -16,7 +16,7 @@ func GetMe(
 ) (*oapi.User, error) {
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if !ok {
-		return nil, fmt.Errorf("user not found in context")
+		return nil, common.ErrUserNotInContext
 	}
 
 	// 获取用户信息
