@@ -28,6 +28,7 @@ func UseSchema(schema string) {
 	UserPasswords = UserPasswords.FromSchema(schema)
 	UserVotes = UserVotes.FromSchema(schema)
 	Users = Users.FromSchema(schema)
+	VoteComments = VoteComments.FromSchema(schema)
 	VoteLikes = VoteLikes.FromSchema(schema)
 	VoteOptionTranslations = VoteOptionTranslations.FromSchema(schema)
 	VoteOptions = VoteOptions.FromSchema(schema)

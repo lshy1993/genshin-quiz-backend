@@ -3,10 +3,13 @@ package services
 import (
 	"context"
 
+	pg "github.com/go-jet/jet/v2/postgres"
+
 	"genshin-quiz/config"
+	"genshin-quiz/generated/db/genshinquiz/public/table"
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/common"
-	question_repo "genshin-quiz/internal/repository/question"
+	vote_repo "genshin-quiz/internal/repository/vote"
 	"genshin-quiz/internal/webserver/middleware"
 )
 
@@ -20,7 +23,7 @@ func PostLikeVote(
 		return common.ErrUserNotInContext
 	}
 
-	questionUUID := req.Id
+	voteUUID := req.Id
 	value := int16(req.Body.Like)
 
 	tx, err := app.DB.BeginTx(ctx, nil)
@@ -28,18 +31,37 @@ func PostLikeVote(
 		return err
 	}
 
+	// 获取投票 ID
+	voteTbl := table.Votes
+	voteIDStmt := pg.SELECT(voteTbl.ID).
+		FROM(voteTbl).
+		WHERE(voteTbl.VoteUUID.EQ(pg.UUID(voteUUID)))
+
+	var voteIDResult struct {
+		ID int64 `alias:"votes.id"`
+	}
+	err = voteIDStmt.QueryContext(ctx, tx, &voteIDResult)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	voteID := voteIDResult.ID
+
 	// 更新点赞状态
-	err = question_repo.UpsertQuestionLike(ctx, tx, userClaims.UserID, questionUUID, value)
+	err = vote_repo.UpsertVoteLike(ctx, tx, userClaims.UserID, voteUUID, value)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-	// 更新问题的点赞数
-	err = question_repo.UpdateQuestionLikeCount(ctx, tx, questionUUID, value)
+
+	// 更新投票的点赞数
+	err = vote_repo.UpdateVoteLikeCount(ctx, tx, voteID)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
+
 	err = tx.Commit()
 	if err != nil {
 		return err

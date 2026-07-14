@@ -82,21 +82,18 @@ func parseAndValidateToken(
 	}
 
 	// Get claims from token
-	claims := token.PrivateClaims()
-
-	// Extract user information
-	userID, ok := claims["user_id"].(float64)
-	if !ok {
+	var userIDFloat float64
+	if err := token.Get("user_id", &userIDFloat); err != nil {
 		return nil, common.ErrInvalidToken
 	}
 
-	email, ok := claims["email"].(string)
-	if !ok {
+	var email string
+	if err := token.Get("email", &email); err != nil {
 		return nil, common.ErrInvalidToken
 	}
 
 	// 检查用户是否仍然存在于数据库中，并获取用户信息包括角色
-	userInfo, err := user_repo.GetUserInfoByID(r.Context(), db, int64(userID))
+	userInfo, err := user_repo.GetUserInfoByID(r.Context(), db, int64(userIDFloat))
 	if err != nil {
 		if errors.Is(err, common.ErrUserNotFound) {
 			return nil, common.ErrUserNotFound
@@ -109,7 +106,7 @@ func parseAndValidateToken(
 	}
 
 	return &UserClaims{
-		UserID: int64(userID),
+		UserID: int64(userIDFloat),
 		Email:  email,
 	}, nil
 }

@@ -162,3 +162,84 @@ func UpsertQuestionLike(
 	_, err = upsertStmt.ExecContext(ctx, db)
 	return err
 }
+
+// GetQuestionLikesCount 获取问题的总点赞数（实时计算）。
+func GetQuestionLikesCount(
+	ctx context.Context,
+	db qrm.DB,
+	questionID int64,
+) (int64, error) {
+	likesTbl := table.QuestionLikes
+
+	// 统计该问题的点赞数（value = 1）
+	countStmt := pg.SELECT(pg.COUNT(pg.STAR)).
+		FROM(likesTbl).
+		WHERE(
+			likesTbl.QuestionID.EQ(pg.Int64(questionID)).
+				AND(likesTbl.Value.EQ(pg.Int16(1))),
+		)
+
+	var countResult struct {
+		Count int64 `alias:"count"`
+	}
+	err := countStmt.QueryContext(ctx, db, &countResult)
+	if err != nil {
+		return 0, err
+	}
+
+	return countResult.Count, nil
+}
+
+// GetMultipleQuestionsLikesCount 批量获取多个问题的点赞数。
+func GetMultipleQuestionsLikesCount(
+	ctx context.Context,
+	db qrm.DB,
+	questionIDs []int64,
+) (map[int64]int64, error) {
+	if len(questionIDs) == 0 {
+		return make(map[int64]int64), nil
+	}
+
+	likesTbl := table.QuestionLikes
+
+	// 构建问题ID列表
+	idList := make([]pg.Expression, 0, len(questionIDs))
+	for _, id := range questionIDs {
+		idList = append(idList, pg.Int64(id))
+	}
+
+	// 统计每个问题的点赞数
+	stmt := pg.SELECT(
+		likesTbl.QuestionID,
+		pg.COUNT(pg.STAR).AS("count"),
+	).FROM(likesTbl).
+		WHERE(
+			likesTbl.QuestionID.IN(idList...).
+				AND(likesTbl.Value.EQ(pg.Int16(1))),
+		).
+		GROUP_BY(likesTbl.QuestionID)
+
+	var results []struct {
+		QuestionID int64 `alias:"question_id"`
+		Count      int64 `alias:"count"`
+	}
+	err := stmt.QueryContext(ctx, db, &results)
+	if err != nil {
+		return nil, err
+	}
+
+	// 构建结果map
+	likesCountMap := make(map[int64]int64)
+
+	// 初始化所有问题为0
+	for _, id := range questionIDs {
+		likesCountMap[id] = 0
+	}
+
+	// 设置有点赞的问题
+	for _, result := range results {
+		likesCountMap[result.QuestionID] = result.Count
+	}
+
+	return likesCountMap, nil
+}

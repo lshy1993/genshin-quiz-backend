@@ -52,6 +52,13 @@ func GetVote(
 		OptionTranslations: *optionTranslations,
 	}
 
+	// 获取投票的实时点赞数
+	likesCount, err := vote_repo.GetVoteLikesCount(ctx, app.DB, voteDBId)
+	if err != nil {
+		return nil, err
+	}
+	detailedVote.Vote.LikesCount = likesCount
+
 	// 检查用户是否已登录，如果已登录则获取用户的投票记录和点赞状态
 	votedOptions := []oapi.VoteSubmissionOption{}
 	likeStatus := int16(0)

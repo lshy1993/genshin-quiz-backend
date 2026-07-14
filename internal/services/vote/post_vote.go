@@ -93,15 +93,18 @@ func genInsertModel(
 
 	// 投票主体
 	insertModel := model.Votes{
-		VoteUUID:       uuid.New(),
-		Public:         req.Body.Public,
-		Category:       model.Category(req.Body.Category),
-		StartAt:        req.Body.StartAt,
-		ExpiresAt:      expiredTime,
-		VotesPerUser:   int32(req.Body.VotesPerUser),
-		VotesPerOption: votesPerOption,
-		CreatedBy:      userID, // 使用从 JWT 获取的用户 ID
-		CreatedAt:      now,
+		VoteUUID:          uuid.New(),
+		Public:            req.Body.Public,
+		Category:          model.Category(req.Body.Category),
+		StartAt:           req.Body.StartAt,
+		ExpiresAt:         expiredTime,
+		VotesPerUser:      int32(req.Body.VotesPerUser),
+		VotesPerOption:    votesPerOption,
+		CreatedBy:         userID, // 使用从 JWT 获取的用户 ID
+		CreatedAt:         now,
+		LikesCount:        0, // 初始化点赞数为 0
+		ParticipantsCount: 0, // 初始化参与者数为 0
+		TotalVotesCount:   0, // 初始化总投票数为 0
 	}
 	return insertModel
 }

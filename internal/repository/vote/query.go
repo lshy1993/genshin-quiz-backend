@@ -172,11 +172,50 @@ func GetVoteByUUID(
 		return nil, common.ErrVoteNotFound
 	}
 
-	return &dao.DetailedVote{
+	detailedVote := &dao.DetailedVote{
 		Vote:        result[0].Votes,
 		User:        result[0].Users,
 		Translation: result[0].VoteTranslations,
-	}, nil
+	}
+
+	// 如果没有获取到指定语言的翻译，则 fallback 到任意语言
+	if detailedVote.Translation.Language == "" {
+		fallbackTrans, err := getVoteTranslationFallback(ctx, db, detailedVote.Vote.ID)
+		if err != nil {
+			return nil, err
+		}
+		if fallbackTrans != nil {
+			detailedVote.Translation = *fallbackTrans
+		}
+	}
+
+	return detailedVote, nil
+}
+
+// getVoteTranslationFallback 获取投票的任意语言翻译（用于 fallback）
+func getVoteTranslationFallback(
+	ctx context.Context,
+	db qrm.DB,
+	voteID int64,
+) (*model.VoteTranslations, error) {
+	tbl := table.VoteTranslations
+
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl).
+		WHERE(tbl.VoteID.EQ(pg.Int64(voteID))).
+		LIMIT(1)
+
+	var trans []model.VoteTranslations
+	err := stmt.QueryContext(ctx, db, &trans)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(trans) == 0 {
+		return nil, nil
+	}
+
+	return &trans[0], nil
 }
 
 func GetVoteOptions(

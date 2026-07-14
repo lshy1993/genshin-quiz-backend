@@ -9,13 +9,15 @@ package model
 
 import (
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type ExamAnswers struct {
 	ID                int64 `sql:"primary_key"`
 	AttemptID         int64
 	QuestionID        int64
-	SelectedOptionIds *string
+	SelectedOptionIds *pq.Int64Array
 	TimeTaken         *int32
 	CreatedAt         time.Time
 }

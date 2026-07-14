@@ -102,6 +102,137 @@ func GetMultipleVotesLikeStatus(
 	return likeStatusMap, nil
 }
 
+// GetVoteLikesCount 获取投票的总点赞数（实时计算）。
+func GetVoteLikesCount(
+	ctx context.Context,
+	db qrm.DB,
+	voteID int64,
+) (int64, error) {
+	likesTbl := table.VoteLikes
+
+	// 统计该投票的点赞数（value = 1）
+	countStmt := pg.SELECT(pg.COUNT(pg.STAR)).
+		FROM(likesTbl).
+		WHERE(
+			likesTbl.VoteID.EQ(pg.Int64(voteID)).
+				AND(likesTbl.Value.EQ(pg.Int16(1))),
+		)
+
+	var countResult struct {
+		Count int64 `alias:"count"`
+	}
+	err := countStmt.QueryContext(ctx, db, &countResult)
+	if err != nil {
+		return 0, err
+	}
+
+	return countResult.Count, nil
+}
+
+// GetMultipleVotesLikesCount 批量获取多个投票的点赞数。
+func GetMultipleVotesLikesCount(
+	ctx context.Context,
+	db qrm.DB,
+	voteIDs []int64,
+) (map[int64]int64, error) {
+	if len(voteIDs) == 0 {
+		return make(map[int64]int64), nil
+	}
+
+	likesTbl := table.VoteLikes
+
+	// 构建投票ID列表
+	idList := make([]pg.Expression, 0, len(voteIDs))
+	for _, id := range voteIDs {
+		idList = append(idList, pg.Int64(id))
+	}
+
+	// 统计每个投票的点赞数
+	stmt := pg.SELECT(
+		likesTbl.VoteID,
+		pg.COUNT(pg.STAR).AS("count"),
+	).FROM(likesTbl).
+		WHERE(
+			likesTbl.VoteID.IN(idList...).
+				AND(likesTbl.Value.EQ(pg.Int16(1))),
+		).
+		GROUP_BY(likesTbl.VoteID)
+
+	var results []struct {
+		VoteID int64 `alias:"vote_id"`
+		Count  int64 `alias:"count"`
+	}
+	err := stmt.QueryContext(ctx, db, &results)
+	if err != nil {
+		return nil, err
+	}
+
+	// 构建结果map
+	likesCountMap := make(map[int64]int64)
+
+	// 初始化所有投票为0
+	for _, id := range voteIDs {
+		likesCountMap[id] = 0
+	}
+
+	// 设置有点赞的投票
+	for _, result := range results {
+		likesCountMap[result.VoteID] = result.Count
+	}
+
+	return likesCountMap, nil
+}
+
+// ============================================
+// 投票评论功能预留
+// ============================================
+// 以下函数为投票评论功能预留，表结构已在迁移文件中创建（vote_comments）
+// 实现时需要添加：
+// - GetVoteComments: 获取投票的评论列表
+// - GetVoteCommentCount: 获取投票的评论总数
+// - InsertVoteComment: 添加投票评论
+// - UpdateVoteComment: 编辑投票评论
+// - DeleteVoteComment: 删除投票评论
+// - GetMultipleVotesCommentsCount: 批量获取多个投票的评论数（避免N+1查询）
+
+// UpdateVoteLikeCount 更新投票的总点赞数。
+func UpdateVoteLikeCount(
+	ctx context.Context,
+	db qrm.DB,
+	voteID int64,
+) error {
+	voteTbl := table.Votes
+	likesTbl := table.VoteLikes
+
+	// 统计该投票的点赞数（value = 1）
+	countStmt := pg.SELECT(pg.COUNT(pg.STAR)).
+		FROM(likesTbl).
+		WHERE(
+			likesTbl.VoteID.EQ(pg.Int64(voteID)).
+				AND(likesTbl.Value.EQ(pg.Int16(1))),
+		)
+
+	var countResult struct {
+		Count int64 `alias:"count"`
+	}
+	err := countStmt.QueryContext(ctx, db, &countResult)
+	if err != nil {
+		return err
+	}
+
+	// 更新投票表中的 likes_count
+	updateStmt := voteTbl.UPDATE().
+		SET(voteTbl.LikesCount.SET(pg.Int32(int32(countResult.Count)))).
+		WHERE(voteTbl.ID.EQ(pg.Int64(voteID)))
+
+	_, err = updateStmt.ExecContext(ctx, db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // UpsertVoteLike 插入或更新用户对投票的点赞状态.
 func UpsertVoteLike(
 	ctx context.Context,

@@ -50,3 +50,14 @@ func (h *Handler) PostVote(
 	}
 	return res, nil
 }
+
+func (h *Handler) PostLikeVote(
+	ctx context.Context,
+	req oapi.PostLikeVoteRequestObject,
+) (oapi.PostLikeVoteResponseObject, error) {
+	err := services.PostLikeVote(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return oapi.PostLikeVote201Response{}, nil
+}

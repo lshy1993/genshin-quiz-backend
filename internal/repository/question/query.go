@@ -169,7 +169,46 @@ func GetQuestionByUUID(
 		return nil, common.ErrQuestionNotFound
 	}
 
-	return &result[0], nil
+	question := result[0]
+
+	// 如果没有获取到指定语言的翻译，则 fallback 到任意语言
+	if question.Translation.Language == "" {
+		fallbackTrans, err := getQuestionTranslationFallback(ctx, db, question.Question.ID)
+		if err != nil {
+			return nil, err
+		}
+		if fallbackTrans != nil {
+			question.Translation = *fallbackTrans
+		}
+	}
+
+	return &question, nil
+}
+
+// getQuestionTranslationFallback 获取题目的任意语言翻译（用于 fallback）
+func getQuestionTranslationFallback(
+	ctx context.Context,
+	db qrm.DB,
+	questionID int64,
+) (*model.QuestionTranslations, error) {
+	tbl := table.QuestionTranslations
+
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl).
+		WHERE(tbl.QuestionID.EQ(pg.Int64(questionID))).
+		LIMIT(1)
+
+	var trans []model.QuestionTranslations
+	err := stmt.QueryContext(ctx, db, &trans)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(trans) == 0 {
+		return nil, nil
+	}
+
+	return &trans[0], nil
 }
 
 func GetQuestionIDByUUID(

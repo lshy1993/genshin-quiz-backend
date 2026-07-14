@@ -10,6 +10,8 @@ import (
 // 将SimpleVote（不包含选项详情）模型转换为 OAPI.
 func ConvertSimpleVoteToDTO(
 	vote dao.SimpleVote,
+	voted bool,
+	likeStatus int16,
 ) oapi.Vote {
 	// 判断是否已过期
 	expired := vote.Vote.ExpiresAt != nil && vote.Vote.ExpiresAt.Before(time.Now())
@@ -38,6 +40,8 @@ func ConvertSimpleVoteToDTO(
 		expireAt = vote.Vote.ExpiresAt
 	}
 
+	likeStatusValue := oapi.VoteLikeStatus(likeStatus)
+
 	return oapi.Vote{
 		Id:             vote.Vote.VoteUUID,
 		Public:         vote.Vote.Public,
@@ -47,6 +51,7 @@ func ConvertSimpleVoteToDTO(
 		StartAt:        vote.Vote.StartAt,
 		ExpireAt:       expireAt,
 		Expired:        expired,
+		Voted:          voted,
 		VotedOptions:   nil, // 简单模式不返回
 		VotesPerUser:   votesPerUser,
 		VotesPerOption: *votesPerOption,
@@ -56,6 +61,7 @@ func ConvertSimpleVoteToDTO(
 		CreatedBy:      vote.User.UserUUID,
 		CreatedAt:      vote.Vote.CreatedAt,
 		Likes:          &likes,
+		LikeStatus:     &likeStatusValue,
 	}
 }
 
@@ -127,6 +133,8 @@ func ConvertDetailedVoteToDTO(
 		expireAt = vote.Vote.ExpiresAt
 	}
 
+	likeStatusValue := oapi.VoteLikeStatus(likeStatus)
+
 	return oapi.Vote{
 		Id:             vote.Vote.VoteUUID,
 		Public:         vote.Vote.Public,
@@ -136,6 +144,7 @@ func ConvertDetailedVoteToDTO(
 		StartAt:        vote.Vote.StartAt,
 		ExpireAt:       expireAt,
 		Expired:        expired,
+		Voted:          len(votedOptions) > 0,
 		VotedOptions:   votedOptions,
 		VotesPerUser:   votesPerUser,
 		VotesPerOption: *votesPerOption,
@@ -145,5 +154,6 @@ func ConvertDetailedVoteToDTO(
 		CreatedBy:      vote.User.UserUUID,
 		CreatedAt:      vote.Vote.CreatedAt,
 		Likes:          &likes,
+		LikeStatus:     &likeStatusValue,
 	}
 }

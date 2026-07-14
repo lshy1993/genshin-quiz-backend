@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type Exams struct {
@@ -27,6 +28,6 @@ type Exams struct {
 	TotalCorrectAnswers int64
 	HighestScore        int32
 	ShortestTime        *int32
-	AverageScore        float64
-	PassRate            float64
+	AverageScore        decimal.Decimal
+	PassRate            decimal.Decimal
 }
