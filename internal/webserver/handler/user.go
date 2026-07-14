@@ -60,3 +60,14 @@ func (h *Handler) GetCurrentUser(
 	}
 	return (oapi.GetCurrentUser200JSONResponse)(*res), nil
 }
+
+func (h *Handler) UpdateUser(
+	ctx context.Context,
+	req oapi.UpdateUserRequestObject,
+) (oapi.UpdateUserResponseObject, error) {
+	res, err := services.UpdateUser(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return (oapi.UpdateUser200JSONResponse)(*res), nil
+}
