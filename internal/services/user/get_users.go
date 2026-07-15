@@ -12,33 +12,75 @@ func GetUsers(
 	app *config.App,
 	req oapi.GetUsersRequestObject,
 ) (*oapi.GetUsers200JSONResponse, error) {
-	// 获取用户信息
-	userInfos, err := user_repo.GetUserInfosByUUIDs(ctx, app.DB, *req.Params.Ids)
+	limit := 10
+	if req.Params.Limit != nil {
+		limit = *req.Params.Limit
+	}
+
+	offset := 0
+	if req.Params.Offset != nil {
+		offset = *req.Params.Offset
+	}
+
+	sortBy := "accuracy"
+	if req.Params.SortBy != nil {
+		sortBy = string(*req.Params.SortBy)
+	}
+
+	sortDesc := true
+	if req.Params.SortDesc != nil {
+		sortDesc = *req.Params.SortDesc
+	}
+
+	result, err := user_repo.GetUsersLeaderboard(
+		ctx,
+		app.DB,
+		req.Params.Ids,
+		limit,
+		offset,
+		sortBy,
+		sortDesc,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert []*model.Users to []oapi.User
-	users := make([]oapi.User, 0, len(userInfos))
-	for _, userInfo := range userInfos {
+	users := make([]oapi.User, 0, len(result.Users))
+	for _, row := range result.Users {
+		userInfo := row.User
+		avatarURL := ""
+		if userInfo.AvatarURL != nil {
+			avatarURL = *userInfo.AvatarURL
+		}
+		country := ""
+		if userInfo.Location != nil {
+			country = *userInfo.Location
+		}
+		nickname := ""
+		if userInfo.DisplayName != nil {
+			nickname = *userInfo.DisplayName
+		}
+		likesReceived := int(row.LikesReceived)
+
 		users = append(users, oapi.User{
 			Uuid:             userInfo.UserUUID,
-			AvatarUrl:        *userInfo.AvatarURL,
-			Country:          *userInfo.Location,
+			AvatarUrl:        avatarURL,
+			Country:          country,
 			Ip:               "",
 			Language:         userInfo.Language,
 			LastLoginAt:      userInfo.CreatedAt,
-			Nickname:         *userInfo.DisplayName,
+			Nickname:         nickname,
 			RegisteredAt:     userInfo.CreatedAt,
 			QuestionsCreated: int(userInfo.QuestionsCreated),
 			TotalAnswers:     int(userInfo.TotalSubmissions),
 			CorrectAnswers:   int(userInfo.CorrectSubmissions),
+			LikesReceived:    &likesReceived,
 			Votes:            int(userInfo.TotalVotes),
 		})
 	}
 
 	return &oapi.GetUsers200JSONResponse{
-		Total: len(users),
+		Total: result.Total,
 		Users: users,
 	}, nil
 }
