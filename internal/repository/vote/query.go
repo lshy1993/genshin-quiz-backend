@@ -192,7 +192,7 @@ func GetVoteByUUID(
 	return detailedVote, nil
 }
 
-// getVoteTranslationFallback 获取投票的任意语言翻译（用于 fallback）
+// getVoteTranslationFallback 获取投票的任意语言翻译（用于 fallback）.
 func getVoteTranslationFallback(
 	ctx context.Context,
 	db qrm.DB,

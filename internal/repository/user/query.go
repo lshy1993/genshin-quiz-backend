@@ -182,7 +182,10 @@ func GetUsersLeaderboard(
 			uuidStrings = append(uuidStrings, id.String())
 		}
 		whereClauses = append(whereClauses, fmt.Sprintf("u.user_uuid = ANY($%d::uuid[])", argPos))
-		countWhereClauses = append(countWhereClauses, fmt.Sprintf("u.user_uuid = ANY($%d::uuid[])", argPos))
+		countWhereClauses = append(
+			countWhereClauses,
+			fmt.Sprintf("u.user_uuid = ANY($%d::uuid[])", argPos),
+		)
 		args = append(args, pq.Array(uuidStrings))
 		countArgs = append(countArgs, pq.Array(uuidStrings))
 		argPos++

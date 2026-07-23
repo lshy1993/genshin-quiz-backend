@@ -185,7 +185,7 @@ func GetQuestionByUUID(
 	return &question, nil
 }
 
-// getQuestionTranslationFallback 获取题目的任意语言翻译（用于 fallback）
+// getQuestionTranslationFallback 获取题目的任意语言翻译（用于 fallback）.
 func getQuestionTranslationFallback(
 	ctx context.Context,
 	db qrm.DB,

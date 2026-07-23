@@ -368,6 +368,14 @@ type Exam struct {
 // ExamLikeStatus 点赞状态：-1踩, 0未操作, 1赞
 type ExamLikeStatus int
 
+// HomePageData defines model for HomePageData.
+type HomePageData struct {
+	LatestQuestions []Question `json:"latestQuestions"`
+	LatestVotes     []Vote     `json:"latestVotes"`
+	PopularExams    []Exam     `json:"popularExams"`
+	PopularVotes    []Vote     `json:"popularVotes"`
+}
+
 // MySubmission defines model for MySubmission.
 type MySubmission struct {
 	// IsCorrect 答案是否正确
@@ -499,12 +507,14 @@ type User struct {
 	Ip             string    `json:"ip"`
 	Language       *string   `json:"language,omitempty"`
 	LastLoginAt    time.Time `json:"last_login_at"`
+	LastLoginIp    *string   `json:"last_login_ip,omitempty"`
 
 	// LikesReceived 该用户创建的所有题目获得的点赞总数，用于创作达人榜按点赞率排序
 	LikesReceived    *int               `json:"likes_received,omitempty"`
 	Nickname         string             `json:"nickname"`
 	QuestionsCreated int                `json:"questions_created"`
 	RegisteredAt     time.Time          `json:"registered_at"`
+	RegisteredIp     *string            `json:"registered_ip,omitempty"`
 	TotalAnswers     int                `json:"total_answers"`
 	Uuid             openapi_types.UUID `json:"uuid"`
 	Votes            int                `json:"votes"`
@@ -659,8 +669,11 @@ type GetExamsParams struct {
 	Category   *QuestionCategory   `form:"category,omitempty" json:"category,omitempty"`
 	Difficulty *QuestionDifficulty `form:"difficulty,omitempty" json:"difficulty,omitempty"`
 	Query      *string             `form:"query,omitempty" json:"query,omitempty"`
-	SortBy     *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
-	SortDesc   *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
+
+	// CreatedBy 只返回指定用户创建的测验
+	CreatedBy *openapi_types.UUID `form:"created_by,omitempty" json:"created_by,omitempty"`
+	SortBy    *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+	SortDesc  *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
 }
 
 // PostLikeExamJSONBody defines parameters for PostLikeExam.
@@ -672,6 +685,11 @@ type PostLikeExamJSONBody struct {
 // PostLikeExamJSONBodyLike defines parameters for PostLikeExam.
 type PostLikeExamJSONBodyLike int
 
+// GetHomeParams defines parameters for GetHome.
+type GetHomeParams struct {
+	Language *string `form:"language,omitempty" json:"language,omitempty"`
+}
+
 // GetQuestionsParams defines parameters for GetQuestions.
 type GetQuestionsParams struct {
 	Page       *int                  `form:"page,omitempty" json:"page,omitempty"`
@@ -680,8 +698,11 @@ type GetQuestionsParams struct {
 	Difficulty *[]QuestionDifficulty `form:"difficulty,omitempty" json:"difficulty,omitempty"`
 	Query      *string               `form:"query,omitempty" json:"query,omitempty"`
 	Language   *[]string             `form:"language,omitempty" json:"language,omitempty"`
-	SortBy     *string               `form:"sortBy,omitempty" json:"sortBy,omitempty"`
-	SortDesc   *bool                 `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
+
+	// CreatedBy 只返回指定用户创建的题目
+	CreatedBy *openapi_types.UUID `form:"created_by,omitempty" json:"created_by,omitempty"`
+	SortBy    *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+	SortDesc  *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
 }
 
 // PostLikeQuestionJSONBody defines parameters for PostLikeQuestion.
@@ -721,8 +742,11 @@ type GetVotesParams struct {
 	Type     *GetVotesParamsType `form:"type,omitempty" json:"type,omitempty"`
 	Query    *string             `form:"query,omitempty" json:"query,omitempty"`
 	Language *[]string           `form:"language,omitempty" json:"language,omitempty"`
-	SortBy   *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
-	SortDesc *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
+
+	// CreatedBy 只返回指定用户创建的投票
+	CreatedBy *openapi_types.UUID `form:"created_by,omitempty" json:"created_by,omitempty"`
+	SortBy    *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+	SortDesc  *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
 }
 
 // GetVotesParamsType defines parameters for GetVotes.
@@ -902,6 +926,9 @@ type ClientInterface interface {
 	PostLikeExamWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	PostLikeExam(ctx context.Context, id openapi_types.UUID, body PostLikeExamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetHome request
+	GetHome(ctx context.Context, params *GetHomeParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetQuestions request
 	GetQuestions(ctx context.Context, params *GetQuestionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1156,6 +1183,18 @@ func (c *Client) PostLikeExamWithBody(ctx context.Context, id openapi_types.UUID
 
 func (c *Client) PostLikeExam(ctx context.Context, id openapi_types.UUID, body PostLikeExamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostLikeExamRequest(c.Server, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetHome(ctx context.Context, params *GetHomeParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetHomeRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1713,6 +1752,18 @@ func NewGetExamsRequest(server string, params *GetExamsParams) (*http.Request, e
 
 		}
 
+		if params.CreatedBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "created_by", *params.CreatedBy, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "uuid"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
 		if params.SortBy != nil {
 
 			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "sortBy", *params.SortBy, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
@@ -1953,6 +2004,60 @@ func NewPostLikeExamRequestWithBody(server string, id openapi_types.UUID, conten
 	return req, nil
 }
 
+// NewGetHomeRequest generates requests for GetHome
+func NewGetHomeRequest(server string, params *GetHomeParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/home")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if params.Language != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewGetQuestionsRequest generates requests for GetQuestions
 func NewGetQuestionsRequest(server string, params *GetQuestionsParams) (*http.Request, error) {
 	var err error
@@ -2044,6 +2149,18 @@ func NewGetQuestionsRequest(server string, params *GetQuestionsParams) (*http.Re
 		if params.Language != nil {
 
 			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "array", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.CreatedBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "created_by", *params.CreatedBy, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "uuid"}); err != nil {
 				return nil, err
 			} else {
 				for _, qp := range strings.Split(queryFrag, "&") {
@@ -2713,6 +2830,18 @@ func NewGetVotesRequest(server string, params *GetVotesParams) (*http.Request, e
 
 		}
 
+		if params.CreatedBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "created_by", *params.CreatedBy, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "uuid"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
 		if params.SortBy != nil {
 
 			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "sortBy", *params.SortBy, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
@@ -3003,6 +3132,9 @@ type ClientWithResponsesInterface interface {
 	PostLikeExamWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostLikeExamResponse, error)
 
 	PostLikeExamWithResponse(ctx context.Context, id openapi_types.UUID, body PostLikeExamJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLikeExamResponse, error)
+
+	// GetHomeWithResponse request
+	GetHomeWithResponse(ctx context.Context, params *GetHomeParams, reqEditors ...RequestEditorFn) (*GetHomeResponse, error)
 
 	// GetQuestionsWithResponse request
 	GetQuestionsWithResponse(ctx context.Context, params *GetQuestionsParams, reqEditors ...RequestEditorFn) (*GetQuestionsResponse, error)
@@ -3397,6 +3529,38 @@ func (r PostLikeExamResponse) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r PostLikeExamResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type GetHomeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *HomePageData
+	JSON400      *BadRequest
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetHomeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetHomeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetHomeResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -4147,6 +4311,15 @@ func (c *ClientWithResponses) PostLikeExamWithResponse(ctx context.Context, id o
 	return ParsePostLikeExamResponse(rsp)
 }
 
+// GetHomeWithResponse request returning *GetHomeResponse
+func (c *ClientWithResponses) GetHomeWithResponse(ctx context.Context, params *GetHomeParams, reqEditors ...RequestEditorFn) (*GetHomeResponse, error) {
+	rsp, err := c.GetHome(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetHomeResponse(rsp)
+}
+
 // GetQuestionsWithResponse request returning *GetQuestionsResponse
 func (c *ClientWithResponses) GetQuestionsWithResponse(ctx context.Context, params *GetQuestionsParams, reqEditors ...RequestEditorFn) (*GetQuestionsResponse, error) {
 	rsp, err := c.GetQuestions(ctx, params, reqEditors...)
@@ -4798,6 +4971,46 @@ func ParsePostLikeExamResponse(rsp *http.Response) (*PostLikeExamResponse, error
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetHomeResponse parses an HTTP response from a GetHomeWithResponse call
+func ParseGetHomeResponse(rsp *http.Response) (*GetHomeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetHomeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest HomePageData
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest InternalServerError
@@ -5707,6 +5920,9 @@ type ServerInterface interface {
 	// 点赞测验
 	// (POST /exams/{id}/like)
 	PostLikeExam(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Get homepage data
+	// (GET /home)
+	GetHome(w http.ResponseWriter, r *http.Request, params GetHomeParams)
 	// Get all questions
 	// (GET /questions)
 	GetQuestions(w http.ResponseWriter, r *http.Request, params GetQuestionsParams)
@@ -5824,6 +6040,12 @@ func (_ Unimplemented) UpdateExam(w http.ResponseWriter, r *http.Request, id ope
 // 点赞测验
 // (POST /exams/{id}/like)
 func (_ Unimplemented) PostLikeExam(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get homepage data
+// (GET /home)
+func (_ Unimplemented) GetHome(w http.ResponseWriter, r *http.Request, params GetHomeParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -6074,6 +6296,19 @@ func (siw *ServerInterfaceWrapper) GetExams(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	// ------------- Optional query parameter "created_by" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "created_by", r.URL.Query(), &params.CreatedBy, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "created_by"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "created_by", Err: err})
+		}
+		return
+	}
+
 	// ------------- Optional query parameter "sortBy" -------------
 
 	err = runtime.BindQueryParameterWithOptions("form", true, false, "sortBy", r.URL.Query(), &params.SortBy, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
@@ -6229,6 +6464,39 @@ func (siw *ServerInterfaceWrapper) PostLikeExam(w http.ResponseWriter, r *http.R
 	handler.ServeHTTP(w, r)
 }
 
+// GetHome operation middleware
+func (siw *ServerInterfaceWrapper) GetHome(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetHomeParams
+
+	// ------------- Optional query parameter "language" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "language", r.URL.Query(), &params.Language, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "language"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "language", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetHome(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // GetQuestions operation middleware
 func (siw *ServerInterfaceWrapper) GetQuestions(w http.ResponseWriter, r *http.Request) {
 
@@ -6312,6 +6580,19 @@ func (siw *ServerInterfaceWrapper) GetQuestions(w http.ResponseWriter, r *http.R
 			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "language"})
 		} else {
 			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "language", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "created_by" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "created_by", r.URL.Query(), &params.CreatedBy, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "created_by"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "created_by", Err: err})
 		}
 		return
 	}
@@ -6786,6 +7067,19 @@ func (siw *ServerInterfaceWrapper) GetVotes(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	// ------------- Optional query parameter "created_by" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "created_by", r.URL.Query(), &params.CreatedBy, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "created_by"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "created_by", Err: err})
+		}
+		return
+	}
+
 	// ------------- Optional query parameter "sortBy" -------------
 
 	err = runtime.BindQueryParameterWithOptions("form", true, false, "sortBy", r.URL.Query(), &params.SortBy, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
@@ -7057,6 +7351,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/exams/{id}/like", wrapper.PostLikeExam)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/home", wrapper.GetHome)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/questions", wrapper.GetQuestions)
@@ -7739,6 +8036,58 @@ type PostLikeExam500JSONResponse struct {
 }
 
 func (response PostLikeExam500JSONResponse) VisitPostLikeExamResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetHomeRequestObject struct {
+	Params GetHomeParams
+}
+
+type GetHomeResponseObject interface {
+	VisitGetHomeResponse(w http.ResponseWriter) error
+}
+
+type GetHome200JSONResponse HomePageData
+
+func (response GetHome200JSONResponse) VisitGetHomeResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetHome400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response GetHome400JSONResponse) VisitGetHomeResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetHome500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetHome500JSONResponse) VisitGetHomeResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -9041,6 +9390,9 @@ type StrictServerInterface interface {
 	// 点赞测验
 	// (POST /exams/{id}/like)
 	PostLikeExam(ctx context.Context, request PostLikeExamRequestObject) (PostLikeExamResponseObject, error)
+	// Get homepage data
+	// (GET /home)
+	GetHome(ctx context.Context, request GetHomeRequestObject) (GetHomeResponseObject, error)
 	// Get all questions
 	// (GET /questions)
 	GetQuestions(ctx context.Context, request GetQuestionsRequestObject) (GetQuestionsResponseObject, error)
@@ -9411,6 +9763,32 @@ func (sh *strictHandler) PostLikeExam(w http.ResponseWriter, r *http.Request, id
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(PostLikeExamResponseObject); ok {
 		if err := validResponse.VisitPostLikeExamResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetHome operation middleware
+func (sh *strictHandler) GetHome(w http.ResponseWriter, r *http.Request, params GetHomeParams) {
+	var request GetHomeRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetHome(ctx, request.(GetHomeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetHome")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetHomeResponseObject); ok {
+		if err := validResponse.VisitGetHomeResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
