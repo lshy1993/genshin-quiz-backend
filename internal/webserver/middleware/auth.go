@@ -2,159 +2,234 @@ package middleware
 
 import (
 	"context"
+	"errors"
+	"genshin-quiz/internal/common"
+	user_repo "genshin-quiz/internal/repository/user"
+	"genshin-quiz/internal/util"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-chi/jwtauth/v5"
-	"github.com/go-chi/render"
+	"github.com/go-jet/jet/v2/qrm"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type UserClaims struct {
-	UserID   int64  `json:"user_id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	UserID int64  `json:"user_id"`
+	Email  string `json:"email"`
 	jwt.RegisteredClaims
 }
 
 type userContextKey struct{}
 
-func JWTAuth(jwtSecret string) func(http.Handler) http.Handler {
+func JWTAuth(
+	jwtSecret string,
+	db qrm.DB,
+	requireToken bool,
+	requireAdmin bool,
+) func(http.Handler) http.Handler {
 	tokenAuth := jwtauth.New("HS256", []byte(jwtSecret), nil)
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Get token from Authorization header
+			// 检查是否有token
 			authHeader := r.Header.Get("Authorization")
+
 			if authHeader == "" {
-				http.Error(w, "Missing authorization header", http.StatusUnauthorized)
+				// 强制token，不存在则报错
+				if requireToken {
+					http.Error(w, "Missing authorization header", http.StatusUnauthorized)
+					return
+				}
+				// 可选认证，直接继续
+				next.ServeHTTP(w, r)
 				return
 			}
 
-			// Check if it's a Bearer token
-			tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-			if tokenString == authHeader {
-				http.Error(w, "Invalid authorization header format", http.StatusUnauthorized)
-				return
-			}
-
-			// Parse and validate token
-			token, err := tokenAuth.Decode(tokenString)
+			// 提供了token，则需要验证
+			userClaims, err := parseAndValidateToken(r, tokenAuth, db, requireAdmin)
 			if err != nil {
-				http.Error(w, "Invalid token", http.StatusUnauthorized)
+				// token无效 - 不管是强制还是可选认证都应该报错
+				handleAuthError(w, err)
 				return
 			}
 
-			if token == nil {
-				http.Error(w, "Invalid token", http.StatusUnauthorized)
-				return
-			}
-
-			// Get claims from token
-			claims := token.PrivateClaims()
-
-			// Extract user information
-			userID, ok := claims["user_id"].(float64)
-			if !ok {
-				http.Error(w, "Invalid user ID in token", http.StatusUnauthorized)
-				return
-			}
-
-			username, ok := claims["username"].(string)
-			if !ok {
-				http.Error(w, "Invalid username in token", http.StatusUnauthorized)
-				return
-			}
-
-			email, ok := claims["email"].(string)
-			if !ok {
-				http.Error(w, "Invalid email in token", http.StatusUnauthorized)
-				return
-			}
-
-			// Create user claims
-			userClaims := UserClaims{
-				UserID:   int64(userID),
-				Username: username,
-				Email:    email,
-			}
-
-			// Add user claims to context
-			ctx := context.WithValue(r.Context(), userContextKey{}, userClaims)
-
-			// Continue with the request
+			// token有效，添加用户信息到context
+			ctx := context.WithValue(r.Context(), userContextKey{}, *userClaims)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }
 
+func parseAndValidateToken(
+	r *http.Request,
+	tokenAuth *jwtauth.JWTAuth,
+	db qrm.DB,
+	requireAdmin bool,
+) (*UserClaims, error) {
+	// Extract Bearer token
+	authHeader := r.Header.Get("Authorization")
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+	if tokenString == authHeader {
+		return nil, common.ErrInvalidTokenFormat
+	}
+
+	// Parse and validate token (包括过期检查)
+	token, err := tokenAuth.Decode(tokenString)
+	if err != nil || token == nil {
+		return nil, common.ErrInvalidToken
+	}
+
+	// Get claims from token
+	var userIDFloat float64
+	if err := token.Get("user_id", &userIDFloat); err != nil {
+		return nil, common.ErrInvalidToken
+	}
+
+	var email string
+	if err := token.Get("email", &email); err != nil {
+		return nil, common.ErrInvalidToken
+	}
+
+	// 检查用户是否仍然存在于数据库中，并获取用户信息包括角色
+	userInfo, err := user_repo.GetUserInfoByID(r.Context(), db, int64(userIDFloat))
+	if err != nil {
+		if errors.Is(err, common.ErrUserNotFound) {
+			return nil, common.ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	if requireAdmin && util.IsAdmin(*userInfo.UserRole) {
+		return nil, common.ErrAdminAuthError
+	}
+
+	return &UserClaims{
+		UserID: int64(userIDFloat),
+		Email:  email,
+	}, nil
+}
+
+func handleAuthError(w http.ResponseWriter, err error) {
+	if errors.Is(err, common.ErrUserNotFound) {
+		writeErrorResponse(
+			w,
+			http.StatusUnauthorized,
+			"User account no longer exists",
+			"USER_DELETED",
+			"Your account has been removed. Please login again.",
+			true, // 强制登出
+		)
+		return
+	}
+
+	if errors.Is(err, common.ErrDatabaseError) {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	// 其他认证错误（token格式错误、过期等）
+	if errors.Is(err, common.ErrInvalidToken) || errors.Is(err, common.ErrInvalidTokenFormat) {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	// 默认处理
+	http.Error(w, err.Error(), http.StatusUnauthorized)
+}
+
 func GetUserFromContext(r *http.Request) (*UserClaims, bool) {
-	user, ok := r.Context().Value(userContextKey{}).(UserClaims)
+	return GetUserFromContextOnly(r.Context())
+}
+
+func GetUserFromContextOnly(ctx context.Context) (*UserClaims, bool) {
+	user, ok := ctx.Value(userContextKey{}).(UserClaims)
 	return &user, ok
 }
 
-func Authenticator(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		token, claims, err := jwtauth.FromContext(r.Context())
-
-		if err != nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		if token == nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		// claims is already a map[string]interface{}
-		// Extract user information
-		userID, ok := claims["user_id"].(float64)
-		if !ok {
-			http.Error(w, "Invalid user ID in token", http.StatusUnauthorized)
-			return
-		}
-
-		username, ok := claims["username"].(string)
-		if !ok {
-			http.Error(w, "Invalid username in token", http.StatusUnauthorized)
-			return
-		}
-
-		email, ok := claims["email"].(string)
-		if !ok {
-			http.Error(w, "Invalid email in token", http.StatusUnauthorized)
-			return
-		}
-
-		// Create user claims
-		userClaims := UserClaims{
-			UserID:   int64(userID),
-			Username: username,
-			Email:    email,
-		}
-
-		// Add user claims to context
-		ctx := context.WithValue(r.Context(), userContextKey{}, userClaims)
-
-		// Continue with the request
-		next.ServeHTTP(w, r.WithContext(ctx))
+func GenerateJWT(userID int64, email, secret string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": userID,
+		"email":   email,
+		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 	})
+
+	return token.SignedString([]byte(secret))
 }
 
-func AdminOnly(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userClaims, ok := GetUserFromContext(r)
-		if !ok || userClaims == nil {
-			render.Status(r, http.StatusUnauthorized)
-			render.JSON(w, r, map[string]string{"error": "Unauthorized"})
-			return
+// RequiredJWTAuth 强制JWT认证中间件.
+func RequiredJWTAuth(jwtSecret string, db qrm.DB) func(http.Handler) http.Handler {
+	return JWTAuth(jwtSecret, db, true, false)
+}
+
+// RequiredAdminJWTAuth 强制管理员JWT认证中间件.
+func RequiredAdminJWTAuth(jwtSecret string, db qrm.DB) func(http.Handler) http.Handler {
+	return JWTAuth(jwtSecret, db, true, true)
+}
+
+// OptionalJWTAuth 可选JWT认证中间件.
+func OptionalJWTAuth(jwtSecret string, db qrm.DB) func(http.Handler) http.Handler {
+	return JWTAuth(jwtSecret, db, false, false)
+}
+
+func ConditionalJWTAuth(jwtSecret string, db qrm.DB) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			path := r.URL.Path
+			method := r.Method
+
+			// 检查是否是公开端点
+			if isPublicEndpoint(path, method) {
+				// 公开端点，使用可选认证（不强制要求token，但如果有token会解析）
+				OptionalJWTAuth(jwtSecret, db)(next).ServeHTTP(w, r)
+				return
+			}
+
+			// 需要认证的端点，使用强制认证流程
+			RequiredJWTAuth(jwtSecret, db)(next).ServeHTTP(w, r)
+		})
+	}
+}
+
+func isPublicEndpoint(path, method string) bool {
+	// 定义不需要认证的路径和方法组合
+	publicEndpoints := map[string][]string{
+		// 认证相关 - 不需要认证
+		"/auth/register":        {"POST"},
+		"/auth/login":           {"POST"},
+		"/auth/forgot-password": {"POST"},
+
+		// 公开的只读API - 不需要认证
+		"/questions":   {"GET"},
+		"/questions/*": {"GET"}, // 通配符支持 /questions/{id}
+		"/exams":       {"GET"},
+		"/exams/*":     {"GET"}, // 通配符支持 /exams/{id}
+		"/votes":       {"GET"},
+		"/votes/*":     {"GET"}, // 只有GET操作公开，POST/PUT需要认证
+	}
+	// 精确匹配
+	if methods, exists := publicEndpoints[path]; exists {
+		for _, allowedMethod := range methods {
+			if allowedMethod == method {
+				return true
+			}
 		}
+	}
 
-		// Check if user is admin (you might want to add admin role to UserClaims)
-		// For now, we'll assume admin check based on user ID or other criteria
-		// This is a placeholder - implement your actual admin logic
+	// 通配符匹配 (简单实现)
+	for pattern, methods := range publicEndpoints {
+		if strings.HasSuffix(pattern, "/*") {
+			prefix := strings.TrimSuffix(pattern, "/*")
+			if strings.HasPrefix(path, prefix+"/") {
+				for _, allowedMethod := range methods {
+					if allowedMethod == method {
+						return true
+					}
+				}
+			}
+		}
+	}
 
-		next.ServeHTTP(w, r)
-	})
+	return false
 }

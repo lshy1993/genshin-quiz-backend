@@ -20,7 +20,6 @@ type voteOptionsTable struct {
 	ID          postgres.ColumnInteger
 	OptionUUID  postgres.ColumnString
 	VoteID      postgres.ColumnInteger
-	OptionText  postgres.ColumnString
 	OptionOrder postgres.ColumnInteger
 	CreatedAt   postgres.ColumnTimestampz
 	VoteCount   postgres.ColumnInteger
@@ -68,12 +67,11 @@ func newVoteOptionsTableImpl(schemaName, tableName, alias string) voteOptionsTab
 		IDColumn          = postgres.IntegerColumn("id")
 		OptionUUIDColumn  = postgres.StringColumn("option_uuid")
 		VoteIDColumn      = postgres.IntegerColumn("vote_id")
-		OptionTextColumn  = postgres.StringColumn("option_text")
 		OptionOrderColumn = postgres.IntegerColumn("option_order")
 		CreatedAtColumn   = postgres.TimestampzColumn("created_at")
 		VoteCountColumn   = postgres.IntegerColumn("vote_count")
-		allColumns        = postgres.ColumnList{IDColumn, OptionUUIDColumn, VoteIDColumn, OptionTextColumn, OptionOrderColumn, CreatedAtColumn, VoteCountColumn}
-		mutableColumns    = postgres.ColumnList{OptionUUIDColumn, VoteIDColumn, OptionTextColumn, OptionOrderColumn, CreatedAtColumn, VoteCountColumn}
+		allColumns        = postgres.ColumnList{IDColumn, OptionUUIDColumn, VoteIDColumn, OptionOrderColumn, CreatedAtColumn, VoteCountColumn}
+		mutableColumns    = postgres.ColumnList{OptionUUIDColumn, VoteIDColumn, OptionOrderColumn, CreatedAtColumn, VoteCountColumn}
 		defaultColumns    = postgres.ColumnList{IDColumn, OptionUUIDColumn, OptionOrderColumn, CreatedAtColumn, VoteCountColumn}
 	)
 
@@ -84,7 +82,6 @@ func newVoteOptionsTableImpl(schemaName, tableName, alias string) voteOptionsTab
 		ID:          IDColumn,
 		OptionUUID:  OptionUUIDColumn,
 		VoteID:      VoteIDColumn,
-		OptionText:  OptionTextColumn,
 		OptionOrder: OptionOrderColumn,
 		CreatedAt:   CreatedAtColumn,
 		VoteCount:   VoteCountColumn,

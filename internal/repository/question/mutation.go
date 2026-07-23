@@ -1,0 +1,234 @@
+package question_repo
+
+import (
+	"context"
+
+	"genshin-quiz/generated/db/genshinquiz/public/model"
+	"genshin-quiz/generated/db/genshinquiz/public/table"
+
+	pg "github.com/go-jet/jet/v2/postgres"
+	"github.com/go-jet/jet/v2/qrm"
+	"github.com/google/uuid"
+)
+
+func InsertQuestion(
+	ctx context.Context,
+	db qrm.DB,
+	insertModel model.Questions,
+) (*model.Questions, error) {
+	tbl := table.Questions
+	insertStmt := tbl.INSERT(tbl.MutableColumns).
+		MODEL(insertModel).
+		RETURNING(tbl.AllColumns)
+
+	var question model.Questions
+	err := insertStmt.QueryContext(ctx, db, &question)
+	if err != nil {
+		return nil, err
+	}
+
+	return &question, nil
+}
+
+func InsertQuestionTranslations(
+	ctx context.Context,
+	db qrm.DB,
+	translations []model.QuestionTranslations,
+) error {
+	if len(translations) == 0 {
+		return nil
+	}
+
+	tbl := table.QuestionTranslations
+	insertStmt := tbl.INSERT(
+		tbl.QuestionID,
+		tbl.Language,
+		tbl.QuestionText,
+		tbl.Explanation,
+		tbl.CreatedAt,
+		tbl.UpdatedAt,
+	).MODELS(translations)
+
+	_, err := insertStmt.ExecContext(ctx, db)
+	return err
+}
+
+func InsertQuestionOptions(
+	ctx context.Context,
+	db qrm.DB,
+	options []model.QuestionOptions,
+) (*[]model.QuestionOptions, error) {
+	tbl := table.QuestionOptions
+	insertStmt := tbl.INSERT(
+		tbl.QuestionID,
+		tbl.OptionUUID,
+		tbl.OptionType,
+		tbl.ImgURL,
+		tbl.IsAnswer,
+		tbl.CreatedAt,
+	).MODELS(options).RETURNING(tbl.AllColumns)
+
+	var insertedOptions []model.QuestionOptions
+	err := insertStmt.QueryContext(ctx, db, &insertedOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	return &insertedOptions, nil
+}
+
+func InsertOptionTranslations(
+	ctx context.Context,
+	db qrm.DB,
+	optionTranslations []model.QuestionOptionTranslations,
+) error {
+	if len(optionTranslations) == 0 {
+		return nil
+	}
+
+	tbl := table.QuestionOptionTranslations
+	insertStmt := tbl.INSERT(
+		tbl.OptionID,
+		tbl.Language,
+		tbl.OptionText,
+		tbl.CreatedAt,
+		tbl.UpdatedAt,
+	).MODELS(optionTranslations)
+
+	_, err := insertStmt.ExecContext(ctx, db)
+	return err
+}
+
+func UpdateOptionSelected(
+	ctx context.Context,
+	db qrm.DB,
+	optionIDs []int64,
+) error {
+	tbl := table.QuestionOptions
+
+	uuidSlice := make([]pg.Expression, 0, len(optionIDs))
+	for _, id := range optionIDs {
+		uuidSlice = append(uuidSlice, pg.Int64(id))
+	}
+
+	updateStmt := tbl.UPDATE().
+		SET(
+			tbl.SelectedCount.SET(tbl.SelectedCount.ADD(pg.Int(1))),
+		).WHERE(
+		tbl.ID.IN(uuidSlice...),
+	)
+	_, err := updateStmt.ExecContext(ctx, db)
+	return err
+}
+
+func InsertSubmission(
+	ctx context.Context,
+	db qrm.DB,
+	submission model.QuestionSubmissions,
+) (*model.QuestionSubmissions, error) {
+	tbl := table.QuestionSubmissions
+
+	insertStmt := tbl.INSERT(
+		tbl.SubmissionUUID,
+		tbl.QuestionID,
+		tbl.UserID,
+		tbl.IsPractice,
+		// tbl.SelectedOptionIDs,
+		tbl.IsCorrect,
+		tbl.CreatedAt,
+	).MODEL(submission).
+		RETURNING(tbl.AllColumns)
+
+	var result model.QuestionSubmissions
+	err := insertStmt.QueryContext(ctx, db, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func InsertSubmissionOptions(
+	ctx context.Context,
+	db qrm.DB,
+	submissionID int64,
+	optionIDs []int64,
+) error {
+	if len(optionIDs) == 0 {
+		return nil
+	}
+
+	tbl := table.QuestionSubmissionOptions
+	var models []model.QuestionSubmissionOptions
+
+	for _, optionID := range optionIDs {
+		models = append(models, model.QuestionSubmissionOptions{
+			SubmissionID: submissionID,
+			OptionID:     optionID,
+		})
+	}
+
+	insertStmt := tbl.INSERT(
+		tbl.SubmissionID,
+		tbl.OptionID,
+	).MODELS(models)
+
+	_, err := insertStmt.ExecContext(ctx, db)
+	return err
+}
+
+func UpdateQuestionSolved(
+	ctx context.Context,
+	db qrm.DB,
+	questionID int64,
+	correct bool,
+) error {
+	tbl := table.Questions
+
+	var updateStmt pg.UpdateStatement
+	if correct {
+		updateStmt = tbl.UPDATE().
+			SET(
+				tbl.SubmitCount.SET(tbl.SubmitCount.ADD(pg.Int(1))),
+				tbl.CorrectCount.SET(tbl.CorrectCount.ADD(pg.Int(1))),
+			).WHERE(
+			tbl.ID.EQ(pg.Int64(questionID)),
+		)
+	} else {
+		updateStmt = tbl.UPDATE().
+			SET(
+				tbl.SubmitCount.SET(tbl.SubmitCount.ADD(pg.Int(1))),
+			).WHERE(
+			tbl.ID.EQ(pg.Int64(questionID)),
+		)
+	}
+
+	_, err := updateStmt.ExecContext(ctx, db)
+	return err
+}
+
+func UpdateQuestionLikeCount(
+	ctx context.Context,
+	db qrm.DB,
+	questionUUID uuid.UUID,
+	value int16,
+) error {
+	tbl := table.Questions
+
+	// 更新问题的总点赞数
+	likeCount := int64(1)
+	if value != 1 {
+		// 取消点赞
+		likeCount = int64(-1)
+	}
+
+	updateStmt := tbl.UPDATE().
+		SET(
+			tbl.Likes.SET(tbl.Likes.ADD(pg.Int(likeCount))),
+		).WHERE(
+		tbl.QuestionUUID.EQ(pg.UUID(questionUUID)),
+	)
+
+	_, err := updateStmt.ExecContext(ctx, db)
+	return err
+}

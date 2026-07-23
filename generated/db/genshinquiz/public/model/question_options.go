@@ -19,7 +19,7 @@ type QuestionOptions struct {
 	QuestionID    int64
 	OptionType    QuestionOptionType
 	ImgURL        *string
-	IsAnswered    bool
+	IsAnswer      bool
 	CreatedAt     time.Time
 	SelectedCount int64
 }

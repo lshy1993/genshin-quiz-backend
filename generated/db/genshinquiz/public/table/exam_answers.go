@@ -20,7 +20,7 @@ type examAnswersTable struct {
 	ID                postgres.ColumnInteger
 	AttemptID         postgres.ColumnInteger
 	QuestionID        postgres.ColumnInteger
-	SelectedOptionIds postgres.ColumnString
+	SelectedOptionIds postgres.ColumnIntegerArray
 	TimeTaken         postgres.ColumnInteger
 	CreatedAt         postgres.ColumnTimestampz
 
@@ -67,7 +67,7 @@ func newExamAnswersTableImpl(schemaName, tableName, alias string) examAnswersTab
 		IDColumn                = postgres.IntegerColumn("id")
 		AttemptIDColumn         = postgres.IntegerColumn("attempt_id")
 		QuestionIDColumn        = postgres.IntegerColumn("question_id")
-		SelectedOptionIdsColumn = postgres.StringColumn("selected_option_ids")
+		SelectedOptionIdsColumn = postgres.IntegerArrayColumn("selected_option_ids")
 		TimeTakenColumn         = postgres.IntegerColumn("time_taken")
 		CreatedAtColumn         = postgres.TimestampzColumn("created_at")
 		allColumns              = postgres.ColumnList{IDColumn, AttemptIDColumn, QuestionIDColumn, SelectedOptionIdsColumn, TimeTakenColumn, CreatedAtColumn}

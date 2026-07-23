@@ -17,7 +17,6 @@ type VoteOptions struct {
 	ID          int64 `sql:"primary_key"`
 	OptionUUID  uuid.UUID
 	VoteID      int64
-	OptionText  string
 	OptionOrder int32
 	CreatedAt   time.Time
 	VoteCount   int64

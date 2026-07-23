@@ -3,20 +3,23 @@ package dao
 import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
+	"time"
 )
 
 type SimpleQuestion struct {
 	Question    model.Questions
 	User        model.Users
 	Translation model.QuestionTranslations
-	Solved      bool
+	// Solved      bool
 }
 
 type DetailedQuestion struct {
-	SimpleQuestion
-	Submissions        model.QuestionSubmissions
+	Question           model.Questions
+	User               model.Users
+	Translation        model.QuestionTranslations
 	Options            []model.QuestionOptions
-	OptionTranslations []model.OptionTranslations
+	OptionTranslations []model.QuestionOptionTranslations
+	SubmissionCount    int64
 }
 
 type QuestionListParams struct {
@@ -31,8 +34,16 @@ type QuestionListParams struct {
 }
 
 type QuestionListResult struct {
-	Questions []oapi.Question
+	Questions []SimpleQuestion
 	Total     int
+}
+
+type SubmissionWithUserName struct {
+	ID        int64
+	IsCorrect bool
+	CreatedAt time.Time
+	TimeTaken *int32
+	UserName  string
 }
 
 // const (

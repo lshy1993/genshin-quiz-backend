@@ -56,7 +56,7 @@ CREATE TABLE question_translations(
 );
 
 -- Create question option translations table
-CREATE TABLE option_translations (
+CREATE TABLE question_option_translations (
     id BIGSERIAL PRIMARY KEY,
     option_id BIGINT NOT NULL REFERENCES question_options(id) ON DELETE CASCADE,
     language VARCHAR(10) NOT NULL,
@@ -107,11 +107,11 @@ CREATE INDEX idx_questions_category_difficulty ON questions(category, difficulty
 
 -- 索引：options（按 question 快速查、按是否为正确项过滤）
 CREATE INDEX idx_question_options_question_id ON question_options(question_id);
-CREATE INDEX idx_question_options_question_is_answer ON question_options(question_id, is_answered);
+CREATE INDEX idx_question_options_question_is_answer ON question_options(question_id, is_answer);
 
 -- 索引：翻译表按语言和 question/option 快速查
 CREATE INDEX idx_question_translations_question_language ON question_translations(question_id, language);
-CREATE INDEX idx_option_translations_option_language ON option_translations(option_id, language);
+CREATE INDEX idx_question_option_translations_option_language ON question_option_translations(option_id, language);
 
 -- 索引：提交（按 user、按 question、按时间范围查询常用）
 CREATE INDEX idx_question_submissions_user_id ON question_submissions(user_id);
@@ -133,7 +133,7 @@ DROP INDEX IF EXISTS idx_question_likes_question_id;
 DROP INDEX IF EXISTS idx_question_submissions_question_created_at;
 DROP INDEX IF EXISTS idx_question_submissions_question_id;
 DROP INDEX IF EXISTS idx_question_submissions_user_id;
-DROP INDEX IF EXISTS idx_option_translations_option_language;
+DROP INDEX IF EXISTS idx_question_option_translations_option_language;
 DROP INDEX IF EXISTS idx_question_translations_question_language;
 DROP INDEX IF EXISTS idx_question_options_question_is_answer;
 DROP INDEX IF EXISTS idx_question_options_question_id;
@@ -145,7 +145,7 @@ DROP INDEX IF EXISTS idx_questions_quiz_id;
 DROP TABLE IF EXISTS question_comments;
 DROP TABLE IF EXISTS question_likes;
 DROP TABLE IF EXISTS question_submissions;
-DROP TABLE IF EXISTS option_translations;
+DROP TABLE IF EXISTS question_option_translations;
 DROP TABLE IF EXISTS question_translations;
 DROP TABLE IF EXISTS question_options;
 DROP TABLE IF EXISTS questions;

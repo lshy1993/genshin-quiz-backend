@@ -3,11 +3,61 @@ package handler
 import (
 	"context"
 	"genshin-quiz/generated/oapi"
+
+	services "genshin-quiz/internal/services/vote"
 )
 
-func (*Handler) GetVotes(
+func (h *Handler) GetVotes(
 	ctx context.Context,
 	req oapi.GetVotesRequestObject,
 ) (oapi.GetVotesResponseObject, error) {
-	return (oapi.GetVotes200JSONResponse{}), nil
+	res, err := services.GetVotes(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (h *Handler) GetVote(
+	ctx context.Context,
+	req oapi.GetVoteRequestObject,
+) (oapi.GetVoteResponseObject, error) {
+	res, err := services.GetVote(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (h *Handler) PostCreateVote(
+	ctx context.Context,
+	req oapi.PostCreateVoteRequestObject,
+) (oapi.PostCreateVoteResponseObject, error) {
+	res, err := services.PostCreateVote(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (h *Handler) PostVote(
+	ctx context.Context,
+	req oapi.PostVoteRequestObject,
+) (oapi.PostVoteResponseObject, error) {
+	res, err := services.PostVote(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (h *Handler) PostLikeVote(
+	ctx context.Context,
+	req oapi.PostLikeVoteRequestObject,
+) (oapi.PostLikeVoteResponseObject, error) {
+	err := services.PostLikeVote(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return oapi.PostLikeVote201Response{}, nil
 }

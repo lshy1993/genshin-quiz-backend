@@ -16,6 +16,6 @@ func NewHandler(app *config.App) *Handler {
 	}
 }
 
-func ptr[T any](v T) *T {
-	return &v
-}
+// func ptr[T any](v T) *T {
+// 	return &v
+// }

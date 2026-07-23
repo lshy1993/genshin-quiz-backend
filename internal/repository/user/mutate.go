@@ -12,6 +12,7 @@ import (
 	"genshin-quiz/internal/common"
 
 	"github.com/go-errors/errors"
+	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -21,6 +22,7 @@ func InsertUser(
 	ctx context.Context,
 	db qrm.DB,
 	email string,
+	language *string,
 ) (*model.Users, error) {
 	tbl := table.Users
 
@@ -37,6 +39,7 @@ func InsertUser(
 		tbl.UserUUID,
 		tbl.Email,
 		tbl.DisplayName,
+		tbl.Language,
 		tbl.CreatedAt,
 		tbl.UpdatedAt,
 	).
@@ -44,6 +47,7 @@ func InsertUser(
 			UserUUID:    newUUID,
 			Email:       email,
 			DisplayName: &tmpName,
+			Language:    language,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}).
@@ -135,13 +139,29 @@ func InsertLoginLog(
 func Update(
 	ctx context.Context,
 	db qrm.DB,
-	model model.Users,
+	u model.Users,
 ) (*model.Users, error) {
-	// start := time.Now()
+	tbl := table.Users
 
-	// updateStmt := table.Users.UPDATE()
+	u.UpdatedAt = time.Now()
 
-	return &model, nil
+	updateStmt := tbl.UPDATE(
+		tbl.DisplayName,
+		tbl.AvatarURL,
+		tbl.Location,
+		tbl.Language,
+		tbl.UpdatedAt,
+	).
+		MODEL(u).
+		WHERE(tbl.ID.EQ(pg.Int64(u.ID))).
+		RETURNING(tbl.AllColumns)
+
+	var result model.Users
+	err := updateStmt.QueryContext(ctx, db, &result)
+	if err != nil {
+		return nil, errors.WrapPrefix(err, "update user failed", 0)
+	}
+	return &result, nil
 }
 
 func Delete(
