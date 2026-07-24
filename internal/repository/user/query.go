@@ -61,9 +61,13 @@ func GetPasswordByEmail(
 	email string,
 ) (*dao.UserInfoWithAuth, error) {
 	tbl := table.Users
-	authTbl := table.UserPasswords
-	stmt := pg.SELECT(tbl.AllColumns, authTbl.PasswordHash).
-		FROM(tbl.LEFT_JOIN(authTbl, tbl.ID.EQ(authTbl.UserID))).
+	authTbl := table.UserCredentials
+	stmt := pg.SELECT(tbl.AllColumns, authTbl.Credential.AS("PasswordHash")).
+		FROM(tbl.LEFT_JOIN(
+			authTbl,
+			tbl.ID.EQ(authTbl.UserID).
+				AND(authTbl.IdentityType.EQ(pg.String("password"))), // 限定凭证类型为 password
+		)).
 		WHERE(
 			tbl.Email.EQ(pg.String(email)),
 		)
@@ -302,7 +306,7 @@ LIMIT $%d OFFSET $%d`,
 			item.User.AvatarURL = &avatarURL.String
 		}
 		if location.Valid {
-			item.User.Location = &location.String
+			item.User.Country = &location.String
 		}
 		if timezone.Valid {
 			item.User.Timezone = &timezone.String
@@ -311,7 +315,7 @@ LIMIT $%d OFFSET $%d`,
 			item.User.Language = &language.String
 		}
 		if showEmail.Valid {
-			item.User.ShowEmail = &showEmail.Bool
+			item.User.ShowEmail = showEmail.Bool
 		}
 		if userRole.Valid {
 			item.User.UserRole = &userRole.Int32

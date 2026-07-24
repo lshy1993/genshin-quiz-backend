@@ -30,8 +30,8 @@ func GetMe(
 		avatar = *userInfo.AvatarURL
 	}
 	country := "Unknown"
-	if userInfo.Location != nil {
-		country = *userInfo.Location
+	if userInfo.Country != nil {
+		country = *userInfo.Country
 	}
 	displayName := ""
 	if userInfo.DisplayName != nil {
@@ -42,9 +42,9 @@ func GetMe(
 		Uuid:             userInfo.UserUUID,
 		AvatarUrl:        avatar,
 		Country:          country,
-		Ip:               "",
 		Language:         userInfo.Language,
 		LastLoginAt:      userInfo.CreatedAt,
+		LastLoginIp:      nil,
 		Nickname:         displayName,
 		RegisteredAt:     userInfo.CreatedAt,
 		QuestionsCreated: int(userInfo.QuestionsCreated),

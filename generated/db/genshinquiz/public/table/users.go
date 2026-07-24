@@ -22,10 +22,13 @@ type usersTable struct {
 	Email              postgres.ColumnString
 	DisplayName        postgres.ColumnString
 	AvatarURL          postgres.ColumnString
-	Location           postgres.ColumnString
+	Biography          postgres.ColumnString
+	Gender             postgres.ColumnString
+	Country            postgres.ColumnString
 	Timezone           postgres.ColumnString
 	Language           postgres.ColumnString
 	ShowEmail          postgres.ColumnBool
+	CreatedIP          postgres.ColumnString
 	CreatedAt          postgres.ColumnTimestampz
 	UpdatedAt          postgres.ColumnTimestampz
 	TotalSubmissions   postgres.ColumnInteger
@@ -79,10 +82,13 @@ func newUsersTableImpl(schemaName, tableName, alias string) usersTable {
 		EmailColumn              = postgres.StringColumn("email")
 		DisplayNameColumn        = postgres.StringColumn("display_name")
 		AvatarURLColumn          = postgres.StringColumn("avatar_url")
-		LocationColumn           = postgres.StringColumn("location")
+		BiographyColumn          = postgres.StringColumn("biography")
+		GenderColumn             = postgres.StringColumn("gender")
+		CountryColumn            = postgres.StringColumn("country")
 		TimezoneColumn           = postgres.StringColumn("timezone")
 		LanguageColumn           = postgres.StringColumn("language")
 		ShowEmailColumn          = postgres.BoolColumn("show_email")
+		CreatedIPColumn          = postgres.StringColumn("created_ip")
 		CreatedAtColumn          = postgres.TimestampzColumn("created_at")
 		UpdatedAtColumn          = postgres.TimestampzColumn("updated_at")
 		TotalSubmissionsColumn   = postgres.IntegerColumn("total_submissions")
@@ -90,8 +96,8 @@ func newUsersTableImpl(schemaName, tableName, alias string) usersTable {
 		QuestionsCreatedColumn   = postgres.IntegerColumn("questions_created")
 		TotalVotesColumn         = postgres.IntegerColumn("total_votes")
 		UserRoleColumn           = postgres.IntegerColumn("user_role")
-		allColumns               = postgres.ColumnList{IDColumn, UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, LocationColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn, UserRoleColumn}
-		mutableColumns           = postgres.ColumnList{UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, LocationColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn, UserRoleColumn}
+		allColumns               = postgres.ColumnList{IDColumn, UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, BiographyColumn, GenderColumn, CountryColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedIPColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn, UserRoleColumn}
+		mutableColumns           = postgres.ColumnList{UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, BiographyColumn, GenderColumn, CountryColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedIPColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn, UserRoleColumn}
 		defaultColumns           = postgres.ColumnList{IDColumn, UserUUIDColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn, UserRoleColumn}
 	)
 
@@ -104,10 +110,13 @@ func newUsersTableImpl(schemaName, tableName, alias string) usersTable {
 		Email:              EmailColumn,
 		DisplayName:        DisplayNameColumn,
 		AvatarURL:          AvatarURLColumn,
-		Location:           LocationColumn,
+		Biography:          BiographyColumn,
+		Gender:             GenderColumn,
+		Country:            CountryColumn,
 		Timezone:           TimezoneColumn,
 		Language:           LanguageColumn,
 		ShowEmail:          ShowEmailColumn,
+		CreatedIP:          CreatedIPColumn,
 		CreatedAt:          CreatedAtColumn,
 		UpdatedAt:          UpdatedAtColumn,
 		TotalSubmissions:   TotalSubmissionsColumn,

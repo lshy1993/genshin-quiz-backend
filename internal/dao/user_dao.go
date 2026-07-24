@@ -5,6 +5,6 @@ import (
 )
 
 type UserInfoWithAuth struct {
-	User model.Users
-	Auth model.UserPasswords
+	User         model.Users
+	PasswordHash string
 }

@@ -201,6 +201,7 @@ func isPublicEndpoint(path, method string) bool {
 		"/auth/forgot-password": {"POST"},
 
 		// 公开的只读API - 不需要认证
+		"/home":        {"GET"},
 		"/questions":   {"GET"},
 		"/questions/*": {"GET"}, // 通配符支持 /questions/{id}
 		"/exams":       {"GET"},

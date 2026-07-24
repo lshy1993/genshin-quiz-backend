@@ -39,7 +39,7 @@ func UpdateUser(
 		existing.AvatarURL = &avatarURL
 
 		country := req.Body.Country
-		existing.Location = &country
+		existing.Country = &country
 
 		existing.Language = req.Body.Language
 	}
@@ -58,15 +58,14 @@ func UpdateUser(
 		avatarURL = *updated.AvatarURL
 	}
 	country := ""
-	if updated.Location != nil {
-		country = *updated.Location
+	if updated.Country != nil {
+		country = *updated.Country
 	}
 
 	return &oapi.User{
 		Uuid:             updated.UserUUID,
 		AvatarUrl:        avatarURL,
 		Country:          country,
-		Ip:               "",
 		Language:         updated.Language,
 		LastLoginAt:      updated.UpdatedAt,
 		Nickname:         displayName,

@@ -53,8 +53,8 @@ func GetUsers(
 			avatarURL = *userInfo.AvatarURL
 		}
 		country := ""
-		if userInfo.Location != nil {
-			country = *userInfo.Location
+		if userInfo.Country != nil {
+			country = *userInfo.Country
 		}
 		nickname := ""
 		if userInfo.DisplayName != nil {
@@ -66,7 +66,6 @@ func GetUsers(
 			Uuid:             userInfo.UserUUID,
 			AvatarUrl:        avatarURL,
 			Country:          country,
-			Ip:               "",
 			Language:         userInfo.Language,
 			LastLoginAt:      userInfo.CreatedAt,
 			Nickname:         nickname,
@@ -74,7 +73,7 @@ func GetUsers(
 			QuestionsCreated: int(userInfo.QuestionsCreated),
 			TotalAnswers:     int(userInfo.TotalSubmissions),
 			CorrectAnswers:   int(userInfo.CorrectSubmissions),
-			LikesReceived:    &likesReceived,
+			LikesReceived:    likesReceived,
 			Votes:            int(userInfo.TotalVotes),
 		})
 	}

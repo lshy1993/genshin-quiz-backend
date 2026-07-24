@@ -18,8 +18,8 @@ func UserModelToDTO(
 		avatarURL = *user.AvatarURL
 	}
 	country := ""
-	if user.Location != nil {
-		country = *user.Location
+	if user.Country != nil {
+		country = *user.Country
 	}
 
 	return oapi.User{
@@ -27,8 +27,9 @@ func UserModelToDTO(
 		Nickname:         nickName,
 		AvatarUrl:        avatarURL,
 		Country:          country,
+		RegisteredIp:     user.CreatedIP,
 		RegisteredAt:     user.CreatedAt,
-		Ip:               login.IPAddress,
+		LastLoginIp:      &login.IPAddress,
 		LastLoginAt:      login.LoginAt,
 		QuestionsCreated: 0,
 		TotalAnswers:     0,

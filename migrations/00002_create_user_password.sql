@@ -31,7 +31,7 @@ CREATE TABLE user_tokens (
   is_used BOOLEAN NOT NULL DEFAULT false,
   expires_at TIMESTAMPTZ NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-)
+);
 
 CREATE INDEX idx_user_tokens_lookup ON user_tokens(user_id, token_type) WHERE is_used = false;
 

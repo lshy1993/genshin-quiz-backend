@@ -45,7 +45,8 @@ func RegisterUser(
 		tx.Rollback()
 		return nil, err
 	}
-	err = user_repo.InsertUserAuth(ctx, tx, res.ID, pwd)
+	// use new auth
+	err = user_repo.InsertUserAuth(ctx, tx, res.ID, "password", string(email), &pwd)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -78,7 +79,7 @@ func LoginUser(
 		return nil, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(authInfo.Auth.PasswordHash), []byte(pwd))
+	err = bcrypt.CompareHashAndPassword([]byte(authInfo.PasswordHash), []byte(pwd))
 	if err != nil {
 		// 密码错误
 		return nil, common.ErrInvalidCredentials

@@ -15,7 +15,6 @@ import (
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func InsertUser(
@@ -71,37 +70,36 @@ func InsertUserAuth(
 	ctx context.Context,
 	db qrm.DB,
 	userID int64,
-	pwd string,
+	identityType string, // 'password', 'google', 'github'
+	identifier string, // email, openid, phone
+	credential *string, // 密码哈希 (OAuth 可传 nil)
 ) error {
-	tbl := table.UserPasswords
-
-	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
-	if err != nil {
-		return errors.WrapPrefix(err, "hash password failed", 0)
-	}
-
+	tbl := table.UserCredentials
 	now := time.Now()
+
 	insertStmt := tbl.INSERT(
 		tbl.UserID,
-		tbl.PasswordHash,
+		tbl.IdentityType,
+		tbl.Identifier,
+		tbl.Credential,
 		tbl.CreatedAt,
 		tbl.UpdatedAt,
-	).
-		MODEL(model.UserPasswords{
-			UserID:       userID,
-			PasswordHash: string(hashedPwd),
-			CreatedAt:    now,
-			UpdatedAt:    now,
-		})
+	).MODEL(model.UserCredentials{
+		UserID:       userID,
+		IdentityType: identityType,
+		Identifier:   identifier,
+		Credential:   credential,
+		CreatedAt:    now,
+		UpdatedAt:    now,
+	})
 
-	_, err = insertStmt.ExecContext(ctx, db)
+	_, err := insertStmt.ExecContext(ctx, db)
 	if err != nil {
 		errStr := err.Error()
-		if errStr != "" &&
-			(contains(errStr, "duplicate key") || contains(errStr, "unique constraint")) {
-			return common.NewBadRequestError("user password already exists")
+		if errStr != "" && (contains(errStr, "duplicate key") || contains(errStr, "unique constraint")) {
+			return common.NewBadRequestError("this identity is already linked to an account")
 		}
-		return errors.WrapPrefix(err, "insert password failed", 0)
+		return errors.WrapPrefix(err, "insert user identity failed", 0)
 	}
 
 	return nil
@@ -148,7 +146,7 @@ func Update(
 	updateStmt := tbl.UPDATE(
 		tbl.DisplayName,
 		tbl.AvatarURL,
-		tbl.Location,
+		tbl.Country,
 		tbl.Language,
 		tbl.UpdatedAt,
 	).

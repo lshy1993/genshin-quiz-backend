@@ -19,10 +19,13 @@ type Users struct {
 	Email              string
 	DisplayName        *string
 	AvatarURL          *string
-	Location           *string
+	Biography          *string
+	Gender             *string
+	Country            *string
 	Timezone           *string
 	Language           *string
-	ShowEmail          *bool
+	ShowEmail          bool
+	CreatedIP          *string
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
 	TotalSubmissions   int64

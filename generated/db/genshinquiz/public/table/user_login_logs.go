@@ -20,6 +20,9 @@ type userLoginLogsTable struct {
 	ID        postgres.ColumnInteger
 	UserID    postgres.ColumnInteger
 	IPAddress postgres.ColumnString
+	UserAgent postgres.ColumnString
+	LoginType postgres.ColumnString
+	Status    postgres.ColumnString
 	LoginAt   postgres.ColumnTimestampz
 
 	AllColumns     postgres.ColumnList
@@ -65,10 +68,13 @@ func newUserLoginLogsTableImpl(schemaName, tableName, alias string) userLoginLog
 		IDColumn        = postgres.IntegerColumn("id")
 		UserIDColumn    = postgres.IntegerColumn("user_id")
 		IPAddressColumn = postgres.StringColumn("ip_address")
+		UserAgentColumn = postgres.StringColumn("user_agent")
+		LoginTypeColumn = postgres.StringColumn("login_type")
+		StatusColumn    = postgres.StringColumn("status")
 		LoginAtColumn   = postgres.TimestampzColumn("login_at")
-		allColumns      = postgres.ColumnList{IDColumn, UserIDColumn, IPAddressColumn, LoginAtColumn}
-		mutableColumns  = postgres.ColumnList{UserIDColumn, IPAddressColumn, LoginAtColumn}
-		defaultColumns  = postgres.ColumnList{IDColumn, LoginAtColumn}
+		allColumns      = postgres.ColumnList{IDColumn, UserIDColumn, IPAddressColumn, UserAgentColumn, LoginTypeColumn, StatusColumn, LoginAtColumn}
+		mutableColumns  = postgres.ColumnList{UserIDColumn, IPAddressColumn, UserAgentColumn, LoginTypeColumn, StatusColumn, LoginAtColumn}
+		defaultColumns  = postgres.ColumnList{IDColumn, LoginTypeColumn, StatusColumn, LoginAtColumn}
 	)
 
 	return userLoginLogsTable{
@@ -78,6 +84,9 @@ func newUserLoginLogsTableImpl(schemaName, tableName, alias string) userLoginLog
 		ID:        IDColumn,
 		UserID:    UserIDColumn,
 		IPAddress: IPAddressColumn,
+		UserAgent: UserAgentColumn,
+		LoginType: LoginTypeColumn,
+		Status:    StatusColumn,
 		LoginAt:   LoginAtColumn,
 
 		AllColumns:     allColumns,

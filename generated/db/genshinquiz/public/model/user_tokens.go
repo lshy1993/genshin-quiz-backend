@@ -11,12 +11,12 @@ import (
 	"time"
 )
 
-type UserLoginLogs struct {
+type UserTokens struct {
 	ID        int64 `sql:"primary_key"`
 	UserID    int64
-	IPAddress string
-	UserAgent *string
-	LoginType *string
-	Status    string
-	LoginAt   time.Time
+	TokenType string
+	TokenHash string
+	IsUsed    bool
+	ExpiresAt time.Time
+	CreatedAt time.Time
 }

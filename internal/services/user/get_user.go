@@ -25,8 +25,8 @@ func GetUser(
 	}
 
 	country := ""
-	if userInfo.Location != nil {
-		country = *userInfo.Location
+	if userInfo.Country != nil {
+		country = *userInfo.Country
 	}
 
 	nickname := ""
@@ -43,7 +43,6 @@ func GetUser(
 		Uuid:             userInfo.UserUUID,
 		AvatarUrl:        avatarURL,
 		Country:          country,
-		Ip:               "",
 		Language:         language,
 		LastLoginAt:      userInfo.CreatedAt,
 		Nickname:         nickname,
