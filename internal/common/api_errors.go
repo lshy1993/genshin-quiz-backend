@@ -45,6 +45,7 @@ func NewInternalServerError(message string) *APIError {
 }
 
 var (
+	ErrNotFound           = NewNotFoundError("记录不存在")
 	ErrUserNotFound       = NewNotFoundError("用户不存在")
 	ErrUserAlreadyExists  = NewBadRequestError("用户已存在")
 	ErrInvalidCredentials = NewUnauthorizedError("邮箱或密码错误")

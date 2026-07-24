@@ -205,7 +205,7 @@ func getQuestionTranslationFallback(
 	}
 
 	if len(trans) == 0 {
-		return nil, nil
+		return nil, common.ErrNotFound
 	}
 
 	return &trans[0], nil

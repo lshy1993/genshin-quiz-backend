@@ -15,5 +15,5 @@ func (h *Handler) GetHome(
 	if err != nil {
 		return nil, err
 	}
-	return (oapi.GetHome200JSONResponse)(*res), nil
+	return *res, nil
 }

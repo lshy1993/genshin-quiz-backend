@@ -1,0 +1,283 @@
+package user_repo
+
+import (
+	"context"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
+	"genshin-quiz/generated/db/genshinquiz/public/model"
+	"genshin-quiz/generated/db/genshinquiz/public/table"
+	"genshin-quiz/internal/common"
+	"genshin-quiz/internal/dao"
+	"genshin-quiz/internal/enum"
+	"time"
+
+	"github.com/go-errors/errors"
+	pg "github.com/go-jet/jet/v2/postgres"
+	"github.com/go-jet/jet/v2/qrm"
+)
+
+func InsertUserAuth(
+	ctx context.Context,
+	db qrm.DB,
+	userID int64,
+	identityType string, // 'password', 'google', 'github'
+	identifier string, // email, openid, phone
+	credential *string, // 密码哈希 (OAuth 可传 nil)
+) error {
+	tbl := table.UserCredentials
+	now := time.Now()
+
+	insertStmt := tbl.INSERT(
+		tbl.UserID,
+		tbl.IdentityType,
+		tbl.Identifier,
+		tbl.Credential,
+		tbl.CreatedAt,
+		tbl.UpdatedAt,
+	).MODEL(model.UserCredentials{
+		UserID:       userID,
+		IdentityType: identityType,
+		Identifier:   identifier,
+		Credential:   credential,
+		CreatedAt:    now,
+		UpdatedAt:    now,
+	})
+
+	_, err := insertStmt.ExecContext(ctx, db)
+	if err != nil {
+		errStr := err.Error()
+		if errStr != "" &&
+			(contains(errStr, "duplicate key") || contains(errStr, "unique constraint")) {
+			return common.NewBadRequestError("this identity is already linked to an account")
+		}
+		return errors.WrapPrefix(err, "insert user identity failed", 0)
+	}
+
+	return nil
+}
+
+func InsertLoginLog(
+	ctx context.Context,
+	db qrm.DB,
+	userID int64,
+	ip string,
+	userAgent *string,
+	loginType *string, // "password", "google" (可传 nil)
+	status string, // "SUCCESS", "FAILED"
+) (*model.UserLoginLogs, error) {
+	tbl := table.UserLoginLogs
+
+	// 1. 设置默认值
+	if status == "" {
+		status = "SUCCESS"
+	}
+	if loginType == nil {
+		defaultType := "password"
+		loginType = &defaultType
+	}
+
+	now := time.Now()
+	insertStmt := tbl.INSERT(
+		tbl.UserID,
+		tbl.IPAddress,
+		tbl.UserAgent,
+		tbl.LoginType,
+		tbl.Status,
+		tbl.LoginAt,
+	).
+		MODEL(model.UserLoginLogs{
+			UserID:    userID,
+			IPAddress: ip,
+			UserAgent: userAgent,
+			LoginType: loginType,
+			Status:    status,
+			LoginAt:   now,
+		}).
+		RETURNING(tbl.AllColumns)
+
+	var result model.UserLoginLogs
+	err := insertStmt.QueryContext(ctx, db, &result)
+	if err != nil {
+		return nil, errors.WrapPrefix(err, "insert login logs error", 0)
+	}
+	return &result, nil
+}
+
+func GetUserCredential(
+	ctx context.Context,
+	db qrm.DB,
+	userID int64,
+	identityType string,
+) (*model.UserCredentials, error) {
+	tbl := table.UserCredentials
+
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl).
+		WHERE(
+			tbl.UserID.EQ(pg.Int(userID)).
+				AND(tbl.IdentityType.EQ(pg.String(identityType))),
+		)
+
+	var cred model.UserCredentials
+	err := stmt.QueryContext(ctx, db, &cred)
+	if err != nil {
+		if errors.Is(err, qrm.ErrNoRows) {
+			return nil, common.ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	return &cred, nil
+}
+
+func GetPasswordByEmail(
+	ctx context.Context,
+	db qrm.DB,
+	email string,
+) (*dao.UserInfoWithAuth, error) {
+	tbl := table.Users
+	authTbl := table.UserCredentials
+	stmt := pg.SELECT(tbl.AllColumns, authTbl.Credential.AS("PasswordHash")).
+		FROM(tbl.LEFT_JOIN(
+			authTbl,
+			tbl.ID.EQ(authTbl.UserID).
+				AND(authTbl.IdentityType.EQ(pg.String("password"))), // 限定凭证类型为 password
+		)).
+		WHERE(
+			tbl.Email.EQ(pg.String(email)),
+		)
+	var auth []dao.UserInfoWithAuth
+	err := stmt.QueryContext(ctx, db, &auth)
+	if err != nil {
+		return nil, errors.WrapPrefix(err, "checking password failed", 0)
+	}
+	if len(auth) == 0 {
+		return nil, common.ErrUserNotFound
+	}
+
+	return &auth[0], nil
+}
+
+func UpdateUserCredential(
+	ctx context.Context,
+	db qrm.DB,
+	userID int64,
+	identityType string,
+	credential *string,
+) error {
+	tbl := table.UserCredentials
+
+	stmt := tbl.UPDATE(tbl.Credential, tbl.UpdatedAt).
+		SET(
+			credential,
+			time.Now(),
+		).
+		WHERE(
+			tbl.UserID.EQ(pg.Int(userID)).
+				AND(tbl.IdentityType.EQ(pg.String(identityType))),
+		)
+
+	_, err := stmt.ExecContext(ctx, db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func InsertUserToken(
+	ctx context.Context,
+	db qrm.DB,
+	userID int64,
+	tokenType enum.TokenType, // "password_reset", "email_verification"
+	expiresIn time.Duration,
+) (string, error) {
+	// 1. 生成 32 字节（256 bit）的密码学安全随机字符串作为原始 Token
+	randomBytes := make([]byte, 32)
+	if _, err := rand.Read(randomBytes); err != nil {
+		return "", errors.WrapPrefix(err, "generate random token failed", 0)
+	}
+	rawToken := hex.EncodeToString(randomBytes)
+
+	// 2. 计算明文 Token 的 SHA-256 哈希用于数据库存储
+	hashBytes := sha256.Sum256([]byte(rawToken))
+	tokenHash := hex.EncodeToString(hashBytes[:])
+
+	// 3. 构建插入数据
+	now := time.Now()
+	expiresAt := now.Add(expiresIn)
+
+	tbl := table.UserTokens
+
+	insertStmt := tbl.INSERT(
+		tbl.UserID,
+		tbl.TokenType,
+		tbl.TokenHash,
+		tbl.IsUsed,
+		tbl.ExpiresAt,
+		tbl.CreatedAt,
+	).
+		MODEL(model.UserTokens{
+			UserID:    userID,
+			TokenType: tokenType.String(),
+			TokenHash: tokenHash,
+			IsUsed:    false,
+			ExpiresAt: expiresAt,
+			CreatedAt: now,
+		})
+
+	// 4. 执行插入
+	_, err := insertStmt.ExecContext(ctx, db)
+	if err != nil {
+		return "", errors.WrapPrefix(err, "insert user token failed", 0)
+	}
+
+	// 5. 返回未加密的明文 rawToken（以便通过邮件/链接发给用户）
+	return rawToken, nil
+}
+
+func VerifyAndUseToken(
+	ctx context.Context,
+	db qrm.DB,
+	rawToken string,
+	tokenType enum.TokenType, // "password_reset", "email_verification"
+) (*model.UserTokens, error) {
+	tbl := table.UserTokens
+
+	// 1. 对传入的明文 rawToken 计算 SHA-256
+	hashBytes := sha256.Sum256([]byte(rawToken))
+	tokenHash := hex.EncodeToString(hashBytes[:])
+
+	// 2. 查询数据库中未过期且未使用的 Token
+	now := time.Now()
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl).
+		WHERE(
+			tbl.TokenHash.EQ(pg.String(tokenHash)).
+				AND(tbl.TokenType.EQ(pg.String(tokenType.String()))).
+				AND(tbl.IsUsed.EQ(pg.Bool(false))).
+				AND(tbl.ExpiresAt.GT(pg.TimestampzT(now))),
+		)
+
+	var tokenRecord model.UserTokens
+	err := stmt.QueryContext(ctx, db, &tokenRecord)
+	if err != nil {
+		if errors.Is(err, qrm.ErrNoRows) {
+			return nil, errors.New("invalid or expired token")
+		}
+		return nil, err
+	}
+
+	// 3. 标记 Token 为已使用
+	updateStmt := tbl.UPDATE(tbl.IsUsed).
+		SET(true).
+		WHERE(tbl.ID.EQ(pg.Int(tokenRecord.ID)))
+
+	_, err = updateStmt.ExecContext(ctx, db)
+	if err != nil {
+		return nil, errors.WrapPrefix(err, "mark token as used failed", 0)
+	}
+
+	return &tokenRecord, nil
+}

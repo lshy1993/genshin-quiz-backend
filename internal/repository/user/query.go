@@ -11,9 +11,7 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
 	"genshin-quiz/internal/common"
-	"genshin-quiz/internal/dao"
 
-	go_errors "github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
@@ -53,34 +51,6 @@ func GetUserByEmail(
 	}
 
 	return &user[0], nil
-}
-
-func GetPasswordByEmail(
-	ctx context.Context,
-	db qrm.DB,
-	email string,
-) (*dao.UserInfoWithAuth, error) {
-	tbl := table.Users
-	authTbl := table.UserCredentials
-	stmt := pg.SELECT(tbl.AllColumns, authTbl.Credential.AS("PasswordHash")).
-		FROM(tbl.LEFT_JOIN(
-			authTbl,
-			tbl.ID.EQ(authTbl.UserID).
-				AND(authTbl.IdentityType.EQ(pg.String("password"))), // 限定凭证类型为 password
-		)).
-		WHERE(
-			tbl.Email.EQ(pg.String(email)),
-		)
-	var auth []dao.UserInfoWithAuth
-	err := stmt.QueryContext(ctx, db, &auth)
-	if err != nil {
-		return nil, go_errors.WrapPrefix(err, "checking password failed", 0)
-	}
-	if len(auth) == 0 {
-		return nil, common.ErrUserNotFound
-	}
-
-	return &auth[0], nil
 }
 
 func GetUserInfoByID(

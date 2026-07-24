@@ -45,13 +45,18 @@ func RegisterUser(
 		tx.Rollback()
 		return nil, err
 	}
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, go_errors.WrapPrefix(err, "hash password failed", 0)
+	}
+	hashedPwdStr := string(hashedPwd)
 	// use new auth
-	err = user_repo.InsertUserAuth(ctx, tx, res.ID, "password", string(email), &pwd)
+	err = user_repo.InsertUserAuth(ctx, tx, res.ID, "password", string(email), &hashedPwdStr)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-	response, err := realLogin(ctx, tx, app.Config.JWTSecret, res)
+	response, err := realLogin(ctx, tx, app.Config.JWTSecret, res, "password")
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -86,7 +91,7 @@ func LoginUser(
 	}
 
 	// 登录流程
-	return realLogin(ctx, app.DB, app.Config.JWTSecret, &authInfo.User)
+	return realLogin(ctx, app.DB, app.Config.JWTSecret, &authInfo.User, "password")
 }
 
 func realLogin(
@@ -94,16 +99,39 @@ func realLogin(
 	db qrm.DB,
 	secret string,
 	res *model.Users,
+	loginType string, // "password", "google"
 ) (*oapi.AuthResponse, error) {
 	// 生成 JWT
 	tokenString, err := middleware.GenerateJWT(res.ID, res.Email, secret)
 	if err != nil {
 		return nil, err
 	}
+	// 从 Context 提取 IP 和 User-Agent
+	ip, _ := ctx.Value(middleware.RealIPKey).(string)
+	// 如果 IP 为空，赋值默认值，防止数据库 INET 字段解析报错
+	if ip == "" {
+		ip = "127.0.0.1"
+	}
+
+	var userAgent *string
+	if ua, ok := ctx.Value(middleware.UserAgentKey).(string); ok && ua != "" {
+		userAgent = &ua
+	}
+
+	if loginType == "" {
+		loginType = "password"
+	}
 
 	// 写登录日志
-	ip, _ := ctx.Value("real_ip").(string)
-	loginInfo, err := user_repo.InsertLoginLog(ctx, db, res.ID, ip)
+	loginInfo, err := user_repo.InsertLoginLog(
+		ctx,
+		db,
+		res.ID,
+		ip,
+		userAgent,
+		&loginType,
+		"SUCCESS",
+	)
 	if err != nil {
 		return nil, err
 	}

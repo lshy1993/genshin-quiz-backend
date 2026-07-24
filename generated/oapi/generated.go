@@ -696,9 +696,20 @@ type PostRegisterUserJSONBody struct {
 	Password string  `json:"password"`
 }
 
+// PostResetPasswordJSONBody defines parameters for PostResetPassword.
+type PostResetPasswordJSONBody struct {
+	Password string `json:"password"`
+	Token    string `json:"token"`
+}
+
+// PostSendVerificationEmailJSONBody defines parameters for PostSendVerificationEmail.
+type PostSendVerificationEmailJSONBody struct {
+	Email openapi_types.Email `json:"email"`
+}
+
 // PostVerifyEmailJSONBody defines parameters for PostVerifyEmail.
 type PostVerifyEmailJSONBody struct {
-	Email openapi_types.Email `json:"email"`
+	Token string `json:"token"`
 }
 
 // GetExamsParams defines parameters for GetExams.
@@ -820,6 +831,12 @@ type PostLoginUserJSONRequestBody PostLoginUserJSONBody
 
 // PostRegisterUserJSONRequestBody defines body for PostRegisterUser for application/json ContentType.
 type PostRegisterUserJSONRequestBody PostRegisterUserJSONBody
+
+// PostResetPasswordJSONRequestBody defines body for PostResetPassword for application/json ContentType.
+type PostResetPasswordJSONRequestBody PostResetPasswordJSONBody
+
+// PostSendVerificationEmailJSONRequestBody defines body for PostSendVerificationEmail for application/json ContentType.
+type PostSendVerificationEmailJSONRequestBody PostSendVerificationEmailJSONBody
 
 // PostVerifyEmailJSONRequestBody defines body for PostVerifyEmail for application/json ContentType.
 type PostVerifyEmailJSONRequestBody PostVerifyEmailJSONBody
@@ -952,6 +969,16 @@ type ClientInterface interface {
 	PostRegisterUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	PostRegisterUser(ctx context.Context, body PostRegisterUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostResetPasswordWithBody request with any body
+	PostResetPasswordWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostResetPassword(ctx context.Context, body PostResetPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostSendVerificationEmailWithBody request with any body
+	PostSendVerificationEmailWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostSendVerificationEmail(ctx context.Context, body PostSendVerificationEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostVerifyEmailWithBody request with any body
 	PostVerifyEmailWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1154,6 +1181,54 @@ func (c *Client) PostRegisterUserWithBody(ctx context.Context, contentType strin
 
 func (c *Client) PostRegisterUser(ctx context.Context, body PostRegisterUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostRegisterUserRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostResetPasswordWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostResetPasswordRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostResetPassword(ctx context.Context, body PostResetPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostResetPasswordRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSendVerificationEmailWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSendVerificationEmailRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSendVerificationEmail(ctx context.Context, body PostSendVerificationEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSendVerificationEmailRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1788,6 +1863,86 @@ func NewPostRegisterUserRequestWithBody(server string, contentType string, body 
 	}
 
 	operationPath := fmt.Sprintf("/auth/register")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostResetPasswordRequest calls the generic PostResetPassword builder with application/json body
+func NewPostResetPasswordRequest(server string, body PostResetPasswordJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostResetPasswordRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostResetPasswordRequestWithBody generates requests for PostResetPassword with any type of body
+func NewPostResetPasswordRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/reset-password")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostSendVerificationEmailRequest calls the generic PostSendVerificationEmail builder with application/json body
+func NewPostSendVerificationEmailRequest(server string, body PostSendVerificationEmailJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostSendVerificationEmailRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostSendVerificationEmailRequestWithBody generates requests for PostSendVerificationEmail with any type of body
+func NewPostSendVerificationEmailRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/send-verification-email")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3297,6 +3452,16 @@ type ClientWithResponsesInterface interface {
 
 	PostRegisterUserWithResponse(ctx context.Context, body PostRegisterUserJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRegisterUserResponse, error)
 
+	// PostResetPasswordWithBodyWithResponse request with any body
+	PostResetPasswordWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostResetPasswordResponse, error)
+
+	PostResetPasswordWithResponse(ctx context.Context, body PostResetPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*PostResetPasswordResponse, error)
+
+	// PostSendVerificationEmailWithBodyWithResponse request with any body
+	PostSendVerificationEmailWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSendVerificationEmailResponse, error)
+
+	PostSendVerificationEmailWithResponse(ctx context.Context, body PostSendVerificationEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSendVerificationEmailResponse, error)
+
 	// PostVerifyEmailWithBodyWithResponse request with any body
 	PostVerifyEmailWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostVerifyEmailResponse, error)
 
@@ -3553,6 +3718,68 @@ func (r PostRegisterUserResponse) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r PostRegisterUserResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type PostResetPasswordResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostResetPasswordResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostResetPasswordResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PostResetPasswordResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type PostSendVerificationEmailResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostSendVerificationEmailResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostSendVerificationEmailResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PostSendVerificationEmailResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -4505,6 +4732,40 @@ func (c *ClientWithResponses) PostRegisterUserWithResponse(ctx context.Context, 
 	return ParsePostRegisterUserResponse(rsp)
 }
 
+// PostResetPasswordWithBodyWithResponse request with arbitrary body returning *PostResetPasswordResponse
+func (c *ClientWithResponses) PostResetPasswordWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostResetPasswordResponse, error) {
+	rsp, err := c.PostResetPasswordWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostResetPasswordResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostResetPasswordWithResponse(ctx context.Context, body PostResetPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*PostResetPasswordResponse, error) {
+	rsp, err := c.PostResetPassword(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostResetPasswordResponse(rsp)
+}
+
+// PostSendVerificationEmailWithBodyWithResponse request with arbitrary body returning *PostSendVerificationEmailResponse
+func (c *ClientWithResponses) PostSendVerificationEmailWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSendVerificationEmailResponse, error) {
+	rsp, err := c.PostSendVerificationEmailWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSendVerificationEmailResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostSendVerificationEmailWithResponse(ctx context.Context, body PostSendVerificationEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSendVerificationEmailResponse, error) {
+	rsp, err := c.PostSendVerificationEmail(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSendVerificationEmailResponse(rsp)
+}
+
 // PostVerifyEmailWithBodyWithResponse request with arbitrary body returning *PostVerifyEmailResponse
 func (c *ClientWithResponses) PostVerifyEmailWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostVerifyEmailResponse, error) {
 	rsp, err := c.PostVerifyEmailWithBody(ctx, contentType, body, reqEditors...)
@@ -5009,6 +5270,72 @@ func ParsePostRegisterUserResponse(rsp *http.Response) (*PostRegisterUserRespons
 		}
 		response.JSON201 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostResetPasswordResponse parses an HTTP response from a PostResetPasswordWithResponse call
+func ParsePostResetPasswordResponse(rsp *http.Response) (*PostResetPasswordResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostResetPasswordResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostSendVerificationEmailResponse parses an HTTP response from a PostSendVerificationEmailWithResponse call
+func ParsePostSendVerificationEmailResponse(rsp *http.Response) (*PostSendVerificationEmailResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostSendVerificationEmailResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest BadRequest
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -6260,6 +6587,12 @@ type ServerInterface interface {
 	// Register a new user
 	// (POST /auth/register)
 	PostRegisterUser(w http.ResponseWriter, r *http.Request)
+	// Reset password
+	// (POST /auth/reset-password)
+	PostResetPassword(w http.ResponseWriter, r *http.Request)
+	// Send verification email
+	// (POST /auth/send-verification-email)
+	PostSendVerificationEmail(w http.ResponseWriter, r *http.Request)
 	// Verify email address
 	// (POST /auth/verify-email)
 	PostVerifyEmail(w http.ResponseWriter, r *http.Request)
@@ -6371,6 +6704,18 @@ func (_ Unimplemented) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 // Register a new user
 // (POST /auth/register)
 func (_ Unimplemented) PostRegisterUser(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Reset password
+// (POST /auth/reset-password)
+func (_ Unimplemented) PostResetPassword(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Send verification email
+// (POST /auth/send-verification-email)
+func (_ Unimplemented) PostSendVerificationEmail(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -6600,6 +6945,34 @@ func (siw *ServerInterfaceWrapper) PostRegisterUser(w http.ResponseWriter, r *ht
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PostRegisterUser(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostResetPassword operation middleware
+func (siw *ServerInterfaceWrapper) PostResetPassword(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostResetPassword(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostSendVerificationEmail operation middleware
+func (siw *ServerInterfaceWrapper) PostSendVerificationEmail(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostSendVerificationEmail(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -7739,6 +8112,12 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Post(options.BaseURL+"/auth/register", wrapper.PostRegisterUser)
 	})
 	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/auth/reset-password", wrapper.PostResetPassword)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/auth/send-verification-email", wrapper.PostSendVerificationEmail)
+	})
+	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/auth/verify-email", wrapper.PostVerifyEmail)
 	})
 	r.Group(func(r chi.Router) {
@@ -8086,6 +8465,98 @@ type PostRegisterUser500JSONResponse struct {
 }
 
 func (response PostRegisterUser500JSONResponse) VisitPostRegisterUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostResetPasswordRequestObject struct {
+	Body *PostResetPasswordJSONRequestBody
+}
+
+type PostResetPasswordResponseObject interface {
+	VisitPostResetPasswordResponse(w http.ResponseWriter) error
+}
+
+type PostResetPassword200Response struct {
+}
+
+func (response PostResetPassword200Response) VisitPostResetPasswordResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type PostResetPassword400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostResetPassword400JSONResponse) VisitPostResetPasswordResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostResetPassword500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostResetPassword500JSONResponse) VisitPostResetPasswordResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostSendVerificationEmailRequestObject struct {
+	Body *PostSendVerificationEmailJSONRequestBody
+}
+
+type PostSendVerificationEmailResponseObject interface {
+	VisitPostSendVerificationEmailResponse(w http.ResponseWriter) error
+}
+
+type PostSendVerificationEmail200Response struct {
+}
+
+func (response PostSendVerificationEmail200Response) VisitPostSendVerificationEmailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type PostSendVerificationEmail400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostSendVerificationEmail400JSONResponse) VisitPostSendVerificationEmailResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostSendVerificationEmail500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostSendVerificationEmail500JSONResponse) VisitPostSendVerificationEmailResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -9874,6 +10345,12 @@ type StrictServerInterface interface {
 	// Register a new user
 	// (POST /auth/register)
 	PostRegisterUser(ctx context.Context, request PostRegisterUserRequestObject) (PostRegisterUserResponseObject, error)
+	// Reset password
+	// (POST /auth/reset-password)
+	PostResetPassword(ctx context.Context, request PostResetPasswordRequestObject) (PostResetPasswordResponseObject, error)
+	// Send verification email
+	// (POST /auth/send-verification-email)
+	PostSendVerificationEmail(ctx context.Context, request PostSendVerificationEmailRequestObject) (PostSendVerificationEmailResponseObject, error)
 	// Verify email address
 	// (POST /auth/verify-email)
 	PostVerifyEmail(ctx context.Context, request PostVerifyEmailRequestObject) (PostVerifyEmailResponseObject, error)
@@ -10124,6 +10601,68 @@ func (sh *strictHandler) PostRegisterUser(w http.ResponseWriter, r *http.Request
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(PostRegisterUserResponseObject); ok {
 		if err := validResponse.VisitPostRegisterUserResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostResetPassword operation middleware
+func (sh *strictHandler) PostResetPassword(w http.ResponseWriter, r *http.Request) {
+	var request PostResetPasswordRequestObject
+
+	var body PostResetPasswordJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostResetPassword(ctx, request.(PostResetPasswordRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostResetPassword")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostResetPasswordResponseObject); ok {
+		if err := validResponse.VisitPostResetPasswordResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostSendVerificationEmail operation middleware
+func (sh *strictHandler) PostSendVerificationEmail(w http.ResponseWriter, r *http.Request) {
+	var request PostSendVerificationEmailRequestObject
+
+	var body PostSendVerificationEmailJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostSendVerificationEmail(ctx, request.(PostSendVerificationEmailRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostSendVerificationEmail")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostSendVerificationEmailResponseObject); ok {
+		if err := validResponse.VisitPostSendVerificationEmailResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

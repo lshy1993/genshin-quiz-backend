@@ -1,6 +1,9 @@
 package util
 
 import (
+	"net/url"
+	"strings"
+
 	"github.com/google/uuid"
 
 	pg "github.com/go-jet/jet/v2/postgres"
@@ -42,4 +45,27 @@ func GetDefaultLanguageFromString(language *string) string {
 		return *language
 	}
 	return "zh" // 默认中文
+}
+
+func buildAuthLink(domain, basePath, rawToken string) string {
+	domain = strings.TrimSuffix(domain, "/")
+	u, err := url.Parse(domain + basePath)
+	if err != nil {
+		// 一般静态路径解析不会报错，如果报错属于程序 Bug
+		panic(err)
+	}
+
+	q := u.Query()
+	q.Set("token", rawToken)
+	u.RawQuery = q.Encode()
+
+	return u.String()
+}
+
+func GenerateResetLink(domain, rawToken string) string {
+	return buildAuthLink(domain, "/reset-password", rawToken)
+}
+
+func GenerateEmailVerifyLink(domain, rawToken string) string {
+	return buildAuthLink(domain, "/verify-email", rawToken)
 }

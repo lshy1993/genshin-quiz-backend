@@ -41,6 +41,7 @@ type AppConfig struct {
 	Environment string
 	Version     string
 	SentryDSN   string
+	Domain      string
 }
 
 type DatabaseConfig struct {
@@ -223,6 +224,7 @@ func NewApp() *App {
 			Environment: getEnv("ENVIRONMENT", "development"),
 			Version:     getEnv("VERSION", "dev"),
 			SentryDSN:   getEnv("SENTRY_DSN", ""),
+			Domain:      getEnv("APP_DOMAIN", "http://localhost:3000"),
 		},
 
 		Database: DatabaseConfig{

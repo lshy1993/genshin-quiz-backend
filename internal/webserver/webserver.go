@@ -39,7 +39,7 @@ func NewServer(app *config.App) *Server {
 
 	// Basic middleware
 	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
+	r.Use(mw.SecureRealIP)
 	r.Use(mw.Logger(app.Logger))
 
 	// 使用自定义的错误处理中间件，替代 chi 的 Recoverer
