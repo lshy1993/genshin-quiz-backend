@@ -11,11 +11,11 @@ import (
 	"genshin-quiz/internal/webserver/middleware"
 )
 
-func GetVotes(
+func GetPolls(
 	ctx context.Context,
 	app *config.App,
-	req oapi.GetVotesRequestObject,
-) (*oapi.GetVotes200JSONResponse, error) {
+	req oapi.GetPollsRequestObject,
+) (*oapi.GetPolls200JSONResponse, error) {
 	// 设置默认值
 	page := 1
 	if req.Params.Page != nil {
@@ -79,7 +79,7 @@ func GetVotes(
 	}
 
 	// 转换为 DTO
-	dtos := make([]oapi.Vote, 0, len(result.Votes))
+	dtos := make([]oapi.Poll, 0, len(result.Votes))
 	for _, vote := range result.Votes {
 		// 覆盖投票的点赞数为实时计算的值
 		vote.Vote.LikesCount = likesCountMap[vote.Vote.ID]
@@ -116,8 +116,8 @@ func GetVotes(
 		dtos = append(dtos, dto)
 	}
 
-	return &oapi.GetVotes200JSONResponse{
+	return &oapi.GetPolls200JSONResponse{
 		Total: result.Total,
-		Votes: dtos,
+		Polls: dtos,
 	}, nil
 }

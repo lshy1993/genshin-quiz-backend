@@ -8,7 +8,7 @@ import (
 func UserModelToDTO(
 	user model.Users,
 	login model.UserLoginLogs,
-) oapi.User {
+) oapi.UserPrivate {
 	nickName := ""
 	if user.DisplayName != nil {
 		nickName = *user.DisplayName
@@ -22,18 +22,18 @@ func UserModelToDTO(
 		country = *user.Country
 	}
 
-	return oapi.User{
+	return oapi.UserPrivate{
 		Uuid:             user.UserUUID,
 		Nickname:         nickName,
 		AvatarUrl:        avatarURL,
-		Country:          country,
-		RegisteredIp:     user.CreatedIP,
+		Country:          &country,
+		RegisteredIp:     *user.CreatedIP,
 		RegisteredAt:     user.CreatedAt,
 		LastLoginIp:      &login.IPAddress,
 		LastLoginAt:      login.LoginAt,
 		QuestionsCreated: 0,
 		TotalAnswers:     0,
 		CorrectAnswers:   0,
-		Votes:            0,
+		PollsCreated:     0,
 	}
 }

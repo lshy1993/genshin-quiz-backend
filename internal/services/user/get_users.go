@@ -45,7 +45,7 @@ func GetUsers(
 		return nil, err
 	}
 
-	users := make([]oapi.User, 0, len(result.Users))
+	users := make([]oapi.UserPublic, 0, len(result.Users))
 	for _, row := range result.Users {
 		userInfo := row.User
 		avatarURL := ""
@@ -62,19 +62,18 @@ func GetUsers(
 		}
 		likesReceived := int(row.LikesReceived)
 
-		users = append(users, oapi.User{
+		users = append(users, oapi.UserPublic{
 			Uuid:             userInfo.UserUUID,
 			AvatarUrl:        avatarURL,
-			Country:          country,
-			Language:         userInfo.Language,
-			LastLoginAt:      userInfo.CreatedAt,
+			Country:          &country,
+			Language:         *userInfo.Language,
 			Nickname:         nickname,
 			RegisteredAt:     userInfo.CreatedAt,
 			QuestionsCreated: int(userInfo.QuestionsCreated),
 			TotalAnswers:     int(userInfo.TotalSubmissions),
 			CorrectAnswers:   int(userInfo.CorrectSubmissions),
 			LikesReceived:    likesReceived,
-			Votes:            int(userInfo.TotalVotes),
+			PollsCreated:     int(userInfo.TotalVotes),
 		})
 	}
 

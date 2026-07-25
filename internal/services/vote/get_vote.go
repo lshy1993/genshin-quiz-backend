@@ -13,11 +13,11 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-func GetVote(
+func GetPoll(
 	ctx context.Context,
 	app *config.App,
-	req oapi.GetVoteRequestObject,
-) (*oapi.GetVote200JSONResponse, error) {
+	req oapi.GetPollRequestObject,
+) (*oapi.GetPoll200JSONResponse, error) {
 	// 调用仓库层获取投票详情（使用默认语言）
 	res, err := vote_repo.GetVoteByUUID(ctx, app.DB, req.Id, nil)
 	if err != nil {
@@ -60,7 +60,7 @@ func GetVote(
 	detailedVote.Vote.LikesCount = likesCount
 
 	// 检查用户是否已登录，如果已登录则获取用户的投票记录和点赞状态
-	votedOptions := []oapi.VoteSubmissionOption{}
+	votedOptions := []oapi.PollVote{}
 	likeStatus := int16(0)
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if ok {
@@ -79,7 +79,7 @@ func GetVote(
 		// 构建VoteSubmissionOption数组
 		for _, uv := range *userVotes {
 			if optionUUID, exists := optionIDToUUID[uv.OptionID]; exists {
-				votedOptions = append(votedOptions, oapi.VoteSubmissionOption{
+				votedOptions = append(votedOptions, oapi.PollVote{
 					OptionId: optionUUID,
 					Votes:    int(uv.VoteCount),
 				})
@@ -105,6 +105,6 @@ func GetVote(
 	// 转换为 DTO
 	dto := transformer.ConvertDetailedVoteToDTO(detailedVote, votedOptions, likeStatus)
 
-	response := oapi.GetVote200JSONResponse(dto)
+	response := oapi.GetPoll200JSONResponse(dto)
 	return &response, nil
 }

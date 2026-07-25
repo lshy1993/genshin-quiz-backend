@@ -58,8 +58,8 @@ func GetHome(
 		userClaims = claims
 	}
 
-	latestVotes := make([]oapi.Vote, 0, len(voteResult.Votes))
-	popularVotes := make([]oapi.Vote, 0, len(voteResult.Votes))
+	latestVotes := make([]oapi.Poll, 0, len(voteResult.Votes))
+	popularVotes := make([]oapi.Poll, 0, len(voteResult.Votes))
 	for _, vote := range voteResult.Votes {
 		voted := false
 		likeStatus := int16(0)
@@ -93,7 +93,7 @@ func GetHome(
 	return &oapi.GetHome200JSONResponse{
 		PopularExams:    []oapi.Exam{},
 		LatestQuestions: latestQuestions,
-		LatestVotes:     latestVotes,
-		PopularVotes:    popularVotes,
+		LatestPolls:     latestVotes,
+		PopularPolls:    popularVotes,
 	}, nil
 }

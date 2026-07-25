@@ -373,6 +373,7 @@ func GetQuestionSubmissions(
 
 	stmt := pg.SELECT(
 		submissionsTbl.AllColumns,
+		userTbl.UserUUID.AS("user_id"),
 		userTbl.DisplayName.AS("user_name"),
 	).FROM(
 		submissionsTbl.
@@ -386,6 +387,7 @@ func GetQuestionSubmissions(
 
 	var results []struct {
 		model.QuestionSubmissions
+		UserID   string `db:"user_id"`
 		UserName string `db:"user_name"`
 	}
 	err := stmt.QueryContext(ctx, db, &results)

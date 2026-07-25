@@ -13,10 +13,10 @@ import (
 	"genshin-quiz/internal/webserver/middleware"
 )
 
-func PostLikeVote(
+func PostLikePoll(
 	ctx context.Context,
 	app *config.App,
-	req oapi.PostLikeVoteRequestObject,
+	req oapi.PostLikePollRequestObject,
 ) error {
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if !ok {

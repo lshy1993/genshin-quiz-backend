@@ -81,16 +81,13 @@ func PostCreateQuestion(
 	// 选项生成数据
 	optionModels := make([]model.QuestionOptions, 0, len(req.Body.Options))
 	for _, option := range req.Body.Options {
-		isAnswer := false
-		if option.IsAnswer != nil {
-			isAnswer = *option.IsAnswer
-		}
+		isAnswer := option.IsAnswer
 
 		optionModel := model.QuestionOptions{
 			QuestionID: createdQuestion.ID,
 			OptionUUID: uuid.New(),
-			OptionType: model.QuestionOptionType(option.Type),
-			ImgURL:     option.Image,
+			OptionType: model.QuestionOptionType(option.OptionType),
+			ImgURL:     option.MediaUrl,
 			IsAnswer:   isAnswer,
 			CreatedAt:  now,
 		}
@@ -137,12 +134,12 @@ func PostCreateQuestion(
 
 	// Convert to API response format
 	response := oapi.PostCreateQuestion201JSONResponse{
-		Category:     oapi.QuestionCategory(createdQuestion.Category),
-		Difficulty:   oapi.QuestionDifficulty(createdQuestion.Difficulty),
+		Category:     oapi.Category(createdQuestion.Category),
+		Difficulty:   oapi.Difficulty(createdQuestion.Difficulty),
 		QuestionType: oapi.QuestionType(createdQuestion.QuestionType),
-		QuestionText: req.Body.QuestionText,   // 直接使用请求中的翻译数据
-		Explanation:  req.Body.Explanation,    // 直接使用请求中的解释数据
-		Options:      []oapi.QuestionOption{}, // Add options
+		QuestionText: req.Body.QuestionText,                // 直接使用请求中的翻译数据
+		Explanation:  req.Body.Explanation,                 // 直接使用请求中的解释数据
+		Options:      []oapi.CreateQuestionOptionRequest{}, // Add options
 		Public:       createdQuestion.Public,
 	}
 

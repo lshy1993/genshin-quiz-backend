@@ -33,6 +33,7 @@ func GetQuestionRecentSubmissions(
 			SubmittedAt: submission.CreatedAt,
 			TimeSpent:   timeSpent,
 			UserName:    submission.UserName,
+			UserId:      submission.UserID,
 		}
 		dtos = append(dtos, dto)
 	}

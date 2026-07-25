@@ -19,8 +19,8 @@ import (
 func PostVote(
 	ctx context.Context,
 	app *config.App,
-	req oapi.PostVoteRequestObject,
-) (oapi.PostVoteResponseObject, error) {
+	req oapi.PostVotePollRequestObject,
+) (oapi.PostVotePollResponseObject, error) {
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if !ok {
 		return nil, common.ErrUserNotInContext
@@ -53,7 +53,7 @@ func PostVote(
 		return nil, err
 	}
 
-	return oapi.PostVote200Response{}, nil
+	return oapi.PostVotePoll200Response{}, nil
 }
 
 func validateVoteTime(vote model.Votes) error {
@@ -68,7 +68,7 @@ func validateVoteTime(vote model.Votes) error {
 }
 
 func validateAndParseVotes(
-	submittedOptions []oapi.VoteSubmissionOption,
+	submittedOptions []oapi.PollVote,
 	voteOptions []model.VoteOptions,
 	vote model.Votes,
 ) (map[int64]int32, error) {

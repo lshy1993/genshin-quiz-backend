@@ -12,13 +12,10 @@ func ConvertSimpleVoteToDTO(
 	vote dao.SimpleVote,
 	voted bool,
 	likeStatus int16,
-) oapi.Vote {
-	// 判断是否已过期
-	expired := vote.Vote.ExpiresAt != nil && vote.Vote.ExpiresAt.Before(time.Now())
-
+) oapi.Poll {
 	// 构建多语言标题和描述（简单模式只有一种语言）
 	title := make(map[string]string)
-	description := make(map[string]string)
+	description := make(oapi.LocalizedText)
 	title[vote.Translation.Language] = vote.Translation.Title
 	if vote.Translation.Description != nil {
 		description[vote.Translation.Language] = *vote.Translation.Description
@@ -40,42 +37,37 @@ func ConvertSimpleVoteToDTO(
 		expireAt = vote.Vote.ExpiresAt
 	}
 
-	likeStatusValue := oapi.VoteLikeStatus(likeStatus)
+	likeStatusValue := oapi.LikeStatus(likeStatus)
 
-	return oapi.Vote{
-		Id:             vote.Vote.VoteUUID,
-		Public:         vote.Vote.Public,
-		Title:          title,
-		Description:    &description,
-		Category:       oapi.QuestionCategory(vote.Vote.Category),
-		StartAt:        vote.Vote.StartAt,
-		ExpireAt:       expireAt,
-		Expired:        expired,
-		Voted:          voted,
-		VotedOptions:   nil, // 简单模式不返回
-		VotesPerUser:   votesPerUser,
-		VotesPerOption: *votesPerOption,
-		Options:        nil, // 简单模式不返回选项
-		Participants:   &participants,
-		TotalVotes:     &totalVotes,
-		CreatedBy:      vote.User.UserUUID,
-		CreatedAt:      vote.Vote.CreatedAt,
-		Likes:          &likes,
-		LikeStatus:     &likeStatusValue,
+	return oapi.Poll{
+		Id:                vote.Vote.VoteUUID,
+		Public:            vote.Vote.Public,
+		Title:             title,
+		Description:       &description,
+		Category:          oapi.Category(vote.Vote.Category),
+		StartAt:           vote.Vote.StartAt,
+		ExpireAt:          expireAt,
+		MyVotes:           nil, // 简单模式不返回
+		VotesPerUser:      votesPerUser,
+		VotesPerOption:    *votesPerOption,
+		Options:           nil, // 简单模式不返回选项
+		ParticipantsCount: participants,
+		TotalVotesCount:   totalVotes,
+		CreatedBy:         vote.User.UserUUID,
+		CreatedAt:         vote.Vote.CreatedAt,
+		LikesCount:        likes,
+		LikeStatus:        likeStatusValue,
 	}
 }
 
 func ConvertDetailedVoteToDTO(
 	vote dao.DetailedVote,
-	votedOptions []oapi.VoteSubmissionOption,
+	votedOptions []oapi.PollVote,
 	likeStatus int16,
-) oapi.Vote {
-	// 判断是否已过期
-	expired := vote.Vote.ExpiresAt != nil && vote.Vote.ExpiresAt.Before(time.Now())
-
+) oapi.Poll {
 	// 构建多语言标题和描述
-	title := make(map[string]string)
-	description := make(map[string]string)
+	title := make(oapi.LocalizedText)
+	description := make(oapi.LocalizedText)
 
 	// 检查是否有翻译数据
 	if vote.Translation.Language != "" {
@@ -95,22 +87,22 @@ func ConvertDetailedVoteToDTO(
 	}
 
 	// 转换选项
-	options := make([]oapi.VoteOption, 0, len(vote.Options))
+	options := make([]oapi.PollOption, 0, len(vote.Options))
 	for _, opt := range vote.Options {
 		votes := int(opt.VoteCount)
 		optionUUID := opt.OptionUUID
 
 		// 获取该选项的多语言文本
-		var optionText *map[string]string
+		var optionText oapi.LocalizedText
 		if texts, ok := optionTranslationsMap[opt.ID]; ok && len(texts) > 0 {
-			optionText = &texts
+			optionText = texts
 		}
 
-		options = append(options, oapi.VoteOption{
-			Id:    &optionUUID,
-			Text:  optionText,
-			Type:  oapi.VoteOptionType("text"), // 默认文本类型，根据实际情况调整
-			Votes: &votes,
+		options = append(options, oapi.PollOption{
+			Id:         optionUUID,
+			Text:       optionText,
+			OptionType: oapi.OptionType("text"), // 默认文本类型，根据实际情况调整
+			VotesCount: &votes,
 		})
 	}
 
@@ -133,27 +125,25 @@ func ConvertDetailedVoteToDTO(
 		expireAt = vote.Vote.ExpiresAt
 	}
 
-	likeStatusValue := oapi.VoteLikeStatus(likeStatus)
+	likeStatusValue := oapi.LikeStatus(likeStatus)
 
-	return oapi.Vote{
-		Id:             vote.Vote.VoteUUID,
-		Public:         vote.Vote.Public,
-		Title:          title,
-		Description:    &description,
-		Category:       oapi.QuestionCategory(vote.Vote.Category),
-		StartAt:        vote.Vote.StartAt,
-		ExpireAt:       expireAt,
-		Expired:        expired,
-		Voted:          len(votedOptions) > 0,
-		VotedOptions:   votedOptions,
-		VotesPerUser:   votesPerUser,
-		VotesPerOption: *votesPerOption,
-		Options:        options,
-		Participants:   &participants,
-		TotalVotes:     &totalVotes,
-		CreatedBy:      vote.User.UserUUID,
-		CreatedAt:      vote.Vote.CreatedAt,
-		Likes:          &likes,
-		LikeStatus:     &likeStatusValue,
+	return oapi.Poll{
+		Id:                vote.Vote.VoteUUID,
+		Public:            vote.Vote.Public,
+		Title:             title,
+		Description:       &description,
+		Category:          oapi.Category(vote.Vote.Category),
+		StartAt:           vote.Vote.StartAt,
+		ExpireAt:          expireAt,
+		MyVotes:           votedOptions,
+		VotesPerUser:      votesPerUser,
+		VotesPerOption:    *votesPerOption,
+		Options:           options,
+		ParticipantsCount: participants,
+		TotalVotesCount:   totalVotes,
+		CreatedBy:         vote.User.UserUUID,
+		CreatedAt:         vote.Vote.CreatedAt,
+		LikesCount:        likes,
+		LikeStatus:        likeStatusValue,
 	}
 }

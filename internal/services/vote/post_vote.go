@@ -14,11 +14,11 @@ import (
 	"github.com/google/uuid"
 )
 
-func PostCreateVote(
+func PostCreatePoll(
 	ctx context.Context,
 	app *config.App,
-	req oapi.PostCreateVoteRequestObject,
-) (oapi.PostCreateVoteResponseObject, error) {
+	req oapi.PostCreatePollRequestObject,
+) (oapi.PostCreatePollResponseObject, error) {
 	// 从 context 中获取用户信息
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if !ok {
@@ -65,19 +65,19 @@ func PostCreateVote(
 	}
 
 	// Convert to API response format
-	response := oapi.PostCreateVote201JSONResponse{
-		Category:    oapi.QuestionCategory(createdVote.Category),
+	response := oapi.PostCreatePoll201JSONResponse{
+		Category:    oapi.Category(createdVote.Category),
 		Public:      createdVote.Public,
 		Title:       req.Body.Title,       // 直接使用请求中的翻译数据
 		Description: req.Body.Description, // 直接使用请求中的解释数据
-		Options:     []oapi.VoteOption{},  // Add options
+		Options:     []oapi.PollOption{},  // Add options
 	}
 
 	return response, nil
 }
 
 func genInsertModel(
-	req oapi.PostCreateVoteRequestObject,
+	req oapi.PostCreatePollRequestObject,
 	userID int64,
 	now time.Time,
 ) model.Votes {
@@ -85,11 +85,7 @@ func genInsertModel(
 	if req.Body.ExpireAt != nil {
 		expiredTime = req.Body.ExpireAt
 	}
-	var votesPerOption *int32
-	if req.Body.VotesPerOption != nil {
-		votesPerOption = new(int32)
-		*votesPerOption = int32(*req.Body.VotesPerOption)
-	}
+	votesPerOption := int32(req.Body.VotesPerOption)
 
 	// 投票主体
 	insertModel := model.Votes{
@@ -99,7 +95,7 @@ func genInsertModel(
 		StartAt:           req.Body.StartAt,
 		ExpiresAt:         expiredTime,
 		VotesPerUser:      int32(req.Body.VotesPerUser),
-		VotesPerOption:    votesPerOption,
+		VotesPerOption:    &votesPerOption,
 		CreatedBy:         userID, // 使用从 JWT 获取的用户 ID
 		CreatedAt:         now,
 		LikesCount:        0, // 初始化点赞数为 0
@@ -110,7 +106,7 @@ func genInsertModel(
 }
 
 func genTranslationModels(
-	req oapi.PostCreateVoteRequestObject,
+	req oapi.PostCreatePollRequestObject,
 	voteID int64,
 	now time.Time,
 ) []model.VoteTranslations {
@@ -146,7 +142,7 @@ func genTranslationModels(
 }
 
 func genOptionModels(
-	req oapi.PostCreateVoteRequestObject,
+	req oapi.PostCreatePollRequestObject,
 	voteID int64,
 	now time.Time,
 ) []model.VoteOptions {
@@ -166,7 +162,7 @@ func genOptionModels(
 
 func genOptionTranslationModels(
 	insertedOptions []model.VoteOptions,
-	req oapi.PostCreateVoteRequestObject,
+	req oapi.PostCreatePollRequestObject,
 	now time.Time,
 ) []model.VoteOptionTranslations {
 	// 生成选项的翻译数据
@@ -178,7 +174,7 @@ func genOptionTranslationModels(
 	for i, option := range insertedOptions {
 		source := req.Body.Options[i]
 		// 为每个选项创建翻译记录
-		for lang, text := range *source.Text {
+		for lang, text := range source.Text {
 			optionTransModel := model.VoteOptionTranslations{
 				OptionID:   option.ID,
 				Language:   lang,

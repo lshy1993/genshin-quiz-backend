@@ -7,43 +7,43 @@ import (
 	services "genshin-quiz/internal/services/vote"
 )
 
-func (h *Handler) GetVotes(
+func (h *Handler) GetPolls(
 	ctx context.Context,
-	req oapi.GetVotesRequestObject,
-) (oapi.GetVotesResponseObject, error) {
-	res, err := services.GetVotes(ctx, h.app, req)
+	req oapi.GetPollsRequestObject,
+) (oapi.GetPollsResponseObject, error) {
+	res, err := services.GetPolls(ctx, h.app, req)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (h *Handler) GetVote(
+func (h *Handler) GetPoll(
 	ctx context.Context,
-	req oapi.GetVoteRequestObject,
-) (oapi.GetVoteResponseObject, error) {
-	res, err := services.GetVote(ctx, h.app, req)
+	req oapi.GetPollRequestObject,
+) (oapi.GetPollResponseObject, error) {
+	res, err := services.GetPoll(ctx, h.app, req)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (h *Handler) PostCreateVote(
+func (h *Handler) PostCreatePoll(
 	ctx context.Context,
-	req oapi.PostCreateVoteRequestObject,
-) (oapi.PostCreateVoteResponseObject, error) {
-	res, err := services.PostCreateVote(ctx, h.app, req)
+	req oapi.PostCreatePollRequestObject,
+) (oapi.PostCreatePollResponseObject, error) {
+	res, err := services.PostCreatePoll(ctx, h.app, req)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (h *Handler) PostVote(
+func (h *Handler) PostVotePoll(
 	ctx context.Context,
-	req oapi.PostVoteRequestObject,
-) (oapi.PostVoteResponseObject, error) {
+	req oapi.PostVotePollRequestObject,
+) (oapi.PostVotePollResponseObject, error) {
 	res, err := services.PostVote(ctx, h.app, req)
 	if err != nil {
 		return nil, err
@@ -51,13 +51,13 @@ func (h *Handler) PostVote(
 	return res, nil
 }
 
-func (h *Handler) PostLikeVote(
+func (h *Handler) PostLikePoll(
 	ctx context.Context,
-	req oapi.PostLikeVoteRequestObject,
-) (oapi.PostLikeVoteResponseObject, error) {
-	err := services.PostLikeVote(ctx, h.app, req)
+	req oapi.PostLikePollRequestObject,
+) (oapi.PostLikePollResponseObject, error) {
+	err := services.PostLikePoll(ctx, h.app, req)
 	if err != nil {
 		return nil, err
 	}
-	return oapi.PostLikeVote201Response{}, nil
+	return oapi.PostLikePoll201Response{}, nil
 }

@@ -13,7 +13,7 @@ func GetMe(
 	ctx context.Context,
 	app *config.App,
 	req oapi.GetCurrentUserRequestObject,
-) (*oapi.User, error) {
+) (*oapi.UserPrivate, error) {
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if !ok {
 		return nil, common.ErrUserNotInContext
@@ -38,11 +38,11 @@ func GetMe(
 		displayName = *userInfo.DisplayName
 	}
 
-	return &oapi.User{
+	return &oapi.UserPrivate{
 		Uuid:             userInfo.UserUUID,
 		AvatarUrl:        avatar,
-		Country:          country,
-		Language:         userInfo.Language,
+		Country:          &country,
+		Language:         *userInfo.Language,
 		LastLoginAt:      userInfo.CreatedAt,
 		LastLoginIp:      nil,
 		Nickname:         displayName,
@@ -50,6 +50,6 @@ func GetMe(
 		QuestionsCreated: int(userInfo.QuestionsCreated),
 		TotalAnswers:     int(userInfo.TotalSubmissions),
 		CorrectAnswers:   int(userInfo.CorrectSubmissions),
-		Votes:            int(userInfo.TotalVotes),
+		PollsCreated:     int(userInfo.TotalVotes),
 	}, nil
 }

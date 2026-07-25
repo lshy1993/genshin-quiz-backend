@@ -13,14 +13,14 @@ func UpdateUser(
 	ctx context.Context,
 	app *config.App,
 	req oapi.UpdateUserRequestObject,
-) (*oapi.User, error) {
+) (*oapi.UserPrivate, error) {
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if !ok {
 		return nil, common.ErrUserNotInContext
 	}
 
 	// 获取目标用户信息
-	existing, err := user_repo.GetUserInfoByUUID(ctx, app.DB, req.Id)
+	existing, err := user_repo.GetUserInfoByUUID(ctx, app.DB, req.Body.Uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -39,16 +39,16 @@ func UpdateUser(
 		existing.AvatarURL = &avatarURL
 
 		country := req.Body.Country
-		existing.Country = &country
+		existing.Country = country
 
 		language := req.Body.Language
-		existing.Language = language
+		existing.Language = &language
 
 		gender := req.Body.Gender
 		existing.Gender = (*string)(gender)
 
 		bio := req.Body.Bio
-		existing.Biography = bio
+		existing.Biography = &bio
 	}
 
 	updated, err := user_repo.Update(ctx, app.DB, *existing)
@@ -70,22 +70,26 @@ func UpdateUser(
 	}
 
 	emailVerified := false
+	var emailVisibility oapi.Visibility
+	if updated.ShowEmail {
+		emailVisibility = ""
+	}
 
-	return &oapi.User{
+	return &oapi.UserPrivate{
 		Uuid:             updated.UserUUID,
 		AvatarUrl:        avatarURL,
-		Country:          country,
-		Language:         updated.Language,
-		Gender:           (*oapi.UserGender)(updated.Gender),
-		Bio:              updated.Biography,
-		EmailVerified:    &emailVerified,
-		EmailPublic:      &updated.ShowEmail,
+		Country:          &country,
+		Language:         *updated.Language,
+		Gender:           (*oapi.UserPrivateGender)(updated.Gender),
+		Bio:              *updated.Biography,
+		EmailVerified:    emailVerified,
+		EmailVisibility:  emailVisibility,
 		LastLoginAt:      updated.UpdatedAt,
 		Nickname:         displayName,
 		RegisteredAt:     updated.CreatedAt,
 		QuestionsCreated: int(updated.QuestionsCreated),
 		TotalAnswers:     int(updated.TotalSubmissions),
 		CorrectAnswers:   int(updated.CorrectSubmissions),
-		Votes:            int(updated.TotalVotes),
+		PollsCreated:     int(updated.TotalVotes),
 	}, nil
 }

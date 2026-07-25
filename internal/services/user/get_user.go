@@ -11,7 +11,7 @@ func GetUser(
 	ctx context.Context,
 	app *config.App,
 	req oapi.GetUserRequestObject,
-) (*oapi.User, error) {
+) (*oapi.UserPublic, error) {
 	// 根据UUID获取用户信息
 	userInfo, err := user_repo.GetUserInfoByUUID(ctx, app.DB, req.Id)
 	if err != nil {
@@ -39,17 +39,16 @@ func GetUser(
 		language = userInfo.Language
 	}
 
-	return &oapi.User{
+	return &oapi.UserPublic{
 		Uuid:             userInfo.UserUUID,
 		AvatarUrl:        avatarURL,
-		Country:          country,
-		Language:         language,
-		LastLoginAt:      userInfo.CreatedAt,
+		Country:          &country,
+		Language:         *language,
 		Nickname:         nickname,
 		RegisteredAt:     userInfo.CreatedAt,
 		QuestionsCreated: int(userInfo.QuestionsCreated),
 		TotalAnswers:     int(userInfo.TotalSubmissions),
 		CorrectAnswers:   int(userInfo.CorrectSubmissions),
-		Votes:            int(userInfo.TotalVotes),
+		PollsCreated:     int(userInfo.TotalVotes),
 	}, nil
 }
