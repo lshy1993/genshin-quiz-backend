@@ -138,7 +138,10 @@ func GetPasswordByEmail(
 ) (*dao.UserInfoWithAuth, error) {
 	tbl := table.Users
 	authTbl := table.UserCredentials
-	stmt := pg.SELECT(tbl.AllColumns, authTbl.Credential.AS("PasswordHash")).
+	stmt := pg.SELECT(
+		tbl.AllColumns,
+		authTbl.Credential,
+	).
 		FROM(tbl.LEFT_JOIN(
 			authTbl,
 			tbl.ID.EQ(authTbl.UserID).

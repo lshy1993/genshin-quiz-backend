@@ -12,3 +12,16 @@ const (
 func (t TokenType) String() string {
 	return string(t)
 }
+
+type Environment string
+
+const (
+	DEV  Environment = "develop"
+	TEST Environment = "testing"
+	// STG  Environment = "staging"
+	PROD Environment = "production"
+)
+
+func (t Environment) String() string {
+	return string(t)
+}

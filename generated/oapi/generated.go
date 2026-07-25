@@ -167,21 +167,21 @@ func (e QuestionType) Valid() bool {
 	}
 }
 
-// Defines values for UserSexuality.
+// Defines values for UserGender.
 const (
-	UserSexualityFemale UserSexuality = "female"
-	UserSexualityMale   UserSexuality = "male"
-	UserSexualityOther  UserSexuality = "other"
+	UserGenderFemale UserGender = "female"
+	UserGenderMale   UserGender = "male"
+	UserGenderOther  UserGender = "other"
 )
 
-// Valid indicates whether the value is a known member of the UserSexuality enum.
-func (e UserSexuality) Valid() bool {
+// Valid indicates whether the value is a known member of the UserGender enum.
+func (e UserGender) Valid() bool {
 	switch e {
-	case UserSexualityFemale:
+	case UserGenderFemale:
 		return true
-	case UserSexualityMale:
+	case UserGenderMale:
 		return true
-	case UserSexualityOther:
+	case UserGenderOther:
 		return true
 	default:
 		return false
@@ -529,6 +529,7 @@ type User struct {
 	Email          *openapi_types.Email `json:"email,omitempty"`
 	EmailPublic    *bool                `json:"email_public,omitempty"`
 	EmailVerified  *bool                `json:"email_verified,omitempty"`
+	Gender         *UserGender          `json:"gender,omitempty"`
 	Language       *string              `json:"language,omitempty"`
 	LastLoginAt    time.Time            `json:"last_login_at"`
 	LastLoginIp    *string              `json:"last_login_ip,omitempty"`
@@ -539,14 +540,13 @@ type User struct {
 	QuestionsCreated int                `json:"questions_created"`
 	RegisteredAt     time.Time          `json:"registered_at"`
 	RegisteredIp     *string            `json:"registered_ip,omitempty"`
-	Sexuality        *UserSexuality     `json:"sexuality,omitempty"`
 	TotalAnswers     int                `json:"total_answers"`
 	Uuid             openapi_types.UUID `json:"uuid"`
 	Votes            int                `json:"votes"`
 }
 
-// UserSexuality defines model for User.Sexuality.
-type UserSexuality string
+// UserGender defines model for User.Gender.
+type UserGender string
 
 // Vote defines model for Vote.
 type Vote struct {

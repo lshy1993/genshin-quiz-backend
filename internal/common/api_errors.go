@@ -45,15 +45,20 @@ func NewInternalServerError(message string) *APIError {
 }
 
 var (
-	ErrNotFound           = NewNotFoundError("记录不存在")
-	ErrUserNotFound       = NewNotFoundError("用户不存在")
-	ErrUserAlreadyExists  = NewBadRequestError("用户已存在")
+	// 业务逻辑类错误
+	ErrNotFound         = NewNotFoundError("记录不存在")
+	ErrUserNotFound     = NewNotFoundError("用户不存在")
+	ErrQuestionNotFound = NewNotFoundError("问题未找到")
+	ErrVoteNotFound     = NewNotFoundError("投票未找到")
+	// 表单提交错误
+	ErrUserAlreadyExists = NewBadRequestError("用户已存在")
+	// 授权类错误
 	ErrInvalidCredentials = NewUnauthorizedError("邮箱或密码错误")
-	ErrQuestionNotFound   = NewNotFoundError("问题未找到")
-	ErrVoteNotFound       = NewNotFoundError("投票未找到")
 	ErrInvalidToken       = NewUnauthorizedError("Invalid or expired token")
 	ErrInvalidTokenFormat = NewUnauthorizedError("Invalid authorization header format")
 	ErrUserNotInContext   = NewUnauthorizedError("用户未登录或认证失败")
-	ErrDatabaseError      = NewInternalServerError("Database error")
-	ErrAdminAuthError     = NewInternalServerError("Admin access required")
+	ErrUserAuthError      = NewUnauthorizedError("用户权限错误")
+	ErrAdminAuthError     = NewUnauthorizedError("Admin access required")
+	// 服务器错误
+	ErrDatabaseError = NewInternalServerError("Database error")
 )

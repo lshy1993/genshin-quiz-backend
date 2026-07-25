@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"fmt"
+	"log"
 
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
@@ -77,7 +77,7 @@ func GetQuestions(
 			return nil, err
 		}
 
-		fmt.Println("Solved Map:", solvedMap)
+		log.Println("Solved Map:", solvedMap)
 	}
 
 	dtos := make([]oapi.Question, 0, len(result.Questions))

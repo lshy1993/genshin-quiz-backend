@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"time"
 
 	"genshin-quiz/config"
@@ -32,7 +32,7 @@ func PostCreateQuestion(
 	}
 
 	now := time.Now()
-	fmt.Println("Creating question by user ID:", userClaims.UserID)
+	log.Println("Creating question by user ID:", userClaims.UserID)
 	// 提问表主体
 	insertModel := model.Questions{
 		QuestionUUID: uuid.New(),

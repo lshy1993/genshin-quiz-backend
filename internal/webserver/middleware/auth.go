@@ -199,6 +199,8 @@ func isPublicEndpoint(path, method string) bool {
 		"/auth/register":        {"POST"},
 		"/auth/login":           {"POST"},
 		"/auth/forgot-password": {"POST"},
+		"/auth/reset-password":  {"POST"},
+		"/auth/verify-email":    {"POST"},
 
 		// 公开的只读API - 不需要认证
 		"/home":        {"GET"},
@@ -207,7 +209,9 @@ func isPublicEndpoint(path, method string) bool {
 		"/exams":       {"GET"},
 		"/exams/*":     {"GET"}, // 通配符支持 /exams/{id}
 		"/votes":       {"GET"},
-		"/votes/*":     {"GET"}, // 只有GET操作公开，POST/PUT需要认证
+		"/votes/*":     {"GET"}, // POST/PUT需要认证
+		"/users":       {"GET"},
+		"/user/*":      {"GET"}, // 通配符支持 /user/{id} POST/PUT需要认证
 	}
 	// 精确匹配
 	if methods, exists := publicEndpoints[path]; exists {

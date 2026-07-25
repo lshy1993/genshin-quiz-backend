@@ -2,7 +2,7 @@ package user_repo
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -56,7 +56,7 @@ func InsertUser(
 	err := insertStmt.QueryContext(ctx, db, &result)
 	if err != nil {
 		errStr := err.Error()
-		fmt.Print(errStr)
+		log.Print(errStr)
 		if errStr != "" &&
 			(contains(errStr, "duplicate key") || contains(errStr, "unique constraint")) {
 			return nil, common.ErrUserAlreadyExists
@@ -80,6 +80,8 @@ func Update(
 		tbl.AvatarURL,
 		tbl.Country,
 		tbl.Language,
+		tbl.Gender,
+		tbl.Biography,
 		tbl.UpdatedAt,
 	).
 		MODEL(u).

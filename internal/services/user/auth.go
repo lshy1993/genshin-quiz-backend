@@ -2,12 +2,12 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/enum"
 	user_repo "genshin-quiz/internal/repository/user"
 	"genshin-quiz/internal/webserver/middleware"
+	"log"
 	"time"
 
 	"genshin-quiz/internal/common"
@@ -24,10 +24,10 @@ func ForgotPassword(
 	app *config.App,
 	req oapi.PostForgotPasswordRequestObject,
 ) (*oapi.PostForgotPassword200Response, error) {
-	email := req.Body.Email
+	email := string(req.Body.Email)
 
 	// 检测用户是否存在
-	user, err := user_repo.GetUserByEmail(ctx, app.DB, string(email))
+	user, err := user_repo.GetUserByEmail(ctx, app.DB, email)
 	// 必须存在
 	if err != nil {
 		return nil, err
@@ -45,9 +45,10 @@ func ForgotPassword(
 		return nil, err
 	}
 
-	// TODO: 发送给邮箱
+	// 发送给邮箱
 	finalURL := util.GenerateResetLink(app.Config.Domain, rawToken)
-	fmt.Println(finalURL)
+	log.Println(finalURL)
+	app.SendEmail(email, "Email verification", finalURL)
 
 	return &oapi.PostForgotPassword200Response{}, nil
 }
@@ -159,10 +160,10 @@ func SendVerificationEmail(
 	app *config.App,
 	req oapi.PostSendVerificationEmailRequestObject,
 ) (*oapi.PostSendVerificationEmail200Response, error) {
-	email := req.Body.Email
+	email := string(req.Body.Email)
 
 	// 检测用户是否存在
-	user, err := user_repo.GetUserByEmail(ctx, app.DB, string(email))
+	user, err := user_repo.GetUserByEmail(ctx, app.DB, email)
 	// 必须存在
 	if err != nil {
 		return nil, err
@@ -179,9 +180,10 @@ func SendVerificationEmail(
 	if err != nil {
 		return nil, err
 	}
-	// TODO: 发送给邮箱
+	// 发送给邮箱
 	finalURL := util.GenerateEmailVerifyLink(app.Config.Domain, rawToken)
-	fmt.Println(finalURL)
+	log.Println(finalURL)
+	app.SendEmail(email, "Email verification", finalURL)
 
 	return &oapi.PostSendVerificationEmail200Response{}, nil
 }
@@ -212,7 +214,7 @@ func VerifyEmail(
 		return nil, common.ErrInvalidToken
 	}
 	// 3.标记用户邮箱已验证
-	fmt.Println(tokenRecord.TokenHash)
+	log.Println(tokenRecord.TokenHash)
 
 	return &oapi.PostVerifyEmail200Response{}, nil
 }
