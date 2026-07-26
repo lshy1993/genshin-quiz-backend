@@ -1,4 +1,4 @@
-package vote_repo
+package poll_repo
 
 import (
 	"context"
@@ -8,50 +8,50 @@ import (
 	"github.com/go-jet/jet/v2/qrm"
 )
 
-// GetVoteComments 获取投票的评论列表（分页）。
-func GetVoteComments(
+// GetPollComments 获取投票的评论列表（分页）。
+func GetPollComments(
 	ctx context.Context,
 	db qrm.DB,
-	voteID int64,
+	pollID int64,
 	limit int,
 	offset int,
-) (*[]model.VoteComments, error) {
+) (*[]model.PollComments, error) {
 	// TODO: 实现评论列表获取
 	panic("not implemented")
 }
 
-// GetVoteCommentCount 获取投票的评论总数。
-func GetVoteCommentCount(
+// GetPollCommentCount 获取投票的评论总数。
+func GetPollCommentCount(
 	ctx context.Context,
 	db qrm.DB,
-	voteID int64,
+	pollID int64,
 ) (int64, error) {
 	// TODO: 实现评论计数
 	panic("not implemented")
 }
 
-// GetMultipleVotesCommentsCount 批量获取多个投票的评论数（避免N+1查询）。
-func GetMultipleVotesCommentsCount(
+// GetMultiplePollsCommentsCount 批量获取多个投票的评论数（避免N+1查询）。
+func GetMultiplePollsCommentsCount(
 	ctx context.Context,
 	db qrm.DB,
-	voteIDs []int64,
+	pollIDs []int64,
 ) (map[int64]int64, error) {
 	// TODO: 实现批量评论计数
 	panic("not implemented")
 }
 
-// InsertVoteComment 添加投票评论。
-func InsertVoteComment(
+// InsertPollComment 添加投票评论。
+func InsertPollComment(
 	ctx context.Context,
 	db qrm.DB,
-	comment model.VoteComments,
-) (*model.VoteComments, error) {
+	comment model.PollComments,
+) (*model.PollComments, error) {
 	// TODO: 实现评论插入
 	panic("not implemented")
 }
 
-// UpdateVoteComment 编辑投票评论。
-func UpdateVoteComment(
+// UpdatePollComment 编辑投票评论。
+func UpdatePollComment(
 	ctx context.Context,
 	db qrm.DB,
 	commentID int64,
@@ -61,8 +61,8 @@ func UpdateVoteComment(
 	panic("not implemented")
 }
 
-// DeleteVoteComment 删除投票评论。
-func DeleteVoteComment(
+// DeletePollComment 删除投票评论。
+func DeletePollComment(
 	ctx context.Context,
 	db qrm.DB,
 	commentID int64,

@@ -9,7 +9,7 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/common"
-	vote_repo "genshin-quiz/internal/repository/vote"
+	poll_repo "genshin-quiz/internal/repository/poll"
 	"genshin-quiz/internal/webserver/middleware"
 )
 
@@ -23,7 +23,7 @@ func PostLikePoll(
 		return common.ErrUserNotInContext
 	}
 
-	voteUUID := req.Id
+	pollUUID := req.Id
 	value := int16(req.Body.Like)
 
 	tx, err := app.DB.BeginTx(ctx, nil)
@@ -32,31 +32,31 @@ func PostLikePoll(
 	}
 
 	// 获取投票 ID
-	voteTbl := table.Votes
-	voteIDStmt := pg.SELECT(voteTbl.ID).
-		FROM(voteTbl).
-		WHERE(voteTbl.VoteUUID.EQ(pg.UUID(voteUUID)))
+	pollTbl := table.Polls
+	pollIDStmt := pg.SELECT(pollTbl.ID).
+		FROM(pollTbl).
+		WHERE(pollTbl.PollUUID.EQ(pg.UUID(pollUUID)))
 
-	var voteIDResult struct {
-		ID int64 `alias:"votes.id"`
+	var pollIDResult struct {
+		ID int64 `alias:"polls.id"`
 	}
-	err = voteIDStmt.QueryContext(ctx, tx, &voteIDResult)
+	err = pollIDStmt.QueryContext(ctx, tx, &pollIDResult)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	voteID := voteIDResult.ID
+	pollID := pollIDResult.ID
 
 	// 更新点赞状态
-	err = vote_repo.UpsertVoteLike(ctx, tx, userClaims.UserID, voteUUID, value)
+	err = poll_repo.UpsertPollLike(ctx, tx, userClaims.UserID, pollUUID, value)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	// 更新投票的点赞数
-	err = vote_repo.UpdateVoteLikeCount(ctx, tx, voteID)
+	err = poll_repo.UpdatePollLikeCount(ctx, tx, pollID)
 	if err != nil {
 		tx.Rollback()
 		return err

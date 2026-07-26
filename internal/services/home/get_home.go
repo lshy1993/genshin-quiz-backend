@@ -7,8 +7,8 @@ import (
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/dao"
 	"genshin-quiz/internal/dao/transformer"
+	poll_repo "genshin-quiz/internal/repository/poll"
 	question_repo "genshin-quiz/internal/repository/question"
-	vote_repo "genshin-quiz/internal/repository/vote"
 	"genshin-quiz/internal/webserver/middleware"
 )
 
@@ -40,12 +40,12 @@ func GetHome(
 		latestQuestions = append(latestQuestions, transformer.ConvertSimpleToQuestion(q, false, 0))
 	}
 
-	voteSortBy := "created_at"
-	voteResult, err := vote_repo.GetVotes(ctx, app.DB, dao.VoteListParams{
+	sortBy := "created_at"
+	result, err := poll_repo.GetPolls(ctx, app.DB, dao.PollListParams{
 		Page:     1,
 		Limit:    5,
 		Type:     "all",
-		SortBy:   voteSortBy,
+		SortBy:   sortBy,
 		SortDesc: true,
 		Language: language,
 	})
@@ -58,34 +58,34 @@ func GetHome(
 		userClaims = claims
 	}
 
-	latestVotes := make([]oapi.Poll, 0, len(voteResult.Votes))
-	popularVotes := make([]oapi.Poll, 0, len(voteResult.Votes))
-	for _, vote := range voteResult.Votes {
+	latestVotes := make([]oapi.Poll, 0, len(result.Polls))
+	popularVotes := make([]oapi.Poll, 0, len(result.Polls))
+	for _, poll := range result.Polls {
 		voted := false
 		likeStatus := int16(0)
 		if userClaims != nil {
-			userVotes, err := vote_repo.GetUserVotedOptions(
+			userVotes, err := poll_repo.GetUserVotedOptions(
 				ctx,
 				app.DB,
 				userClaims.UserID,
-				vote.Vote.ID,
+				poll.Poll.ID,
 			)
 			if err == nil && userVotes != nil && len(*userVotes) > 0 {
 				voted = true
 			}
 
-			userLikeStatus, err := vote_repo.GetVoteLikeStatus(
+			userLikeStatus, err := poll_repo.GetPollLikeStatus(
 				ctx,
 				app.DB,
 				userClaims.UserID,
-				vote.Vote.ID,
+				poll.Poll.ID,
 			)
 			if err == nil && userLikeStatus != nil {
 				likeStatus = *userLikeStatus
 			}
 		}
 
-		dto := transformer.ConvertSimpleVoteToDTO(vote, voted, likeStatus)
+		dto := transformer.ConvertSimplePollToDTO(poll, voted, likeStatus)
 		latestVotes = append(latestVotes, dto)
 		popularVotes = append(popularVotes, dto)
 	}

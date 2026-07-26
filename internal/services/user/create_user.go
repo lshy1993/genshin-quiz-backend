@@ -6,6 +6,7 @@ import (
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
 	user_repo "genshin-quiz/internal/repository/user"
+	"genshin-quiz/internal/util"
 
 	"genshin-quiz/internal/common"
 
@@ -31,12 +32,14 @@ func RegisterUser(
 		return nil, common.ErrUserAlreadyExists
 	}
 
-	// 创建用户
 	tx, err := app.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, go_errors.WrapPrefix(err, "failed to begin transaction", 0)
 	}
-	res, err := user_repo.InsertUser(ctx, tx, string(email), language)
+	defer tx.Rollback()
+
+	// 创建用户
+	res, err := user_repo.InsertUser(ctx, tx, string(email), util.LanguageOrDefault(language))
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -46,20 +49,46 @@ func RegisterUser(
 		return nil, go_errors.WrapPrefix(err, "hash password failed", 0)
 	}
 	hashedPwdStr := string(hashedPwd)
+	userID := res.ID
 	// use new auth
-	err = user_repo.InsertUserAuth(ctx, tx, res.ID, "password", string(email), &hashedPwdStr)
+	err = user_repo.InsertUserAuth(ctx, tx, userID, "password", string(email), &hashedPwdStr)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-	response, err := realLogin(ctx, tx, app.Config.JWTSecret, res, "password")
+	// 创建关联表的行
+	profile, err := user_repo.InsertUserProfile(ctx, tx, userID)
+	if err != nil {
+		tx.Rollback()
+		return nil, go_errors.WrapPrefix(err, "failed to insert user profile", 0)
+	}
+	privacies, err := user_repo.InsertUserPrivacies(ctx, tx, userID)
+	if err != nil {
+		tx.Rollback()
+		return nil, go_errors.WrapPrefix(err, "failed to insert user privacies", 0)
+	}
+	stats, err := user_repo.InsertUserStats(ctx, tx, userID)
+	if err != nil {
+		tx.Rollback()
+		return nil, go_errors.WrapPrefix(err, "failed to insert user stats", 0)
+	}
+
+	response, err := realLogin(
+		ctx,
+		tx,
+		app.Config.JWTSecret,
+		"password",
+		res,
+		profile,
+		privacies,
+		stats,
+	)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	err = tx.Commit()
-	if err != nil {
+	if err := tx.Commit(); err != nil {
 		return nil, go_errors.WrapPrefix(err, "failed to commit transaction", 0)
 	}
 

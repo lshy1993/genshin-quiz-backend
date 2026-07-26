@@ -3,13 +3,12 @@ package config
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"genshin-quiz/internal/enum"
+	"genshin-quiz/logger"
 	"log"
 	"os"
 	"strconv"
-	"syscall"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
@@ -19,7 +18,6 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/resend/resend-go/v3"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 type App struct {
@@ -114,46 +112,6 @@ func getEnvAsDuration(key string, defaultValue string) time.Duration {
 		return value
 	}
 	return time.Minute * 5
-}
-
-func (app *App) initializeLogger() (*zap.Logger, error) {
-	var config zap.Config
-
-	if app.Config.Environment == enum.PROD {
-		config = zap.NewProductionConfig()
-		config.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
-		// 生产环境不使用彩色输出
-		config.EncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
-	} else {
-		config = zap.NewDevelopmentConfig()
-		config.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
-		// 开发环境使用彩色输出
-		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	}
-
-	config.EncoderConfig.TimeKey = "timestamp"
-	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-
-	// 设置更友好的时间格式和颜色编码
-	if app.Config.Environment != enum.PROD {
-		config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("15:04:05.000")
-		// 使用短路径显示 caller 信息
-		config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
-	}
-
-	logger, _ := config.Build(zap.AddStacktrace(zapcore.ErrorLevel))
-	// Set up defer immediately after logger is created
-	defer func() {
-		err := logger.Sync()
-		if err != nil &&
-			!errors.Is(err, syscall.EINVAL) && // invalid argument
-			!errors.Is(err, syscall.EBADF) && // bad file descriptor
-			!errors.Is(err, syscall.ENOTTY) {
-			panic(err.Error())
-		}
-	}()
-
-	return logger, nil
 }
 
 func (app *App) initializeDatabase() (*sql.DB, error) {
@@ -329,16 +287,15 @@ func NewApp() *App {
 		},
 	}
 
-	logger, err := app.initializeLogger()
-	if err != nil {
+	if err := logger.Init(string(app.Config.Environment)); err != nil {
 		log.Fatalf("Failed to initialize logger: %v", err)
 	}
-	app.Logger = logger
+	app.Logger = logger.L
 
 	app.Logger.Info("Current App Config", zap.Any("config", app.Config))
 
 	// 初始化sentry
-	err = app.initializeSentry()
+	err := app.initializeSentry()
 	if err != nil {
 		app.Logger.Error("Failed to initialize Sentry", zap.Error(err))
 		// 不要因为 Sentry 初始化失败而崩溃应用
@@ -350,7 +307,7 @@ func NewApp() *App {
 	// pg数据库
 	db, err := app.initializeDatabase()
 	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
+		app.Logger.Fatal("Failed to initialize database:", zap.Error(err))
 	}
 	app.DB = db
 

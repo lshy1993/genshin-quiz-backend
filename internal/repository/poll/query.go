@@ -1,4 +1,4 @@
-package vote_repo
+package poll_repo
 
 import (
 	"context"
@@ -15,13 +15,13 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetVotes(
+func GetPolls(
 	ctx context.Context,
 	db qrm.DB,
-	params dao.VoteListParams,
-) (*dao.VoteListResult, error) {
-	tbl := table.Votes
-	transTbl := table.VoteTranslations
+	params dao.PollListParams,
+) (*dao.PollListResult, error) {
+	tbl := table.Polls
+	transTbl := table.PollTranslations
 	userTbl := table.Users
 
 	offset := (params.Page - 1) * params.Limit
@@ -40,21 +40,21 @@ func GetVotes(
 	).FROM(
 		tbl.LEFT_JOIN(
 			transTbl,
-			tbl.ID.EQ(transTbl.VoteID).AND(transTbl.Language.EQ(pg.String(defaultLang))),
+			tbl.ID.EQ(transTbl.PollID).AND(transTbl.Language.EQ(pg.String(defaultLang))),
 		).
 			LEFT_JOIN(userTbl, tbl.CreatedBy.EQ(userTbl.ID)),
 	).
 		WHERE(
-			buildVoteCondition(params),
+			buildPollCondition(params),
 		).
-		ORDER_BY(buildVoteOrderBy(params)).
+		ORDER_BY(buildPollOrderBy(params)).
 		LIMIT(int64(params.Limit)).
 		OFFSET(int64(offset))
 
 	// 获取总数
 	countStmt := pg.SELECT(pg.COUNT(pg.STAR)).
 		FROM(tbl).
-		WHERE(buildVoteCondition(params))
+		WHERE(buildPollCondition(params))
 
 	var countResult struct {
 		Count int64 `alias:"count"`
@@ -64,21 +64,21 @@ func GetVotes(
 		return nil, err
 	}
 
-	var votes []dao.SimpleVote
+	var votes []dao.SimplePoll
 	err = stmt.QueryContext(ctx, db, &votes)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dao.VoteListResult{
-		Votes: votes,
+	return &dao.PollListResult{
+		Polls: votes,
 		Total: int(countResult.Count),
 	}, nil
 }
 
-func buildVoteCondition(params dao.VoteListParams) pg.BoolExpression {
-	tbl := table.Votes
-	transTbl := table.VoteTranslations
+func buildPollCondition(params dao.PollListParams) pg.BoolExpression {
+	tbl := table.Polls
+	transTbl := table.PollTranslations
 	condition := tbl.Public.IS_TRUE()
 
 	// 类型筛选：all, available, expired
@@ -106,8 +106,8 @@ func buildVoteCondition(params dao.VoteListParams) pg.BoolExpression {
 	return condition
 }
 
-func buildVoteOrderBy(params dao.VoteListParams) pg.OrderByClause {
-	tbl := table.Votes
+func buildPollOrderBy(params dao.PollListParams) pg.OrderByClause {
+	tbl := table.Polls
 	var orderExpr pg.Expression
 
 	switch params.SortBy {
@@ -131,14 +131,14 @@ func buildVoteOrderBy(params dao.VoteListParams) pg.OrderByClause {
 	return orderExpr.ASC()
 }
 
-func GetVoteByUUID(
+func GetPollByUUID(
 	ctx context.Context,
 	db qrm.DB,
 	voteUUID uuid.UUID,
 	language *[]string,
-) (*dao.DetailedVote, error) {
-	tbl := table.Votes
-	transTbl := table.VoteTranslations
+) (*dao.DetailedPoll, error) {
+	tbl := table.Polls
+	transTbl := table.PollTranslations
 	userTbl := table.Users
 
 	// 获取默认语言
@@ -151,15 +151,15 @@ func GetVoteByUUID(
 	).FROM(
 		tbl.LEFT_JOIN(
 			transTbl,
-			tbl.ID.EQ(transTbl.VoteID).AND(transTbl.Language.EQ(pg.String(defaultLang))),
+			tbl.ID.EQ(transTbl.PollID).AND(transTbl.Language.EQ(pg.String(defaultLang))),
 		).LEFT_JOIN(userTbl, tbl.CreatedBy.EQ(userTbl.ID)),
 	).WHERE(
-		tbl.VoteUUID.EQ(pg.UUID(voteUUID)),
+		tbl.PollUUID.EQ(pg.UUID(voteUUID)),
 	)
 
 	var result []struct {
-		model.Votes
-		model.VoteTranslations
+		model.Polls
+		model.PollTranslations
 		model.Users
 	}
 
@@ -169,43 +169,43 @@ func GetVoteByUUID(
 	}
 
 	if len(result) == 0 {
-		return nil, common.ErrVoteNotFound
+		return nil, common.ErrPollNotFound
 	}
 
-	detailedVote := &dao.DetailedVote{
-		Vote:        result[0].Votes,
+	detailedPoll := &dao.DetailedPoll{
+		Poll:        result[0].Polls,
 		User:        result[0].Users,
-		Translation: result[0].VoteTranslations,
+		Translation: result[0].PollTranslations,
 	}
 
 	// 如果没有获取到指定语言的翻译，则 fallback 到任意语言
-	if detailedVote.Translation.Language == "" {
-		fallbackTrans, err := getVoteTranslationFallback(ctx, db, detailedVote.Vote.ID)
+	if detailedPoll.Translation.Language == "" {
+		fallbackTrans, err := getPollTranslationFallback(ctx, db, detailedPoll.Poll.ID)
 		if err != nil {
 			return nil, err
 		}
 		if fallbackTrans != nil {
-			detailedVote.Translation = *fallbackTrans
+			detailedPoll.Translation = *fallbackTrans
 		}
 	}
 
-	return detailedVote, nil
+	return detailedPoll, nil
 }
 
-// getVoteTranslationFallback 获取投票的任意语言翻译（用于 fallback）.
-func getVoteTranslationFallback(
+// getPollTranslationFallback 获取投票的任意语言翻译（用于 fallback）.
+func getPollTranslationFallback(
 	ctx context.Context,
 	db qrm.DB,
 	voteID int64,
-) (*model.VoteTranslations, error) {
-	tbl := table.VoteTranslations
+) (*model.PollTranslations, error) {
+	tbl := table.PollTranslations
 
 	stmt := pg.SELECT(tbl.AllColumns).
 		FROM(tbl).
-		WHERE(tbl.VoteID.EQ(pg.Int64(voteID))).
+		WHERE(tbl.PollID.EQ(pg.Int64(voteID))).
 		LIMIT(1)
 
-	var trans []model.VoteTranslations
+	var trans []model.PollTranslations
 	err := stmt.QueryContext(ctx, db, &trans)
 	if err != nil {
 		return nil, err
@@ -218,19 +218,19 @@ func getVoteTranslationFallback(
 	return &trans[0], nil
 }
 
-func GetVoteOptions(
+func GetPollOptions(
 	ctx context.Context,
 	db qrm.DB,
 	voteID int64,
-) (*[]model.VoteOptions, error) {
-	tbl := table.VoteOptions
+) (*[]model.PollOptions, error) {
+	tbl := table.PollOptions
 
 	stmt := pg.SELECT(tbl.AllColumns).
 		FROM(tbl).
-		WHERE(tbl.VoteID.EQ(pg.Int64(voteID))).
+		WHERE(tbl.PollID.EQ(pg.Int64(voteID))).
 		ORDER_BY(tbl.OptionOrder.ASC())
 
-	var options []model.VoteOptions
+	var options []model.PollOptions
 	err := stmt.QueryContext(ctx, db, &options)
 	if err != nil {
 		return nil, err
@@ -239,17 +239,17 @@ func GetVoteOptions(
 	return &options, nil
 }
 
-func GetVoteOptionTranslations(
+func GetPollOptionTranslations(
 	ctx context.Context,
 	db qrm.DB,
 	optionIDs []int64,
 	language *[]string,
-) (*[]model.VoteOptionTranslations, error) {
+) (*[]model.PollOptionTranslations, error) {
 	if len(optionIDs) == 0 {
-		return &[]model.VoteOptionTranslations{}, nil
+		return &[]model.PollOptionTranslations{}, nil
 	}
 
-	tbl := table.VoteOptionTranslations
+	tbl := table.PollOptionTranslations
 
 	// 构建选项 ID 表达式列表
 	optionIDExpressions := util.BuildInt64Expressions(optionIDs)
@@ -264,7 +264,7 @@ func GetVoteOptionTranslations(
 		stmt = stmt.WHERE(tbl.Language.IN(langExpressions...))
 	}
 
-	var translations []model.VoteOptionTranslations
+	var translations []model.PollOptionTranslations
 	err := stmt.QueryContext(ctx, db, &translations)
 	if err != nil {
 		return nil, err
@@ -280,7 +280,7 @@ func GetUserVotedOptions(
 	voteID int64,
 ) (*[]model.UserVotes, error) {
 	tbl := table.UserVotes
-	optionTbl := table.VoteOptions
+	optionTbl := table.PollOptions
 
 	stmt := pg.SELECT(tbl.AllColumns).
 		FROM(
@@ -288,7 +288,7 @@ func GetUserVotedOptions(
 		).
 		WHERE(
 			tbl.UserID.EQ(pg.Int64(userID)).AND(
-				optionTbl.VoteID.EQ(pg.Int64(voteID)),
+				optionTbl.PollID.EQ(pg.Int64(voteID)),
 			),
 		)
 

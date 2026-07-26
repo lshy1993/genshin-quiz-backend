@@ -4,6 +4,9 @@ import (
 	"context"
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
+	"genshin-quiz/internal/dao"
+	"genshin-quiz/internal/dao/transformer"
+	"genshin-quiz/internal/enum"
 	user_repo "genshin-quiz/internal/repository/user"
 )
 
@@ -22,9 +25,9 @@ func GetUsers(
 		offset = *req.Params.Offset
 	}
 
-	sortBy := "accuracy"
+	sortBy := enum.SortByAccuracy
 	if req.Params.SortBy != nil {
-		sortBy = string(*req.Params.SortBy)
+		sortBy = enum.LeaderboardSortBy(*req.Params.SortBy)
 	}
 
 	sortDesc := true
@@ -32,53 +35,25 @@ func GetUsers(
 		sortDesc = *req.Params.SortDesc
 	}
 
-	result, err := user_repo.GetUsersLeaderboard(
-		ctx,
-		app.DB,
-		req.Params.Ids,
-		limit,
-		offset,
-		sortBy,
-		sortDesc,
-	)
+	rows, total, err := user_repo.GetUsersLeaderboard(ctx, app.DB, dao.LeaderboardParams{
+		SortBy:   sortBy,
+		SortDesc: sortDesc,
+		Limit:    limit,
+		Offset:   offset,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	users := make([]oapi.UserPublic, 0, len(result.Users))
-	for _, row := range result.Users {
-		userInfo := row.User
-		avatarURL := ""
-		if userInfo.AvatarURL != nil {
-			avatarURL = *userInfo.AvatarURL
-		}
-		country := ""
-		if userInfo.Country != nil {
-			country = *userInfo.Country
-		}
-		nickname := ""
-		if userInfo.DisplayName != nil {
-			nickname = *userInfo.DisplayName
-		}
-		likesReceived := int(row.LikesReceived)
-
-		users = append(users, oapi.UserPublic{
-			Uuid:             userInfo.UserUUID,
-			AvatarUrl:        avatarURL,
-			Country:          &country,
-			Language:         *userInfo.Language,
-			Nickname:         nickname,
-			RegisteredAt:     userInfo.CreatedAt,
-			QuestionsCreated: int(userInfo.QuestionsCreated),
-			TotalAnswers:     int(userInfo.TotalSubmissions),
-			CorrectAnswers:   int(userInfo.CorrectSubmissions),
-			LikesReceived:    likesReceived,
-			PollsCreated:     int(userInfo.TotalVotes),
-		})
+	users := make([]oapi.UserPublic, 0, len(rows))
+	for _, row := range rows {
+		users = append(users, transformer.UserModelToPublic(
+			row.User, row.Profile, row.Privacy, row.Stats,
+		))
 	}
 
 	return &oapi.GetUsers200JSONResponse{
-		Total: result.Total,
+		Total: total,
 		Users: users,
 	}, nil
 }

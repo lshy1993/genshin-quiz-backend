@@ -48,7 +48,10 @@ func ForgotPassword(
 	// 发送给邮箱
 	finalURL := util.GenerateResetLink(app.Config.Domain, rawToken)
 	log.Println(finalURL)
-	app.SendEmail(email, "Email verification", finalURL)
+	err = app.SendEmail(email, "Email verification", finalURL)
+	if err != nil {
+		return nil, err
+	}
 
 	return &oapi.PostForgotPassword200Response{}, nil
 }
@@ -183,7 +186,10 @@ func SendVerificationEmail(
 	// 发送给邮箱
 	finalURL := util.GenerateEmailVerifyLink(app.Config.Domain, rawToken)
 	log.Println(finalURL)
-	app.SendEmail(email, "Email verification", finalURL)
+	err = app.SendEmail(email, "Email verification", finalURL)
+	if err != nil {
+		return nil, err
+	}
 
 	return &oapi.PostSendVerificationEmail200Response{}, nil
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"genshin-quiz/generated/oapi"
 
-	services "genshin-quiz/internal/services/vote"
+	services "genshin-quiz/internal/services/poll"
 )
 
 func (h *Handler) GetPolls(
@@ -44,7 +44,7 @@ func (h *Handler) PostVotePoll(
 	ctx context.Context,
 	req oapi.PostVotePollRequestObject,
 ) (oapi.PostVotePollResponseObject, error) {
-	res, err := services.PostVote(ctx, h.app, req)
+	res, err := services.PostVotePoll(ctx, h.app, req)
 	if err != nil {
 		return nil, err
 	}

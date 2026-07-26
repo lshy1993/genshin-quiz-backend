@@ -101,7 +101,7 @@ func parseAndValidateToken(
 		return nil, err
 	}
 
-	if requireAdmin && util.IsAdmin(*userInfo.UserRole) {
+	if requireAdmin && util.IsAdmin(userInfo.UserRole) {
 		return nil, common.ErrAdminAuthError
 	}
 

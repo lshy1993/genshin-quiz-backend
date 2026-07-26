@@ -12,6 +12,7 @@ import (
 	"genshin-quiz/config"
 	"genshin-quiz/internal/enum"
 	"genshin-quiz/internal/webserver"
+	"genshin-quiz/logger"
 )
 
 func main() {
@@ -43,6 +44,9 @@ func main() {
 	app := config.NewApp()
 
 	defer sentry.Flush(2 * time.Second)
+
+	// Set up defer immediately after logger is created
+	defer logger.Sync()
 
 	// Initialize server
 	server := webserver.NewServer(app)

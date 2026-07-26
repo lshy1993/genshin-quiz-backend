@@ -1,4 +1,4 @@
-package vote_repo
+package poll_repo
 
 import (
 	"context"
@@ -10,30 +10,30 @@ import (
 )
 
 /*
-RecalculateAllVoteLikeStats 根据 vote_likes 表统计每个投票的点赞数，并更新 votes.likes_count 字段.
+RecalculateAllPollLikeStats 根据 vote_likes 表统计每个投票的点赞数，并更新 votes.likes_count 字段.
 只统计 value=1 的点赞数.
 */
-func RecalculateAllVoteLikeStats(
+func RecalculateAllPollLikeStats(
 	ctx context.Context,
 	db qrm.DB,
 ) error {
-	voteTbl := table.Votes
-	likesTbl := table.VoteLikes
+	voteTbl := table.Polls
+	likesTbl := table.PollLikes
 
 	// 统计每个投票的点赞数
 	stmt := pg.SELECT(
-		likesTbl.VoteID,
+		likesTbl.PollID,
 		pg.COUNT(likesTbl.Value).AS("like_count"),
 	).FROM(
 		likesTbl,
 	).WHERE(
 		likesTbl.Value.EQ(pg.Int16(1)),
 	).GROUP_BY(
-		likesTbl.VoteID,
+		likesTbl.PollID,
 	)
 
 	var results []struct {
-		VoteID    int64 `alias:"vote_likes.vote_id"`
+		PollID    int64 `alias:"vote_likes.vote_id"`
 		LikeCount int64 `alias:"like_count"`
 	}
 	err := stmt.QueryContext(ctx, db, &results)
@@ -44,7 +44,7 @@ func RecalculateAllVoteLikeStats(
 	// 构建 voteID -> likeCount 映射
 	likeCountMap := make(map[int64]int64, len(results))
 	for _, r := range results {
-		likeCountMap[r.VoteID] = r.LikeCount
+		likeCountMap[r.PollID] = r.LikeCount
 	}
 
 	// 对每个投票执行更新
@@ -64,14 +64,14 @@ func RecalculateAllVoteLikeStats(
 }
 
 /*
-RecalculateAllVoteOptionStats 根据 user_votes 表统计每个投票选项的票数，并更新 vote_options.vote_count 字段.
+RecalculateAllPollOptionStats 根据 user_votes 表统计每个投票选项的票数，并更新 vote_options.vote_count 字段.
 同时统计整个投票的总票数和参与人数.
 */
-func RecalculateAllVoteOptionStats(
+func RecalculateAllPollOptionStats(
 	ctx context.Context,
 	db qrm.DB,
 ) error {
-	voteOptionTbl := table.VoteOptions
+	voteOptionTbl := table.PollOptions
 	userVotesTbl := table.UserVotes
 
 	// 统计每个选项的总票数
@@ -115,18 +115,18 @@ func RecalculateAllVoteOptionStats(
 }
 
 /*
-RecalculateVoteStats 根据 user_votes 表统计指定投票的参与人数和总票数，并更新 votes 表.
+RecalculatePollStats 根据 user_votes 表统计指定投票的参与人数和总票数，并更新 votes 表.
 参与人数 = 该投票下不同用户的数量.
 总票数 = 该投票下所有用户投票的总和.
 */
-func RecalculateVoteStats(
+func RecalculatePollStats(
 	ctx context.Context,
 	db qrm.DB,
 	voteID int64,
 ) error {
-	voteTbl := table.Votes
+	voteTbl := table.Polls
 	userVotesTbl := table.UserVotes
-	voteOptionTbl := table.VoteOptions
+	voteOptionTbl := table.PollOptions
 
 	// 统计参与人数（不同用户的数量）
 	participantsStmt := pg.SELECT(
@@ -134,7 +134,7 @@ func RecalculateVoteStats(
 	).FROM(
 		userVotesTbl.INNER_JOIN(voteOptionTbl, voteOptionTbl.ID.EQ(userVotesTbl.OptionID)),
 	).WHERE(
-		voteOptionTbl.VoteID.EQ(pg.Int64(voteID)),
+		voteOptionTbl.PollID.EQ(pg.Int64(voteID)),
 	)
 
 	var participantsResult struct {
@@ -151,7 +151,7 @@ func RecalculateVoteStats(
 	).FROM(
 		userVotesTbl.INNER_JOIN(voteOptionTbl, voteOptionTbl.ID.EQ(userVotesTbl.OptionID)),
 	).WHERE(
-		voteOptionTbl.VoteID.EQ(pg.Int64(voteID)),
+		voteOptionTbl.PollID.EQ(pg.Int64(voteID)),
 	)
 
 	var totalVotesResult struct {
@@ -180,30 +180,30 @@ func RecalculateVoteStats(
 }
 
 /*
-RecalculateAllVoteStats 重新计算所有投票的统计数据.
+RecalculateAllPollStats 重新计算所有投票的统计数据.
 包括：参与人数、总票数.
 */
-func RecalculateAllVoteStats(
+func RecalculateAllPollStats(
 	ctx context.Context,
 	db qrm.DB,
 ) error {
-	voteTbl := table.Votes
+	voteTbl := table.Polls
 	userVotesTbl := table.UserVotes
-	voteOptionTbl := table.VoteOptions
+	voteOptionTbl := table.PollOptions
 
 	// 统计每个投票的参与人数和总票数
 	stmt := pg.SELECT(
-		voteOptionTbl.VoteID,
+		voteOptionTbl.PollID,
 		pg.COUNT(pg.DISTINCT(userVotesTbl.UserID)).AS("participants_count"),
 		pg.SUM(pg.CAST(userVotesTbl.VoteCount).AS("BIGINT")).AS("total_votes"),
 	).FROM(
 		userVotesTbl.INNER_JOIN(voteOptionTbl, voteOptionTbl.ID.EQ(userVotesTbl.OptionID)),
 	).GROUP_BY(
-		voteOptionTbl.VoteID,
+		voteOptionTbl.PollID,
 	)
 
 	var results []struct {
-		VoteID            int64  `alias:"vote_options.vote_id"`
+		PollID            int64  `alias:"poll_options.poll_id"`
 		ParticipantsCount int64  `alias:"participants_count"`
 		TotalVotes        *int64 `alias:"total_votes"`
 	}
@@ -223,7 +223,7 @@ func RecalculateAllVoteStats(
 			voteTbl.ParticipantsCount.SET(pg.Int64(r.ParticipantsCount)),
 			voteTbl.TotalVotesCount.SET(pg.Int64(totalVotes)),
 		).WHERE(
-			voteTbl.ID.EQ(pg.Int64(r.VoteID)),
+			voteTbl.ID.EQ(pg.Int64(r.PollID)),
 		)
 		_, err := updateStmt.ExecContext(ctx, db)
 		if err != nil {
@@ -235,20 +235,20 @@ func RecalculateAllVoteStats(
 }
 
 /*
-RecalculateVoteOptionStats 重新计算指定投票的所有选项的票数统计.
+RecalculatePollOptionStats 重新计算指定投票的所有选项的票数统计.
 */
-func RecalculateVoteOptionStats(
+func RecalculatePollOptionStats(
 	ctx context.Context,
 	db qrm.DB,
 	voteID int64,
 ) error {
-	voteOptionTbl := table.VoteOptions
+	voteOptionTbl := table.PollOptions
 	userVotesTbl := table.UserVotes
 
 	// 获取该投票的所有选项
 	optionsStmt := pg.SELECT(voteOptionTbl.ID).
 		FROM(voteOptionTbl).
-		WHERE(voteOptionTbl.VoteID.EQ(pg.Int64(voteID)))
+		WHERE(voteOptionTbl.PollID.EQ(pg.Int64(voteID)))
 
 	var options []struct {
 		ID int64 `alias:"vote_options.id"`
@@ -268,7 +268,7 @@ func RecalculateVoteOptionStats(
 		userVotesTbl.OptionID.IN(
 			pg.SELECT(voteOptionTbl.ID).
 				FROM(voteOptionTbl).
-				WHERE(voteOptionTbl.VoteID.EQ(pg.Int64(voteID))),
+				WHERE(voteOptionTbl.PollID.EQ(pg.Int64(voteID))),
 		),
 	).GROUP_BY(
 		userVotesTbl.OptionID,

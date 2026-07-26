@@ -374,7 +374,7 @@ func GetQuestionSubmissions(
 	stmt := pg.SELECT(
 		submissionsTbl.AllColumns,
 		userTbl.UserUUID.AS("user_id"),
-		userTbl.DisplayName.AS("user_name"),
+		userTbl.Nickname.AS("user_name"),
 	).FROM(
 		submissionsTbl.
 			INNER_JOIN(questionsTbl, submissionsTbl.QuestionID.EQ(questionsTbl.ID)).

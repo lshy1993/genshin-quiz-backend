@@ -7,7 +7,7 @@ import (
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/dao"
 	"genshin-quiz/internal/dao/transformer"
-	vote_repo "genshin-quiz/internal/repository/vote"
+	poll_repo "genshin-quiz/internal/repository/poll"
 	"genshin-quiz/internal/webserver/middleware"
 )
 
@@ -27,9 +27,9 @@ func GetPolls(
 		limit = *req.Params.Limit
 	}
 
-	voteType := "all"
+	pollType := "all"
 	if req.Params.Type != nil {
-		voteType = string(*req.Params.Type)
+		pollType = string(*req.Params.Type)
 	}
 
 	sortBy := "created_at"
@@ -43,13 +43,13 @@ func GetPolls(
 	}
 
 	// 调用 repository 层获取数据
-	result, err := vote_repo.GetVotes(
+	result, err := poll_repo.GetPolls(
 		ctx,
 		app.DB,
-		dao.VoteListParams{
+		dao.PollListParams{
 			Page:     page,
 			Limit:    limit,
-			Type:     voteType,
+			Type:     pollType,
 			Query:    req.Params.Query,
 			Language: req.Params.Language,
 			SortBy:   sortBy,
@@ -67,22 +67,22 @@ func GetPolls(
 	}
 
 	// 提取所有投票的ID用于批量查询
-	voteIDs := make([]int64, 0, len(result.Votes))
-	for _, vote := range result.Votes {
-		voteIDs = append(voteIDs, vote.Vote.ID)
+	pollIDs := make([]int64, 0, len(result.Polls))
+	for _, poll := range result.Polls {
+		pollIDs = append(pollIDs, poll.Poll.ID)
 	}
 
 	// 批量获取所有投票的点赞数
-	likesCountMap, err := vote_repo.GetMultipleVotesLikesCount(ctx, app.DB, voteIDs)
+	likesCountMap, err := poll_repo.GetMultiplePollsLikesCount(ctx, app.DB, pollIDs)
 	if err != nil {
 		return nil, err
 	}
 
 	// 转换为 DTO
-	dtos := make([]oapi.Poll, 0, len(result.Votes))
-	for _, vote := range result.Votes {
+	dtos := make([]oapi.Poll, 0, len(result.Polls))
+	for _, poll := range result.Polls {
 		// 覆盖投票的点赞数为实时计算的值
-		vote.Vote.LikesCount = likesCountMap[vote.Vote.ID]
+		poll.Poll.LikesCount = likesCountMap[poll.Poll.ID]
 
 		voted := false
 		likeStatus := int16(0)
@@ -90,29 +90,29 @@ func GetPolls(
 		// 如果用户已登录，检查投票状态和点赞状态
 		if userClaims != nil {
 			// 检查用户是否已投票
-			userVotes, err := vote_repo.GetUserVotedOptions(
+			userVotes, err := poll_repo.GetUserVotedOptions(
 				ctx,
 				app.DB,
 				userClaims.UserID,
-				vote.Vote.ID,
+				poll.Poll.ID,
 			)
 			if err == nil && userVotes != nil && len(*userVotes) > 0 {
 				voted = true
 			}
 
 			// 获取点赞状态
-			userLikeStatus, err := vote_repo.GetVoteLikeStatus(
+			userLikeStatus, err := poll_repo.GetPollLikeStatus(
 				ctx,
 				app.DB,
 				userClaims.UserID,
-				vote.Vote.ID,
+				poll.Poll.ID,
 			)
 			if err == nil && userLikeStatus != nil {
 				likeStatus = *userLikeStatus
 			}
 		}
 
-		dto := transformer.ConvertSimpleVoteToDTO(vote, voted, likeStatus)
+		dto := transformer.ConvertSimplePollToDTO(poll, voted, likeStatus)
 		dtos = append(dtos, dto)
 	}
 

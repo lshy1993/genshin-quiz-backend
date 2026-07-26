@@ -4,22 +4,22 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 )
 
-type SimpleVote struct {
-	Vote        model.Votes
-	Translation model.VoteTranslations
+type SimplePoll struct {
+	Poll        model.Polls
+	Translation model.PollTranslations
 	User        model.Users
 }
 
-type DetailedVote struct {
-	Vote               model.Votes
+type DetailedPoll struct {
+	Poll               model.Polls
 	User               model.Users
-	Translation        model.VoteTranslations
-	Options            []model.VoteOptions
-	OptionTranslations []model.VoteOptionTranslations
+	Translation        model.PollTranslations
+	Options            []model.PollOptions
+	OptionTranslations []model.PollOptionTranslations
 	SubmissionCount    int64
 }
 
-type VoteListParams struct {
+type PollListParams struct {
 	Page     int       // 页码，从1开始
 	Limit    int       // 每页数量
 	Type     string    // 类型筛选: all, available, expired
@@ -29,7 +29,7 @@ type VoteListParams struct {
 	SortDesc bool      // 是否降序排列
 }
 
-type VoteListResult struct {
-	Votes []SimpleVote
+type PollListResult struct {
+	Polls []SimplePoll
 	Total int
 }

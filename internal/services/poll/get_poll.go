@@ -7,7 +7,7 @@ import (
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/dao"
 	"genshin-quiz/internal/dao/transformer"
-	vote_repo "genshin-quiz/internal/repository/vote"
+	poll_repo "genshin-quiz/internal/repository/poll"
 	"genshin-quiz/internal/webserver/middleware"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
@@ -19,14 +19,14 @@ func GetPoll(
 	req oapi.GetPollRequestObject,
 ) (*oapi.GetPoll200JSONResponse, error) {
 	// 调用仓库层获取投票详情（使用默认语言）
-	res, err := vote_repo.GetVoteByUUID(ctx, app.DB, req.Id, nil)
+	res, err := poll_repo.GetPollByUUID(ctx, app.DB, req.Id, nil)
 	if err != nil {
 		return nil, err
 	}
-	voteDBId := res.Vote.ID
+	pollDBId := res.Poll.ID
 
 	// 获取选项
-	options, err := vote_repo.GetVoteOptions(ctx, app.DB, voteDBId)
+	options, err := poll_repo.GetPollOptions(ctx, app.DB, pollDBId)
 	if err != nil {
 		return nil, err
 	}
@@ -38,14 +38,14 @@ func GetPoll(
 	}
 
 	// 获取选项翻译
-	optionTranslations, err := vote_repo.GetVoteOptionTranslations(ctx, app.DB, ids, nil)
+	optionTranslations, err := poll_repo.GetPollOptionTranslations(ctx, app.DB, ids, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	// 构建 DetailedVote
-	detailedVote := dao.DetailedVote{
-		Vote:               res.Vote,
+	// 构建 DetailedPoll
+	detailedPoll := dao.DetailedPoll{
+		Poll:               res.Poll,
 		User:               res.User,
 		Translation:        res.Translation,
 		Options:            *options,
@@ -53,19 +53,19 @@ func GetPoll(
 	}
 
 	// 获取投票的实时点赞数
-	likesCount, err := vote_repo.GetVoteLikesCount(ctx, app.DB, voteDBId)
+	likesCount, err := poll_repo.GetPollLikesCount(ctx, app.DB, pollDBId)
 	if err != nil {
 		return nil, err
 	}
-	detailedVote.Vote.LikesCount = likesCount
+	detailedPoll.Poll.LikesCount = likesCount
 
 	// 检查用户是否已登录，如果已登录则获取用户的投票记录和点赞状态
-	votedOptions := []oapi.PollVote{}
+	polldOptions := []oapi.PollVote{}
 	likeStatus := int16(0)
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if ok {
 		// 获取用户已投票的选项
-		userVotes, err := vote_repo.GetUserVotedOptions(ctx, app.DB, userClaims.UserID, voteDBId)
+		userVotes, err := poll_repo.GetUserVotedOptions(ctx, app.DB, userClaims.UserID, pollDBId)
 		if err != nil {
 			return nil, err
 		}
@@ -79,7 +79,7 @@ func GetPoll(
 		// 构建VoteSubmissionOption数组
 		for _, uv := range *userVotes {
 			if optionUUID, exists := optionIDToUUID[uv.OptionID]; exists {
-				votedOptions = append(votedOptions, oapi.PollVote{
+				polldOptions = append(polldOptions, oapi.PollVote{
 					OptionId: optionUUID,
 					Votes:    int(uv.VoteCount),
 				})
@@ -87,11 +87,11 @@ func GetPoll(
 		}
 
 		// 获取用户的点赞状态
-		userLikeStatus, err := vote_repo.GetVoteLikeStatus(
+		userLikeStatus, err := poll_repo.GetPollLikeStatus(
 			ctx,
 			app.DB,
 			userClaims.UserID,
-			voteDBId,
+			pollDBId,
 		)
 		if err != nil {
 			return nil, err
@@ -103,7 +103,7 @@ func GetPoll(
 	}
 
 	// 转换为 DTO
-	dto := transformer.ConvertDetailedVoteToDTO(detailedVote, votedOptions, likeStatus)
+	dto := transformer.ConvertDetailedVoteToDTO(detailedPoll, polldOptions, likeStatus)
 
 	response := oapi.GetPoll200JSONResponse(dto)
 	return &response, nil

@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 	"genshin-quiz/internal/common"
@@ -16,6 +17,21 @@ import (
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 )
+
+func loginProviderToInt16(provider enum.LoginProvider) (int16, error) {
+	switch provider {
+	case "password":
+		return 0, nil
+	case "google":
+		return 1, nil
+	case "apple":
+		return 2, nil
+	case "github":
+		return 3, nil
+	default:
+		return 0, fmt.Errorf("%w: %s", common.ErrInvalidLoginProvider, provider)
+	}
+}
 
 func InsertUserAuth(
 	ctx context.Context,
@@ -63,18 +79,16 @@ func InsertLoginLog(
 	userID int64,
 	ip string,
 	userAgent *string,
-	loginType *string, // "password", "google" (可传 nil)
-	status string, // "SUCCESS", "FAILED"
+	loginType enum.LoginProvider, // "password", "google"
+	status enum.LoginStatus, // "SUCCESS", "FAILED"
 ) (*model.UserLoginLogs, error) {
 	tbl := table.UserLoginLogs
 
 	// 1. 设置默认值
-	if status == "" {
-		status = "SUCCESS"
-	}
-	if loginType == nil {
-		defaultType := "password"
-		loginType = &defaultType
+	credType, err := loginProviderToInt16(loginType)
+	if err != nil {
+		// 返回 400 Bad Request，而不是让非法数据流入数据库
+		return nil, err
 	}
 
 	now := time.Now()
@@ -82,25 +96,47 @@ func InsertLoginLog(
 		tbl.UserID,
 		tbl.IPAddress,
 		tbl.UserAgent,
-		tbl.LoginType,
+		tbl.CredentialType,
 		tbl.Status,
 		tbl.LoginAt,
 	).
 		MODEL(model.UserLoginLogs{
-			UserID:    userID,
-			IPAddress: ip,
-			UserAgent: userAgent,
-			LoginType: loginType,
-			Status:    status,
-			LoginAt:   now,
+			UserID:         userID,
+			IPAddress:      ip,
+			UserAgent:      userAgent,
+			CredentialType: credType,
+			Status:         int16(status),
+			LoginAt:        now,
 		}).
 		RETURNING(tbl.AllColumns)
 
 	var result model.UserLoginLogs
-	err := insertStmt.QueryContext(ctx, db, &result)
+	err = insertStmt.QueryContext(ctx, db, &result)
 	if err != nil {
 		return nil, errors.WrapPrefix(err, "insert login logs error", 0)
 	}
+	return &result, nil
+}
+
+func GetLatestLoginLogByID(
+	ctx context.Context,
+	db qrm.DB,
+	userID int64,
+) (*model.UserLoginLogs, error) {
+	tbl := table.UserLoginLogs
+
+	stmt := pg.SELECT(tbl.AllColumns).
+		FROM(tbl).
+		WHERE(tbl.UserID.EQ(pg.Int64(userID))).
+		ORDER_BY(tbl.LoginAt.DESC()).
+		LIMIT(1)
+
+	var result model.UserLoginLogs
+	err := stmt.QueryContext(ctx, db, &result)
+	if err != nil {
+		return nil, errors.WrapPrefix(err, "get latest login log error", 0)
+	}
+
 	return &result, nil
 }
 

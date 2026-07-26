@@ -6,6 +6,7 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/dao/transformer"
+	"genshin-quiz/internal/enum"
 	user_repo "genshin-quiz/internal/repository/user"
 	"genshin-quiz/internal/webserver/middleware"
 
@@ -40,19 +41,47 @@ func LoginUser(
 		return nil, common.ErrInvalidCredentials
 	}
 
+	// TODO:获取用户的其他统计信息
+	userProfile, err := user_repo.GetUserProfileByID(ctx, app.DB, authInfo.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	userPrivacies, err := user_repo.GetUserPrivaciesByID(ctx, app.DB, authInfo.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	userStats, err := user_repo.GetUserStatisticsByID(ctx, app.DB, authInfo.UserID)
+	if err != nil {
+		return nil, err
+	}
+
 	// 登录流程
-	return realLogin(ctx, app.DB, app.Config.JWTSecret, &authInfo.Users, "password")
+	return realLogin(
+		ctx,
+		app.DB,
+		app.Config.JWTSecret,
+		"password",
+		&authInfo.Users,
+		userProfile,
+		userPrivacies,
+		userStats,
+	)
 }
 
 func realLogin(
 	ctx context.Context,
 	db qrm.DB,
 	secret string,
-	res *model.Users,
-	loginType string, // "password", "google"
+	loginType enum.LoginProvider, // "password", "google"
+	user *model.Users,
+	profile *model.UserProfiles,
+	privacies *model.UserPrivacies,
+	stats *model.UserStats,
 ) (*oapi.AuthResponse, error) {
 	// 生成 JWT
-	tokenString, err := middleware.GenerateJWT(res.ID, res.Email, secret)
+	tokenString, err := middleware.GenerateJWT(user.ID, user.Email, secret)
 	if err != nil {
 		return nil, err
 	}
@@ -68,27 +97,28 @@ func realLogin(
 		userAgent = &ua
 	}
 
-	if loginType == "" {
-		loginType = "password"
-	}
-
 	// 写登录日志
 	loginInfo, err := user_repo.InsertLoginLog(
 		ctx,
 		db,
-		res.ID,
+		user.ID,
 		ip,
 		userAgent,
-		&loginType,
-		"SUCCESS",
+		loginType,
+		enum.LoginStatusSuccess,
 	)
 	if err != nil {
 		return nil, err
 	}
-	// TODO:获取用户的其他统计信息
 
 	return &oapi.AuthResponse{
 		Token: tokenString,
-		User:  transformer.UserModelToDTO(*res, *loginInfo),
+		User: transformer.UserModelToPrivate(
+			*user,
+			*profile,
+			*privacies,
+			*stats,
+			*loginInfo,
+		),
 	}, nil
 }

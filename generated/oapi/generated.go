@@ -86,6 +86,30 @@ func (e Difficulty) Valid() bool {
 	}
 }
 
+// Defines values for Gender.
+const (
+	GenderFemale  Gender = "female"
+	GenderMale    Gender = "male"
+	GenderOther   Gender = "other"
+	GenderUnknown Gender = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the Gender enum.
+func (e Gender) Valid() bool {
+	switch e {
+	case GenderFemale:
+		return true
+	case GenderMale:
+		return true
+	case GenderOther:
+		return true
+	case GenderUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for LikeStatus.
 const (
 	Minus1 LikeStatus = -1
@@ -106,19 +130,19 @@ func (e LikeStatus) Valid() bool {
 
 // Defines values for OptionType.
 const (
-	OptionTypeImage OptionType = "image"
-	OptionTypeMusic OptionType = "music"
-	OptionTypeText  OptionType = "text"
+	Image OptionType = "image"
+	Music OptionType = "music"
+	Text  OptionType = "text"
 )
 
 // Valid indicates whether the value is a known member of the OptionType enum.
 func (e OptionType) Valid() bool {
 	switch e {
-	case OptionTypeImage:
+	case Image:
 		return true
-	case OptionTypeMusic:
+	case Music:
 		return true
-	case OptionTypeText:
+	case Text:
 		return true
 	default:
 		return false
@@ -140,102 +164,6 @@ func (e QuestionType) Valid() bool {
 	case SingleChoice:
 		return true
 	case TrueFalse:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for UserAdminGender.
-const (
-	UserAdminGenderFemale  UserAdminGender = "female"
-	UserAdminGenderMale    UserAdminGender = "male"
-	UserAdminGenderOther   UserAdminGender = "other"
-	UserAdminGenderUnknown UserAdminGender = "unknown"
-)
-
-// Valid indicates whether the value is a known member of the UserAdminGender enum.
-func (e UserAdminGender) Valid() bool {
-	switch e {
-	case UserAdminGenderFemale:
-		return true
-	case UserAdminGenderMale:
-		return true
-	case UserAdminGenderOther:
-		return true
-	case UserAdminGenderUnknown:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for UserPrivateGender.
-const (
-	UserPrivateGenderFemale  UserPrivateGender = "female"
-	UserPrivateGenderMale    UserPrivateGender = "male"
-	UserPrivateGenderOther   UserPrivateGender = "other"
-	UserPrivateGenderUnknown UserPrivateGender = "unknown"
-)
-
-// Valid indicates whether the value is a known member of the UserPrivateGender enum.
-func (e UserPrivateGender) Valid() bool {
-	switch e {
-	case UserPrivateGenderFemale:
-		return true
-	case UserPrivateGenderMale:
-		return true
-	case UserPrivateGenderOther:
-		return true
-	case UserPrivateGenderUnknown:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for UserProfileGender.
-const (
-	UserProfileGenderFemale  UserProfileGender = "female"
-	UserProfileGenderMale    UserProfileGender = "male"
-	UserProfileGenderOther   UserProfileGender = "other"
-	UserProfileGenderUnknown UserProfileGender = "unknown"
-)
-
-// Valid indicates whether the value is a known member of the UserProfileGender enum.
-func (e UserProfileGender) Valid() bool {
-	switch e {
-	case UserProfileGenderFemale:
-		return true
-	case UserProfileGenderMale:
-		return true
-	case UserProfileGenderOther:
-		return true
-	case UserProfileGenderUnknown:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for UserPublicGender.
-const (
-	UserPublicGenderFemale  UserPublicGender = "female"
-	UserPublicGenderMale    UserPublicGender = "male"
-	UserPublicGenderOther   UserPublicGender = "other"
-	UserPublicGenderUnknown UserPublicGender = "unknown"
-)
-
-// Valid indicates whether the value is a known member of the UserPublicGender enum.
-func (e UserPublicGender) Valid() bool {
-	switch e {
-	case UserPublicGenderFemale:
-		return true
-	case UserPublicGenderMale:
-		return true
-	case UserPublicGenderOther:
-		return true
-	case UserPublicGenderUnknown:
 		return true
 	default:
 		return false
@@ -463,6 +391,9 @@ type ExamQuestion struct {
 	Points     *float32            `json:"points,omitempty"`
 	QuestionId *openapi_types.UUID `json:"question_id,omitempty"`
 }
+
+// Gender defines model for Gender.
+type Gender string
 
 // HomePageData defines model for HomePageData.
 type HomePageData struct {
@@ -724,7 +655,7 @@ type UserAdmin struct {
 	Email              *openapi_types.Email `json:"email,omitempty"`
 	EmailVerified      bool                 `json:"email_verified"`
 	EmailVisibility    Visibility           `json:"email_visibility"`
-	Gender             *UserAdminGender     `json:"gender,omitempty"`
+	Gender             *Gender              `json:"gender,omitempty"`
 	GenderVisibility   Visibility           `json:"gender_visibility"`
 	IsDeleted          bool                 `json:"is_deleted"`
 	Language           string               `json:"language"`
@@ -739,9 +670,6 @@ type UserAdmin struct {
 	TotalAnswers       int                  `json:"total_answers"`
 	Uuid               openapi_types.UUID   `json:"uuid"`
 }
-
-// UserAdminGender defines model for UserAdmin.Gender.
-type UserAdminGender string
 
 // UserBase defines model for UserBase.
 type UserBase struct {
@@ -772,7 +700,7 @@ type UserPrivate struct {
 	Email              *openapi_types.Email `json:"email,omitempty"`
 	EmailVerified      bool                 `json:"email_verified"`
 	EmailVisibility    Visibility           `json:"email_visibility"`
-	Gender             *UserPrivateGender   `json:"gender,omitempty"`
+	Gender             *Gender              `json:"gender,omitempty"`
 	GenderVisibility   Visibility           `json:"gender_visibility"`
 	Language           string               `json:"language"`
 	LastLoginAt        time.Time            `json:"last_login_at"`
@@ -787,20 +715,14 @@ type UserPrivate struct {
 	Uuid               openapi_types.UUID   `json:"uuid"`
 }
 
-// UserPrivateGender defines model for UserPrivate.Gender.
-type UserPrivateGender string
-
 // UserProfile defines model for UserProfile.
 type UserProfile struct {
 	Birthday *openapi_types.Date  `json:"birthday,omitempty"`
 	Country  *string              `json:"country,omitempty"`
 	Email    *openapi_types.Email `json:"email,omitempty"`
-	Gender   *UserProfileGender   `json:"gender,omitempty"`
+	Gender   *Gender              `json:"gender,omitempty"`
 	Language string               `json:"language"`
 }
-
-// UserProfileGender defines model for UserProfile.Gender.
-type UserProfileGender string
 
 // UserPublic defines model for UserPublic.
 type UserPublic struct {
@@ -810,7 +732,7 @@ type UserPublic struct {
 	CorrectAnswers   int                  `json:"correct_answers"`
 	Country          *string              `json:"country,omitempty"`
 	Email            *openapi_types.Email `json:"email,omitempty"`
-	Gender           *UserPublicGender    `json:"gender,omitempty"`
+	Gender           *Gender              `json:"gender,omitempty"`
 	Language         string               `json:"language"`
 	LikesReceived    int                  `json:"likes_received"`
 	Nickname         string               `json:"nickname"`
@@ -820,9 +742,6 @@ type UserPublic struct {
 	TotalAnswers     int                  `json:"total_answers"`
 	Uuid             openapi_types.UUID   `json:"uuid"`
 }
-
-// UserPublicGender defines model for UserPublic.Gender.
-type UserPublicGender string
 
 // UserSecurity defines model for UserSecurity.
 type UserSecurity struct {

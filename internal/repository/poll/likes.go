@@ -1,4 +1,4 @@
-package vote_repo
+package poll_repo
 
 import (
 	"context"
@@ -10,14 +10,14 @@ import (
 	"github.com/google/uuid"
 )
 
-// GetVoteLikeStatus 获取用户对指定投票的点赞状态.
-func GetVoteLikeStatus(
+// GetPollLikeStatus 获取用户对指定投票的点赞状态.
+func GetPollLikeStatus(
 	ctx context.Context,
 	db qrm.DB,
 	userID int64,
-	voteID int64,
+	pollID int64,
 ) (*int16, error) {
-	likesTbl := table.VoteLikes
+	likesTbl := table.PollLikes
 
 	stmt := pg.SELECT(
 		likesTbl.Value,
@@ -25,11 +25,11 @@ func GetVoteLikeStatus(
 		likesTbl,
 	).WHERE(
 		likesTbl.UserID.EQ(pg.Int64(userID)).
-			AND(likesTbl.VoteID.EQ(pg.Int64(voteID))),
+			AND(likesTbl.PollID.EQ(pg.Int64(pollID))),
 	)
 
 	var results []struct {
-		Value int16 `alias:"vote_likes.value"`
+		Value int16 `alias:"poll_likes.value"`
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
@@ -46,39 +46,39 @@ func GetVoteLikeStatus(
 	return &results[0].Value, nil
 }
 
-// GetMultipleVotesLikeStatus 批量获取用户对多个投票的点赞状态.
-func GetMultipleVotesLikeStatus(
+// GetMultiplePollsLikeStatus 批量获取用户对多个投票的点赞状态.
+func GetMultiplePollsLikeStatus(
 	ctx context.Context,
 	db qrm.DB,
 	userID int64,
-	voteUUIDs []uuid.UUID,
+	pollUUIDs []uuid.UUID,
 ) (map[uuid.UUID]*int16, error) {
-	if len(voteUUIDs) == 0 {
+	if len(pollUUIDs) == 0 {
 		return make(map[uuid.UUID]*int16), nil
 	}
 
-	voteTbl := table.Votes
-	likesTbl := table.VoteLikes
+	pollTbl := table.Polls
+	likesTbl := table.PollLikes
 
 	// 构建 UUID 列表
-	uuidList := make([]pg.Expression, 0, len(voteUUIDs))
-	for _, uuid := range voteUUIDs {
+	uuidList := make([]pg.Expression, 0, len(pollUUIDs))
+	for _, uuid := range pollUUIDs {
 		uuidList = append(uuidList, pg.UUID(uuid))
 	}
 
 	stmt := pg.SELECT(
-		voteTbl.VoteUUID,
+		pollTbl.PollUUID,
 		likesTbl.Value,
 	).FROM(
-		likesTbl.INNER_JOIN(voteTbl, voteTbl.ID.EQ(likesTbl.VoteID)),
+		likesTbl.INNER_JOIN(pollTbl, pollTbl.ID.EQ(likesTbl.PollID)),
 	).WHERE(
 		likesTbl.UserID.EQ(pg.Int64(userID)).
-			AND(voteTbl.VoteUUID.IN(uuidList...)),
+			AND(pollTbl.PollUUID.IN(uuidList...)),
 	)
 
 	var results []struct {
-		VoteUUID uuid.UUID `alias:"votes.vote_uuid"`
-		Value    int16     `alias:"vote_likes.value"`
+		PollUUID uuid.UUID `alias:"polls.poll_uuid"`
+		Value    int16     `alias:"poll_likes.value"`
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
@@ -89,32 +89,32 @@ func GetMultipleVotesLikeStatus(
 	likeStatusMap := make(map[uuid.UUID]*int16)
 
 	// 初始化所有投票为未点赞
-	for _, uuid := range voteUUIDs {
+	for _, uuid := range pollUUIDs {
 		likeStatusMap[uuid] = nil
 	}
 
 	// 设置已点赞的投票状态
 	for _, result := range results {
 		value := result.Value
-		likeStatusMap[result.VoteUUID] = &value
+		likeStatusMap[result.PollUUID] = &value
 	}
 
 	return likeStatusMap, nil
 }
 
-// GetVoteLikesCount 获取投票的总点赞数（实时计算）。
-func GetVoteLikesCount(
+// GetPollLikesCount 获取投票的总点赞数（实时计算）。
+func GetPollLikesCount(
 	ctx context.Context,
 	db qrm.DB,
-	voteID int64,
+	pollID int64,
 ) (int64, error) {
-	likesTbl := table.VoteLikes
+	likesTbl := table.PollLikes
 
 	// 统计该投票的点赞数（value = 1）
 	countStmt := pg.SELECT(pg.COUNT(pg.STAR)).
 		FROM(likesTbl).
 		WHERE(
-			likesTbl.VoteID.EQ(pg.Int64(voteID)).
+			likesTbl.PollID.EQ(pg.Int64(pollID)).
 				AND(likesTbl.Value.EQ(pg.Int16(1))),
 		)
 
@@ -129,37 +129,37 @@ func GetVoteLikesCount(
 	return countResult.Count, nil
 }
 
-// GetMultipleVotesLikesCount 批量获取多个投票的点赞数。
-func GetMultipleVotesLikesCount(
+// GetMultiplePollsLikesCount 批量获取多个投票的点赞数。
+func GetMultiplePollsLikesCount(
 	ctx context.Context,
 	db qrm.DB,
-	voteIDs []int64,
+	pollIDs []int64,
 ) (map[int64]int64, error) {
-	if len(voteIDs) == 0 {
+	if len(pollIDs) == 0 {
 		return make(map[int64]int64), nil
 	}
 
-	likesTbl := table.VoteLikes
+	likesTbl := table.PollLikes
 
 	// 构建投票ID列表
-	idList := make([]pg.Expression, 0, len(voteIDs))
-	for _, id := range voteIDs {
+	idList := make([]pg.Expression, 0, len(pollIDs))
+	for _, id := range pollIDs {
 		idList = append(idList, pg.Int64(id))
 	}
 
 	// 统计每个投票的点赞数
 	stmt := pg.SELECT(
-		likesTbl.VoteID,
+		likesTbl.PollID,
 		pg.COUNT(pg.STAR).AS("count"),
 	).FROM(likesTbl).
 		WHERE(
-			likesTbl.VoteID.IN(idList...).
+			likesTbl.PollID.IN(idList...).
 				AND(likesTbl.Value.EQ(pg.Int16(1))),
 		).
-		GROUP_BY(likesTbl.VoteID)
+		GROUP_BY(likesTbl.PollID)
 
 	var results []struct {
-		VoteID int64 `alias:"vote_id"`
+		PollID int64 `alias:"poll_id"`
 		Count  int64 `alias:"count"`
 	}
 	err := stmt.QueryContext(ctx, db, &results)
@@ -171,13 +171,13 @@ func GetMultipleVotesLikesCount(
 	likesCountMap := make(map[int64]int64)
 
 	// 初始化所有投票为0
-	for _, id := range voteIDs {
+	for _, id := range pollIDs {
 		likesCountMap[id] = 0
 	}
 
 	// 设置有点赞的投票
 	for _, result := range results {
-		likesCountMap[result.VoteID] = result.Count
+		likesCountMap[result.PollID] = result.Count
 	}
 
 	return likesCountMap, nil
@@ -186,29 +186,29 @@ func GetMultipleVotesLikesCount(
 // ============================================
 // 投票评论功能预留
 // ============================================
-// 以下函数为投票评论功能预留，表结构已在迁移文件中创建（vote_comments）
+// 以下函数为投票评论功能预留，表结构已在迁移文件中创建（poll_comments）
 // 实现时需要添加：
-// - GetVoteComments: 获取投票的评论列表
-// - GetVoteCommentCount: 获取投票的评论总数
-// - InsertVoteComment: 添加投票评论
-// - UpdateVoteComment: 编辑投票评论
-// - DeleteVoteComment: 删除投票评论
-// - GetMultipleVotesCommentsCount: 批量获取多个投票的评论数（避免N+1查询）
+// - GetPollComments: 获取投票的评论列表
+// - GetPollCommentCount: 获取投票的评论总数
+// - InsertPollComment: 添加投票评论
+// - UpdatePollComment: 编辑投票评论
+// - DeletePollComment: 删除投票评论
+// - GetMultiplePollsCommentsCount: 批量获取多个投票的评论数（避免N+1查询）
 
-// UpdateVoteLikeCount 更新投票的总点赞数。
-func UpdateVoteLikeCount(
+// UpdatePollLikeCount 更新投票的总点赞数。
+func UpdatePollLikeCount(
 	ctx context.Context,
 	db qrm.DB,
-	voteID int64,
+	pollID int64,
 ) error {
-	voteTbl := table.Votes
-	likesTbl := table.VoteLikes
+	pollTbl := table.Polls
+	likesTbl := table.PollLikes
 
 	// 统计该投票的点赞数（value = 1）
 	countStmt := pg.SELECT(pg.COUNT(pg.STAR)).
 		FROM(likesTbl).
 		WHERE(
-			likesTbl.VoteID.EQ(pg.Int64(voteID)).
+			likesTbl.PollID.EQ(pg.Int64(pollID)).
 				AND(likesTbl.Value.EQ(pg.Int16(1))),
 		)
 
@@ -221,9 +221,9 @@ func UpdateVoteLikeCount(
 	}
 
 	// 更新投票表中的 likes_count
-	updateStmt := voteTbl.UPDATE().
-		SET(voteTbl.LikesCount.SET(pg.Int32(int32(countResult.Count)))).
-		WHERE(voteTbl.ID.EQ(pg.Int64(voteID)))
+	updateStmt := pollTbl.UPDATE().
+		SET(pollTbl.LikesCount.SET(pg.Int32(int32(countResult.Count)))).
+		WHERE(pollTbl.ID.EQ(pg.Int64(pollID)))
 
 	_, err = updateStmt.ExecContext(ctx, db)
 	if err != nil {
@@ -233,36 +233,36 @@ func UpdateVoteLikeCount(
 	return nil
 }
 
-// UpsertVoteLike 插入或更新用户对投票的点赞状态.
-func UpsertVoteLike(
+// UpsertPollLike 插入或更新用户对投票的点赞状态.
+func UpsertPollLike(
 	ctx context.Context,
 	db qrm.DB,
 	userID int64,
-	voteUUID uuid.UUID,
+	pollUUID uuid.UUID,
 	value int16, // 1=点赞, -1=点踩, 0=取消
 ) error {
-	voteTbl := table.Votes
-	likesTbl := table.VoteLikes
+	pollTbl := table.Polls
+	likesTbl := table.PollLikes
 
-	// 首先获取 vote_id
-	voteIDStmt := pg.SELECT(voteTbl.ID).
-		FROM(voteTbl).
-		WHERE(voteTbl.VoteUUID.EQ(pg.UUID(voteUUID)))
+	// 首先获取 poll_id
+	pollIDStmt := pg.SELECT(pollTbl.ID).
+		FROM(pollTbl).
+		WHERE(pollTbl.PollUUID.EQ(pg.UUID(pollUUID)))
 
-	var voteIDResult struct {
-		ID int64 `alias:"votes.id"`
+	var pollIDResult struct {
+		ID int64 `alias:"polls.id"`
 	}
-	err := voteIDStmt.QueryContext(ctx, db, &voteIDResult)
+	err := pollIDStmt.QueryContext(ctx, db, &pollIDResult)
 	if err != nil {
 		return err
 	}
 
-	voteID := voteIDResult.ID
+	pollID := pollIDResult.ID
 
 	if value == 0 {
 		// 删除点赞记录
 		deleteStmt := likesTbl.DELETE().WHERE(
-			likesTbl.VoteID.EQ(pg.Int64(voteID)).
+			likesTbl.PollID.EQ(pg.Int64(pollID)).
 				AND(likesTbl.UserID.EQ(pg.Int64(userID))),
 		)
 		_, err = deleteStmt.ExecContext(ctx, db)
@@ -272,18 +272,18 @@ func UpsertVoteLike(
 	// 插入或更新点赞记录
 	now := pg.NOW()
 	upsertStmt := likesTbl.INSERT(
-		likesTbl.VoteID,
+		likesTbl.PollID,
 		likesTbl.UserID,
 		likesTbl.Value,
 		likesTbl.CreatedAt,
 		likesTbl.UpdatedAt,
 	).VALUES(
-		voteID,
+		pollID,
 		userID,
 		value,
 		now,
 		now,
-	).ON_CONFLICT(likesTbl.VoteID, likesTbl.UserID).DO_UPDATE(
+	).ON_CONFLICT(likesTbl.PollID, likesTbl.UserID).DO_UPDATE(
 		pg.SET(
 			likesTbl.Value.SET(pg.Int16(value)),
 			likesTbl.UpdatedAt.SET(now),

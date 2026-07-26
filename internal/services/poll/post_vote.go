@@ -8,7 +8,7 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/common"
-	vote_repo "genshin-quiz/internal/repository/vote"
+	poll_repo "genshin-quiz/internal/repository/poll"
 	"genshin-quiz/internal/webserver/middleware"
 
 	"github.com/google/uuid"
@@ -33,28 +33,28 @@ func PostCreatePoll(
 
 	now := time.Now()
 	insertModel := genInsertModel(req, userClaims.UserID, now)
-	createdVote, err := vote_repo.InsertVote(ctx, tx, insertModel)
+	createdPoll, err := poll_repo.InsertPoll(ctx, tx, insertModel)
 	if err != nil {
 		return nil, err
 	}
 
 	// 批量插入翻译数据
-	transModels := genTranslationModels(req, createdVote.ID, now)
-	err = vote_repo.InsertVoteTranslations(ctx, tx, transModels)
+	transModels := genTranslationModels(req, createdPoll.ID, now)
+	err = poll_repo.InsertPollTranslations(ctx, tx, transModels)
 	if err != nil {
 		return nil, err
 	}
 
 	// 插入选项
-	optionModels := genOptionModels(req, createdVote.ID, now)
-	insertedOptions, err := vote_repo.InsertVoteOptions(ctx, tx, optionModels)
+	optionModels := genOptionModels(req, createdPoll.ID, now)
+	insertedOptions, err := poll_repo.InsertPollOptions(ctx, tx, optionModels)
 	if err != nil {
 		return nil, err
 	}
 
 	// 插入选项翻译
 	optionTransModels := genOptionTranslationModels(*insertedOptions, req, now)
-	err = vote_repo.InsertOptionTranslations(ctx, tx, optionTransModels)
+	err = poll_repo.InsertOptionTranslations(ctx, tx, optionTransModels)
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +66,8 @@ func PostCreatePoll(
 
 	// Convert to API response format
 	response := oapi.PostCreatePoll201JSONResponse{
-		Category:    oapi.Category(createdVote.Category),
-		Public:      createdVote.Public,
+		Category:    oapi.Category(createdPoll.Category),
+		Public:      createdPoll.Public,
 		Title:       req.Body.Title,       // 直接使用请求中的翻译数据
 		Description: req.Body.Description, // 直接使用请求中的解释数据
 		Options:     []oapi.PollOption{},  // Add options
@@ -80,7 +80,7 @@ func genInsertModel(
 	req oapi.PostCreatePollRequestObject,
 	userID int64,
 	now time.Time,
-) model.Votes {
+) model.Polls {
 	var expiredTime *time.Time
 	if req.Body.ExpireAt != nil {
 		expiredTime = req.Body.ExpireAt
@@ -88,14 +88,14 @@ func genInsertModel(
 	votesPerOption := int32(req.Body.VotesPerOption)
 
 	// 投票主体
-	insertModel := model.Votes{
-		VoteUUID:          uuid.New(),
+	insertModel := model.Polls{
+		PollUUID:          uuid.New(),
 		Public:            req.Body.Public,
 		Category:          model.Category(req.Body.Category),
 		StartAt:           req.Body.StartAt,
 		ExpiresAt:         expiredTime,
 		VotesPerUser:      int32(req.Body.VotesPerUser),
-		VotesPerOption:    &votesPerOption,
+		VotesPerOption:    votesPerOption,
 		CreatedBy:         userID, // 使用从 JWT 获取的用户 ID
 		CreatedAt:         now,
 		LikesCount:        0, // 初始化点赞数为 0
@@ -109,7 +109,7 @@ func genTranslationModels(
 	req oapi.PostCreatePollRequestObject,
 	voteID int64,
 	now time.Time,
-) []model.VoteTranslations {
+) []model.PollTranslations {
 	// 投票主体的翻译 - 预先合并 title 和 description
 	type TranslationData struct {
 		Title       string
@@ -126,10 +126,10 @@ func genTranslationModels(
 		translationMap[lang] = data
 	}
 
-	transModels := make([]model.VoteTranslations, 0, len(translationMap))
+	transModels := make([]model.PollTranslations, 0, len(translationMap))
 	for lang, data := range translationMap {
-		transModel := model.VoteTranslations{
-			VoteID:      voteID,
+		transModel := model.PollTranslations{
+			PollID:      voteID,
 			Language:    lang,
 			Title:       data.Title,
 			Description: data.Description,
@@ -145,12 +145,12 @@ func genOptionModels(
 	req oapi.PostCreatePollRequestObject,
 	voteID int64,
 	now time.Time,
-) []model.VoteOptions {
+) []model.PollOptions {
 	// 生成投票项数据
-	optionModels := make([]model.VoteOptions, 0, len(req.Body.Options))
+	optionModels := make([]model.PollOptions, 0, len(req.Body.Options))
 	for index := range req.Body.Options {
-		optionModel := model.VoteOptions{
-			VoteID:      voteID,
+		optionModel := model.PollOptions{
+			PollID:      voteID,
 			OptionUUID:  uuid.New(),
 			OptionOrder: int32(index),
 			CreatedAt:   now,
@@ -161,13 +161,13 @@ func genOptionModels(
 }
 
 func genOptionTranslationModels(
-	insertedOptions []model.VoteOptions,
+	insertedOptions []model.PollOptions,
 	req oapi.PostCreatePollRequestObject,
 	now time.Time,
-) []model.VoteOptionTranslations {
+) []model.PollOptionTranslations {
 	// 生成选项的翻译数据
 	optionTransModels := make(
-		[]model.VoteOptionTranslations,
+		[]model.PollOptionTranslations,
 		0,
 		len(req.Body.Options)*len(req.Body.Title),
 	)
@@ -175,7 +175,7 @@ func genOptionTranslationModels(
 		source := req.Body.Options[i]
 		// 为每个选项创建翻译记录
 		for lang, text := range source.Text {
-			optionTransModel := model.VoteOptionTranslations{
+			optionTransModel := model.PollOptionTranslations{
 				OptionID:   option.ID,
 				Language:   lang,
 				OptionText: text,

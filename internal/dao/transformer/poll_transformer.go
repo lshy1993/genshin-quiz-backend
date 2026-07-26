@@ -1,67 +1,58 @@
 package transformer
 
 import (
-	"time"
-
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/dao"
 )
 
-// 将SimpleVote（不包含选项详情）模型转换为 OAPI.
-func ConvertSimpleVoteToDTO(
-	vote dao.SimpleVote,
+// 将SimplePoll（不包含选项详情）模型转换为 OAPI.
+func ConvertSimplePollToDTO(
+	poll dao.SimplePoll,
 	voted bool,
 	likeStatus int16,
 ) oapi.Poll {
 	// 构建多语言标题和描述（简单模式只有一种语言）
 	title := make(map[string]string)
 	description := make(oapi.LocalizedText)
-	title[vote.Translation.Language] = vote.Translation.Title
-	if vote.Translation.Description != nil {
-		description[vote.Translation.Language] = *vote.Translation.Description
+	title[poll.Translation.Language] = poll.Translation.Title
+	if poll.Translation.Description != nil {
+		description[poll.Translation.Language] = *poll.Translation.Description
 	}
 
-	participants := int(vote.Vote.ParticipantsCount)
-	totalVotes := int(vote.Vote.TotalVotesCount)
-	likes := int(vote.Vote.LikesCount)
-	votesPerUser := int(vote.Vote.VotesPerUser)
+	participants := int(poll.Poll.ParticipantsCount)
+	totalVotes := int(poll.Poll.TotalVotesCount)
+	likes := int(poll.Poll.LikesCount)
+	votesPerUser := int(poll.Poll.VotesPerUser)
 
-	var votesPerOption *int
-	if vote.Vote.VotesPerOption != nil {
-		val := int(*vote.Vote.VotesPerOption)
-		votesPerOption = &val
-	}
+	votesPerOption := int(poll.Poll.VotesPerOption)
 
-	var expireAt *time.Time
-	if vote.Vote.ExpiresAt != nil {
-		expireAt = vote.Vote.ExpiresAt
-	}
+	expireAt := poll.Poll.ExpiresAt
 
 	likeStatusValue := oapi.LikeStatus(likeStatus)
 
 	return oapi.Poll{
-		Id:                vote.Vote.VoteUUID,
-		Public:            vote.Vote.Public,
+		Id:                poll.Poll.PollUUID,
+		Public:            poll.Poll.Public,
 		Title:             title,
 		Description:       &description,
-		Category:          oapi.Category(vote.Vote.Category),
-		StartAt:           vote.Vote.StartAt,
+		Category:          oapi.Category(poll.Poll.Category),
+		StartAt:           poll.Poll.StartAt,
 		ExpireAt:          expireAt,
 		MyVotes:           nil, // 简单模式不返回
 		VotesPerUser:      votesPerUser,
-		VotesPerOption:    *votesPerOption,
+		VotesPerOption:    votesPerOption,
 		Options:           nil, // 简单模式不返回选项
 		ParticipantsCount: participants,
 		TotalVotesCount:   totalVotes,
-		CreatedBy:         vote.User.UserUUID,
-		CreatedAt:         vote.Vote.CreatedAt,
+		CreatedBy:         poll.User.UserUUID,
+		CreatedAt:         poll.Poll.CreatedAt,
 		LikesCount:        likes,
 		LikeStatus:        likeStatusValue,
 	}
 }
 
 func ConvertDetailedVoteToDTO(
-	vote dao.DetailedVote,
+	vote dao.DetailedPoll,
 	votedOptions []oapi.PollVote,
 	likeStatus int16,
 ) oapi.Poll {
@@ -106,43 +97,32 @@ func ConvertDetailedVoteToDTO(
 		})
 	}
 
-	participants := int(vote.Vote.ParticipantsCount)
-	totalVotes := int(vote.Vote.TotalVotesCount)
-	likes := int(vote.Vote.LikesCount)
-	votesPerUser := int(vote.Vote.VotesPerUser)
+	participants := int(vote.Poll.ParticipantsCount)
+	totalVotes := int(vote.Poll.TotalVotesCount)
+	likes := int(vote.Poll.LikesCount)
+	votesPerUser := int(vote.Poll.VotesPerUser)
 
-	var votesPerOption *int
-	if vote.Vote.VotesPerOption != nil {
-		val := int(*vote.Vote.VotesPerOption)
-		votesPerOption = &val
-	} else {
-		zero := 0
-		votesPerOption = &zero
-	}
-
-	var expireAt *time.Time
-	if vote.Vote.ExpiresAt != nil {
-		expireAt = vote.Vote.ExpiresAt
-	}
+	votesPerOption := int(vote.Poll.VotesPerOption)
+	expireAt := vote.Poll.ExpiresAt
 
 	likeStatusValue := oapi.LikeStatus(likeStatus)
 
 	return oapi.Poll{
-		Id:                vote.Vote.VoteUUID,
-		Public:            vote.Vote.Public,
+		Id:                vote.Poll.PollUUID,
+		Public:            vote.Poll.Public,
 		Title:             title,
 		Description:       &description,
-		Category:          oapi.Category(vote.Vote.Category),
-		StartAt:           vote.Vote.StartAt,
+		Category:          oapi.Category(vote.Poll.Category),
+		StartAt:           vote.Poll.StartAt,
 		ExpireAt:          expireAt,
 		MyVotes:           votedOptions,
 		VotesPerUser:      votesPerUser,
-		VotesPerOption:    *votesPerOption,
+		VotesPerOption:    votesPerOption,
 		Options:           options,
 		ParticipantsCount: participants,
 		TotalVotesCount:   totalVotes,
 		CreatedBy:         vote.User.UserUUID,
-		CreatedAt:         vote.Vote.CreatedAt,
+		CreatedAt:         vote.Poll.CreatedAt,
 		LikesCount:        likes,
 		LikeStatus:        likeStatusValue,
 	}

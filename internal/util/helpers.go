@@ -69,3 +69,10 @@ func GenerateResetLink(domain, rawToken string) string {
 func GenerateEmailVerifyLink(domain, rawToken string) string {
 	return buildAuthLink(domain, "/verify-email", rawToken)
 }
+
+func LanguageOrDefault(lang *string) string {
+	if lang == nil {
+		return "zh-CN"
+	}
+	return *lang
+}

@@ -1,4 +1,4 @@
-package vote_repo
+package poll_repo
 
 import (
 	"context"
@@ -10,37 +10,37 @@ import (
 	"github.com/go-jet/jet/v2/qrm"
 )
 
-func InsertVote(
+func InsertPoll(
 	ctx context.Context,
 	db qrm.DB,
-	insertModel model.Votes,
-) (*model.Votes, error) {
-	tbl := table.Votes
+	insertModel model.Polls,
+) (*model.Polls, error) {
+	tbl := table.Polls
 	insertStmt := tbl.INSERT(tbl.MutableColumns).
 		MODEL(insertModel).
 		RETURNING(tbl.AllColumns)
 
-	var vote model.Votes
-	err := insertStmt.QueryContext(ctx, db, &vote)
+	var poll model.Polls
+	err := insertStmt.QueryContext(ctx, db, &poll)
 	if err != nil {
 		return nil, err
 	}
 
-	return &vote, nil
+	return &poll, nil
 }
 
-func InsertVoteTranslations(
+func InsertPollTranslations(
 	ctx context.Context,
 	db qrm.DB,
-	translations []model.VoteTranslations,
+	translations []model.PollTranslations,
 ) error {
 	if len(translations) == 0 {
 		return nil
 	}
 
-	tbl := table.VoteTranslations
+	tbl := table.PollTranslations
 	insertStmt := tbl.INSERT(
-		tbl.VoteID,
+		tbl.PollID,
 		tbl.Language,
 		tbl.Title,
 		tbl.Description,
@@ -52,19 +52,19 @@ func InsertVoteTranslations(
 	return err
 }
 
-func InsertVoteOptions(
+func InsertPollOptions(
 	ctx context.Context,
 	db qrm.DB,
-	options []model.VoteOptions,
-) (*[]model.VoteOptions, error) {
-	tbl := table.VoteOptions
+	options []model.PollOptions,
+) (*[]model.PollOptions, error) {
+	tbl := table.PollOptions
 	insertStmt := tbl.INSERT(
-		tbl.VoteID,
+		tbl.PollID,
 		tbl.OptionUUID,
 		tbl.CreatedAt,
 	).MODELS(options).RETURNING(tbl.AllColumns)
 
-	var insertedOptions []model.VoteOptions
+	var insertedOptions []model.PollOptions
 	err := insertStmt.QueryContext(ctx, db, &insertedOptions)
 	if err != nil {
 		return nil, err
@@ -76,13 +76,13 @@ func InsertVoteOptions(
 func InsertOptionTranslations(
 	ctx context.Context,
 	db qrm.DB,
-	optionTranslations []model.VoteOptionTranslations,
+	optionTranslations []model.PollOptionTranslations,
 ) error {
 	if len(optionTranslations) == 0 {
 		return nil
 	}
 
-	tbl := table.VoteOptionTranslations
+	tbl := table.PollOptionTranslations
 	insertStmt := tbl.INSERT(
 		tbl.OptionID,
 		tbl.Language,
@@ -100,7 +100,7 @@ func UpdateOptionSelected(
 	db qrm.DB,
 	optionIDs []int64,
 ) error {
-	tbl := table.VoteOptions
+	tbl := table.PollOptions
 
 	uuidSlice := make([]pg.Expression, 0, len(optionIDs))
 	for _, id := range optionIDs {
@@ -124,7 +124,7 @@ func InsertUserVote(
 ) error {
 	tbl := table.UserVotes
 	insertStmt := tbl.INSERT(
-		tbl.VoteID,
+		tbl.PollID,
 		tbl.UserID,
 		tbl.OptionID,
 		tbl.VoteCount,
@@ -143,14 +143,14 @@ func UpsertUserVote(
 ) error {
 	tbl := table.UserVotes
 	insertStmt := tbl.INSERT(
-		tbl.VoteID,
+		tbl.PollID,
 		tbl.UserID,
 		tbl.OptionID,
 		tbl.VoteCount,
 		tbl.CreatedAt,
 		tbl.UpdatedAt,
 	).MODEL(userVote).
-		ON_CONFLICT(tbl.VoteID, tbl.UserID, tbl.OptionID).
+		ON_CONFLICT(tbl.PollID, tbl.UserID, tbl.OptionID).
 		DO_UPDATE(
 			pg.SET(
 				tbl.VoteCount.SET(pg.Int32(userVote.VoteCount)),
