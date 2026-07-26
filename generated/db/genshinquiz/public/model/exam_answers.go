@@ -8,9 +8,8 @@
 package model
 
 import (
-	"time"
-
 	"github.com/lib/pq"
+	"time"
 )
 
 type ExamAnswers struct {

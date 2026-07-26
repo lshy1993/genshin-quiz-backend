@@ -8,29 +8,23 @@
 package model
 
 import (
-	"time"
-
 	"github.com/google/uuid"
+	"time"
 )
 
 type Users struct {
-	ID                 int64 `sql:"primary_key"`
-	UserUUID           uuid.UUID
-	Email              string
-	DisplayName        *string
-	AvatarURL          *string
-	Biography          *string
-	Gender             *string
-	Country            *string
-	Timezone           *string
-	Language           *string
-	ShowEmail          bool
-	CreatedIP          *string
-	CreatedAt          time.Time
-	UpdatedAt          time.Time
-	TotalSubmissions   int64
-	CorrectSubmissions int64
-	QuestionsCreated   int64
-	TotalVotes         int64
-	UserRole           *int32 // User role: 0=regular user, 1=admin, 2=moderator
+	ID            int64 `sql:"primary_key"`
+	UserUUID      uuid.UUID
+	Email         string
+	Nickname      string
+	AvatarURL     *string
+	Biography     *string
+	Language      string // IETF BCP 47 language tag
+	UserRole      int16  // 0=regular user, 1=admin, 2=moderator
+	EmailVerified bool
+	Status        int16 // 0=active, 1=suspended, 2=deleted
+	DeletedAt     *time.Time
+	CreatedIP     *string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }

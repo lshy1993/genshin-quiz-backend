@@ -11,12 +11,11 @@ import (
 	"time"
 )
 
-type UserVotes struct {
+type PollLikes struct {
 	ID        int64 `sql:"primary_key"`
 	PollID    int64
 	UserID    int64
-	OptionID  int64
-	VoteCount int32
+	Value     int16
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

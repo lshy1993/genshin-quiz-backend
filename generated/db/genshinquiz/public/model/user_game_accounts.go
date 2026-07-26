@@ -11,11 +11,11 @@ import (
 	"time"
 )
 
-type VoteLikes struct {
+type UserGameAccounts struct {
 	ID        int64 `sql:"primary_key"`
-	VoteID    int64
 	UserID    int64
-	Value     int16
+	Game      int16
+	Server    int16
+	GameUID   string
 	CreatedAt time.Time
-	UpdatedAt time.Time
 }

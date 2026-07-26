@@ -11,9 +11,9 @@ import (
 	"time"
 )
 
-type VoteTranslations struct {
+type PollTranslations struct {
 	ID          int64 `sql:"primary_key"`
-	VoteID      int64
+	PollID      int64
 	Language    string
 	Title       string
 	Description *string

@@ -18,7 +18,7 @@ type userVotesTable struct {
 
 	// Columns
 	ID        postgres.ColumnInteger
-	VoteID    postgres.ColumnInteger
+	PollID    postgres.ColumnInteger
 	UserID    postgres.ColumnInteger
 	OptionID  postgres.ColumnInteger
 	VoteCount postgres.ColumnInteger
@@ -66,14 +66,14 @@ func newUserVotesTable(schemaName, tableName, alias string) *UserVotesTable {
 func newUserVotesTableImpl(schemaName, tableName, alias string) userVotesTable {
 	var (
 		IDColumn        = postgres.IntegerColumn("id")
-		VoteIDColumn    = postgres.IntegerColumn("vote_id")
+		PollIDColumn    = postgres.IntegerColumn("poll_id")
 		UserIDColumn    = postgres.IntegerColumn("user_id")
 		OptionIDColumn  = postgres.IntegerColumn("option_id")
 		VoteCountColumn = postgres.IntegerColumn("vote_count")
 		CreatedAtColumn = postgres.TimestampzColumn("created_at")
 		UpdatedAtColumn = postgres.TimestampzColumn("updated_at")
-		allColumns      = postgres.ColumnList{IDColumn, VoteIDColumn, UserIDColumn, OptionIDColumn, VoteCountColumn, CreatedAtColumn, UpdatedAtColumn}
-		mutableColumns  = postgres.ColumnList{VoteIDColumn, UserIDColumn, OptionIDColumn, VoteCountColumn, CreatedAtColumn, UpdatedAtColumn}
+		allColumns      = postgres.ColumnList{IDColumn, PollIDColumn, UserIDColumn, OptionIDColumn, VoteCountColumn, CreatedAtColumn, UpdatedAtColumn}
+		mutableColumns  = postgres.ColumnList{PollIDColumn, UserIDColumn, OptionIDColumn, VoteCountColumn, CreatedAtColumn, UpdatedAtColumn}
 		defaultColumns  = postgres.ColumnList{IDColumn, VoteCountColumn, CreatedAtColumn, UpdatedAtColumn}
 	)
 
@@ -82,7 +82,7 @@ func newUserVotesTableImpl(schemaName, tableName, alias string) userVotesTable {
 
 		//Columns
 		ID:        IDColumn,
-		VoteID:    VoteIDColumn,
+		PollID:    PollIDColumn,
 		UserID:    UserIDColumn,
 		OptionID:  OptionIDColumn,
 		VoteCount: VoteCountColumn,

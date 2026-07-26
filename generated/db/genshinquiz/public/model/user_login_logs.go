@@ -12,11 +12,11 @@ import (
 )
 
 type UserLoginLogs struct {
-	ID        int64 `sql:"primary_key"`
-	UserID    int64
-	IPAddress string
-	UserAgent *string
-	LoginType *string
-	Status    string
-	LoginAt   time.Time
+	ID             int64 `sql:"primary_key"`
+	UserID         int64
+	IPAddress      string
+	UserAgent      *string
+	CredentialType int16 // Login provider: 0=password, 1=google, 2=apple, 3=github
+	Status         int16 // Login result: 0=success, 1=failed, 2=blocked
+	LoginAt        time.Time
 }

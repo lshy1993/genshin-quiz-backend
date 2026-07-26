@@ -8,20 +8,19 @@
 package model
 
 import (
-	"time"
-
 	"github.com/google/uuid"
+	"time"
 )
 
-type Votes struct {
+type Polls struct {
 	ID                int64 `sql:"primary_key"`
-	VoteUUID          uuid.UUID
+	PollUUID          uuid.UUID
 	Public            bool
 	Category          Category
 	StartAt           time.Time
 	ExpiresAt         *time.Time
 	VotesPerUser      int32
-	VotesPerOption    *int32
+	VotesPerOption    int32
 	CreatedBy         int64
 	CreatedAt         time.Time
 	ParticipantsCount int64

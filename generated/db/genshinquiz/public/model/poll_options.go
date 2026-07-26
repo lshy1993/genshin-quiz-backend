@@ -8,14 +8,15 @@
 package model
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
-type VoteComments struct {
-	ID        int64 `sql:"primary_key"`
-	VoteID    int64
-	UserID    int64
-	Comment   string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+type PollOptions struct {
+	ID          int64 `sql:"primary_key"`
+	OptionUUID  uuid.UUID
+	PollID      int64
+	OptionOrder int32
+	CreatedAt   time.Time
+	VoteCount   int64
 }

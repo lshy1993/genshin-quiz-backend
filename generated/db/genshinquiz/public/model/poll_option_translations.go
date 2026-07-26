@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type VoteOptionTranslations struct {
+type PollOptionTranslations struct {
 	ID         int64 `sql:"primary_key"`
 	OptionID   int64
 	Language   string

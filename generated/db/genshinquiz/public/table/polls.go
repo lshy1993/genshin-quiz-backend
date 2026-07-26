@@ -11,14 +11,14 @@ import (
 	"github.com/go-jet/jet/v2/postgres"
 )
 
-var Votes = newVotesTable("public", "votes", "")
+var Polls = newPollsTable("public", "polls", "")
 
-type votesTable struct {
+type pollsTable struct {
 	postgres.Table
 
 	// Columns
 	ID                postgres.ColumnInteger
-	VoteUUID          postgres.ColumnString
+	PollUUID          postgres.ColumnString
 	Public            postgres.ColumnBool
 	Category          postgres.ColumnString
 	StartAt           postgres.ColumnTimestampz
@@ -36,43 +36,43 @@ type votesTable struct {
 	DefaultColumns postgres.ColumnList
 }
 
-type VotesTable struct {
-	votesTable
+type PollsTable struct {
+	pollsTable
 
-	EXCLUDED votesTable
+	EXCLUDED pollsTable
 }
 
-// AS creates new VotesTable with assigned alias
-func (a VotesTable) AS(alias string) *VotesTable {
-	return newVotesTable(a.SchemaName(), a.TableName(), alias)
+// AS creates new PollsTable with assigned alias
+func (a PollsTable) AS(alias string) *PollsTable {
+	return newPollsTable(a.SchemaName(), a.TableName(), alias)
 }
 
-// Schema creates new VotesTable with assigned schema name
-func (a VotesTable) FromSchema(schemaName string) *VotesTable {
-	return newVotesTable(schemaName, a.TableName(), a.Alias())
+// Schema creates new PollsTable with assigned schema name
+func (a PollsTable) FromSchema(schemaName string) *PollsTable {
+	return newPollsTable(schemaName, a.TableName(), a.Alias())
 }
 
-// WithPrefix creates new VotesTable with assigned table prefix
-func (a VotesTable) WithPrefix(prefix string) *VotesTable {
-	return newVotesTable(a.SchemaName(), prefix+a.TableName(), a.TableName())
+// WithPrefix creates new PollsTable with assigned table prefix
+func (a PollsTable) WithPrefix(prefix string) *PollsTable {
+	return newPollsTable(a.SchemaName(), prefix+a.TableName(), a.TableName())
 }
 
-// WithSuffix creates new VotesTable with assigned table suffix
-func (a VotesTable) WithSuffix(suffix string) *VotesTable {
-	return newVotesTable(a.SchemaName(), a.TableName()+suffix, a.TableName())
+// WithSuffix creates new PollsTable with assigned table suffix
+func (a PollsTable) WithSuffix(suffix string) *PollsTable {
+	return newPollsTable(a.SchemaName(), a.TableName()+suffix, a.TableName())
 }
 
-func newVotesTable(schemaName, tableName, alias string) *VotesTable {
-	return &VotesTable{
-		votesTable: newVotesTableImpl(schemaName, tableName, alias),
-		EXCLUDED:   newVotesTableImpl("", "excluded", ""),
+func newPollsTable(schemaName, tableName, alias string) *PollsTable {
+	return &PollsTable{
+		pollsTable: newPollsTableImpl(schemaName, tableName, alias),
+		EXCLUDED:   newPollsTableImpl("", "excluded", ""),
 	}
 }
 
-func newVotesTableImpl(schemaName, tableName, alias string) votesTable {
+func newPollsTableImpl(schemaName, tableName, alias string) pollsTable {
 	var (
 		IDColumn                = postgres.IntegerColumn("id")
-		VoteUUIDColumn          = postgres.StringColumn("vote_uuid")
+		PollUUIDColumn          = postgres.StringColumn("poll_uuid")
 		PublicColumn            = postgres.BoolColumn("public")
 		CategoryColumn          = postgres.StringColumn("category")
 		StartAtColumn           = postgres.TimestampzColumn("start_at")
@@ -84,17 +84,17 @@ func newVotesTableImpl(schemaName, tableName, alias string) votesTable {
 		ParticipantsCountColumn = postgres.IntegerColumn("participants_count")
 		TotalVotesCountColumn   = postgres.IntegerColumn("total_votes_count")
 		LikesCountColumn        = postgres.IntegerColumn("likes_count")
-		allColumns              = postgres.ColumnList{IDColumn, VoteUUIDColumn, PublicColumn, CategoryColumn, StartAtColumn, ExpiresAtColumn, VotesPerUserColumn, VotesPerOptionColumn, CreatedByColumn, CreatedAtColumn, ParticipantsCountColumn, TotalVotesCountColumn, LikesCountColumn}
-		mutableColumns          = postgres.ColumnList{VoteUUIDColumn, PublicColumn, CategoryColumn, StartAtColumn, ExpiresAtColumn, VotesPerUserColumn, VotesPerOptionColumn, CreatedByColumn, CreatedAtColumn, ParticipantsCountColumn, TotalVotesCountColumn, LikesCountColumn}
-		defaultColumns          = postgres.ColumnList{IDColumn, VoteUUIDColumn, PublicColumn, StartAtColumn, VotesPerUserColumn, VotesPerOptionColumn, CreatedAtColumn, ParticipantsCountColumn, TotalVotesCountColumn, LikesCountColumn}
+		allColumns              = postgres.ColumnList{IDColumn, PollUUIDColumn, PublicColumn, CategoryColumn, StartAtColumn, ExpiresAtColumn, VotesPerUserColumn, VotesPerOptionColumn, CreatedByColumn, CreatedAtColumn, ParticipantsCountColumn, TotalVotesCountColumn, LikesCountColumn}
+		mutableColumns          = postgres.ColumnList{PollUUIDColumn, PublicColumn, CategoryColumn, StartAtColumn, ExpiresAtColumn, VotesPerUserColumn, VotesPerOptionColumn, CreatedByColumn, CreatedAtColumn, ParticipantsCountColumn, TotalVotesCountColumn, LikesCountColumn}
+		defaultColumns          = postgres.ColumnList{IDColumn, PollUUIDColumn, PublicColumn, StartAtColumn, VotesPerUserColumn, VotesPerOptionColumn, CreatedAtColumn, ParticipantsCountColumn, TotalVotesCountColumn, LikesCountColumn}
 	)
 
-	return votesTable{
+	return pollsTable{
 		Table: postgres.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
 		ID:                IDColumn,
-		VoteUUID:          VoteUUIDColumn,
+		PollUUID:          PollUUIDColumn,
 		Public:            PublicColumn,
 		Category:          CategoryColumn,
 		StartAt:           StartAtColumn,
