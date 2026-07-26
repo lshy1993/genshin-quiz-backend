@@ -93,7 +93,7 @@ func ConvertDetailedVoteToDTO(
 			Id:         optionUUID,
 			Text:       optionText,
 			OptionType: oapi.OptionType("text"), // 默认文本类型，根据实际情况调整
-			VotesCount: &votes,
+			VotesCount: votes,
 		})
 	}
 

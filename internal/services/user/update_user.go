@@ -99,11 +99,11 @@ func UpdateUser(
 		return nil, errors.WrapPrefix(err, "failed to commit transaction", 0)
 	}
 
-	stats, err := user_repo.GetUserStatisticsByID(ctx, tx, userInfo.ID)
+	stats, err := user_repo.GetUserStatisticsByID(ctx, app.DB, userInfo.ID)
 	if err != nil {
 		return nil, err
 	}
-	logins, err := user_repo.GetLatestLoginLogByID(ctx, tx, userInfo.ID)
+	logins, err := user_repo.GetLatestLoginLogByID(ctx, app.DB, userInfo.ID)
 	if err != nil {
 		return nil, err
 	}

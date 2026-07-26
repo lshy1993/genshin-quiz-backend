@@ -21,9 +21,9 @@ func ConvertSimpleToQuestion(
 	}
 
 	return oapi.Question{
-		AnswersCount:        &answered,
+		AnswersCount:        answered,
 		Category:            oapi.Category(res.Question.Category),
-		CorrectAnswersCount: &correct,
+		CorrectAnswersCount: correct,
 		CreatedAt:           res.Question.CreatedAt,
 		CreatedBy:           res.User.UserUUID,
 		Difficulty:          oapi.Difficulty(res.Question.Difficulty),
@@ -68,9 +68,9 @@ func ConvertDetailToQuestion(
 	}
 
 	return oapi.Question{
-		AnswersCount:        &answer,
+		AnswersCount:        answer,
 		Category:            oapi.Category(res.Question.Category),
-		CorrectAnswersCount: &correct,
+		CorrectAnswersCount: correct,
 		CreatedAt:           res.Question.CreatedAt,
 		CreatedBy:           res.User.UserUUID,
 		Difficulty:          oapi.Difficulty(res.Question.Difficulty),
@@ -99,7 +99,7 @@ func ToQuestionOption(
 		Id:            option.OptionUUID,
 		MediaUrl:      option.ImgURL,
 		Text:          &text,
-		SelectedCount: &count,
+		SelectedCount: count,
 		OptionType:    oapi.OptionType(option.OptionType),
 	}
 	if solved {

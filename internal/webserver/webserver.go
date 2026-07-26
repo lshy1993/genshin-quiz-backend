@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -66,14 +65,6 @@ func NewServer(app *config.App) *Server {
 
 	// Setup API routes - 使用条件认证中间件，根据路径决定是否需要认证
 	r.Group(func(r chi.Router) {
-		// 仅在业务路由组中使用 Sentry 中间件
-		if app.Config.SentryDSN != "" {
-			sentryHandler := sentryhttp.New(sentryhttp.Options{
-				Repanic: true,
-			})
-			r.Use(sentryHandler.Handle)
-		}
-
 		// JWT 认证中间件
 		r.Use(mw.ConditionalJWTAuth(app.Config.JWTSecret, app.DB))
 

@@ -35,7 +35,7 @@ func GetUsersLeaderboard(
 	users := table.Users
 	profiles := table.UserProfiles
 	privacies := table.UserPrivacies
-	stats := table.UserStats
+	stats := table.UserStats.AS("us")
 
 	orderCol := buildOrderByColumn(params.SortBy)
 	orderClause := orderCol.ASC()

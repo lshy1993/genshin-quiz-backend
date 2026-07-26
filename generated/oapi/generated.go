@@ -114,6 +114,7 @@ func (e Gender) Valid() bool {
 const (
 	Minus1 LikeStatus = -1
 	N0     LikeStatus = 0
+	N1     LikeStatus = 1
 )
 
 // Valid indicates whether the value is a known member of the LikeStatus enum.
@@ -122,6 +123,8 @@ func (e LikeStatus) Valid() bool {
 	case Minus1:
 		return true
 	case N0:
+		return true
+	case N1:
 		return true
 	default:
 		return false
@@ -271,6 +274,9 @@ type CreateExamRequest struct {
 	Title LocalizedText `json:"title"`
 }
 
+// CreatePollOptionRequest defines model for CreatePollOptionRequest.
+type CreatePollOptionRequest = PollOptionBase
+
 // CreatePollRequest defines model for CreatePollRequest.
 type CreatePollRequest struct {
 	// Category 分类
@@ -336,9 +342,9 @@ type Difficulty string
 
 // Exam defines model for Exam.
 type Exam struct {
-	Categories []Category          `json:"categories"`
-	CreatedAt  *time.Time          `json:"created_at,omitempty"`
-	CreatedBy  *openapi_types.UUID `json:"created_by,omitempty"`
+	Categories []Category         `json:"categories"`
+	CreatedAt  time.Time          `json:"created_at"`
+	CreatedBy  openapi_types.UUID `json:"created_by"`
 
 	// Description Localized text keyed by language code.
 	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
@@ -484,7 +490,7 @@ type PollOption struct {
 	Text LocalizedText `json:"text"`
 
 	// VotesCount 获得的累计票数
-	VotesCount *int `json:"votes_count,omitempty"`
+	VotesCount int `json:"votes_count"`
 }
 
 // PollOptionBase defines model for PollOptionBase.
@@ -512,13 +518,13 @@ type PollVote struct {
 // Question defines model for Question.
 type Question struct {
 	// AnswersCount 总答题人数
-	AnswersCount *int `json:"answers_count,omitempty"`
+	AnswersCount int `json:"answers_count"`
 
 	// Category 分类
 	Category Category `json:"category"`
 
 	// CorrectAnswersCount 总答对人数
-	CorrectAnswersCount *int               `json:"correct_answers_count,omitempty"`
+	CorrectAnswersCount int                `json:"correct_answers_count"`
 	CreatedAt           time.Time          `json:"created_at"`
 	CreatedBy           openapi_types.UUID `json:"created_by"`
 
@@ -584,7 +590,7 @@ type QuestionOption struct {
 	OptionType OptionType `json:"option_type"`
 
 	// SelectedCount 选中次数
-	SelectedCount *int `json:"selected_count,omitempty"`
+	SelectedCount int `json:"selected_count"`
 
 	// Text Localized text keyed by language code.
 	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}

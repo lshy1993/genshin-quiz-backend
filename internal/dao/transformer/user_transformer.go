@@ -56,6 +56,14 @@ func UserModelToPrivate(
 	if profile.Country != nil {
 		country = *profile.Country
 	}
+	bio := ""
+	if user.Biography != nil {
+		bio = *user.Biography
+	}
+	createdIP := ""
+	if user.CreatedIP != nil {
+		createdIP = *user.CreatedIP
+	}
 
 	var genderDTO *oapi.Gender
 	g := genderToDTO(profile.Gender)
@@ -70,13 +78,13 @@ func UserModelToPrivate(
 		Uuid:         user.UserUUID,
 		Nickname:     nickName,
 		AvatarUrl:    avatarURL,
-		Bio:          *user.Biography,
+		Bio:          bio,
 		Birthday:     birthday,
 		Country:      &country,
 		Gender:       genderDTO,
 		Email:        (*types.Email)(&user.Email),
 		Language:     user.Language,
-		RegisteredIp: *user.CreatedIP,
+		RegisteredIp: createdIP,
 		RegisteredAt: user.CreatedAt,
 		LastLoginIp:  &login.IPAddress,
 		LastLoginAt:  login.LoginAt,
@@ -110,6 +118,10 @@ func UserModelToPublic(
 	if profile.Country != nil && privacies.CountryVisibility == 1 {
 		country = *profile.Country
 	}
+	bio := ""
+	if user.Biography != nil {
+		bio = *user.Biography
+	}
 
 	var genderDTO *oapi.Gender
 	if privacies.GenderVisibility == 1 {
@@ -126,7 +138,7 @@ func UserModelToPublic(
 		Uuid:             user.UserUUID,
 		Nickname:         user.Nickname,
 		AvatarUrl:        avatarURL,
-		Bio:              *user.Biography,
+		Bio:              bio,
 		Birthday:         birthday,
 		Country:          &country,
 		Gender:           genderDTO,

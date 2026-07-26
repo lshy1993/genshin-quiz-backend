@@ -208,8 +208,8 @@ func isPublicEndpoint(path, method string) bool {
 		"/questions/*": {"GET"}, // 通配符支持 /questions/{id}
 		"/exams":       {"GET"},
 		"/exams/*":     {"GET"}, // 通配符支持 /exams/{id}
-		"/votes":       {"GET"},
-		"/votes/*":     {"GET"}, // POST/PUT需要认证
+		"/polls":       {"GET"},
+		"/polls/*":     {"GET"}, // POST/PUT需要认证
 		"/users":       {"GET"},
 		"/user/*":      {"GET"}, // 通配符支持 /user/{id} POST/PUT需要认证
 	}
