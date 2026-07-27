@@ -651,30 +651,30 @@ type SubmissionBase struct {
 
 // UserAdmin defines model for UserAdmin.
 type UserAdmin struct {
-	AvatarUrl          string               `json:"avatar_url"`
-	Bio                string               `json:"bio"`
-	Birthday           *openapi_types.Date  `json:"birthday,omitempty"`
-	BirthdayVisibility Visibility           `json:"birthday_visibility"`
-	CorrectAnswers     int                  `json:"correct_answers"`
-	Country            *string              `json:"country,omitempty"`
-	CountryVisibility  Visibility           `json:"country_visibility"`
-	Email              *openapi_types.Email `json:"email,omitempty"`
-	EmailVerified      bool                 `json:"email_verified"`
-	EmailVisibility    Visibility           `json:"email_visibility"`
-	Gender             *Gender              `json:"gender,omitempty"`
-	GenderVisibility   Visibility           `json:"gender_visibility"`
-	IsDeleted          bool                 `json:"is_deleted"`
-	Language           string               `json:"language"`
-	LastLoginAt        time.Time            `json:"last_login_at"`
-	LastLoginIp        *string              `json:"last_login_ip,omitempty"`
-	LikesReceived      int                  `json:"likes_received"`
-	Nickname           string               `json:"nickname"`
-	PollsCreated       int                  `json:"polls_created"`
-	QuestionsCreated   int                  `json:"questions_created"`
-	RegisteredAt       time.Time            `json:"registered_at"`
-	RegisteredIp       string               `json:"registered_ip"`
-	TotalAnswers       int                  `json:"total_answers"`
-	Uuid               openapi_types.UUID   `json:"uuid"`
+	AvatarUrl          string              `json:"avatar_url"`
+	Bio                string              `json:"bio"`
+	Birthday           *openapi_types.Date `json:"birthday,omitempty"`
+	BirthdayVisibility Visibility          `json:"birthday_visibility"`
+	CorrectAnswers     int                 `json:"correct_answers"`
+	Country            *string             `json:"country,omitempty"`
+	CountryVisibility  Visibility          `json:"country_visibility"`
+	Email              openapi_types.Email `json:"email"`
+	EmailVerified      bool                `json:"email_verified"`
+	EmailVisibility    Visibility          `json:"email_visibility"`
+	Gender             *Gender             `json:"gender,omitempty"`
+	GenderVisibility   Visibility          `json:"gender_visibility"`
+	IsDeleted          bool                `json:"is_deleted"`
+	Language           string              `json:"language"`
+	LastLoginAt        time.Time           `json:"last_login_at"`
+	LastLoginIp        *string             `json:"last_login_ip,omitempty"`
+	LikesReceived      int                 `json:"likes_received"`
+	Nickname           string              `json:"nickname"`
+	PollsCreated       int                 `json:"polls_created"`
+	QuestionsCreated   int                 `json:"questions_created"`
+	RegisteredAt       time.Time           `json:"registered_at"`
+	RegisteredIp       string              `json:"registered_ip"`
+	TotalAnswers       int                 `json:"total_answers"`
+	Uuid               openapi_types.UUID  `json:"uuid"`
 }
 
 // UserBase defines model for UserBase.
@@ -696,29 +696,29 @@ type UserPrivacy struct {
 
 // UserPrivate defines model for UserPrivate.
 type UserPrivate struct {
-	AvatarUrl          string               `json:"avatar_url"`
-	Bio                string               `json:"bio"`
-	Birthday           *openapi_types.Date  `json:"birthday,omitempty"`
-	BirthdayVisibility Visibility           `json:"birthday_visibility"`
-	CorrectAnswers     int                  `json:"correct_answers"`
-	Country            *string              `json:"country,omitempty"`
-	CountryVisibility  Visibility           `json:"country_visibility"`
-	Email              *openapi_types.Email `json:"email,omitempty"`
-	EmailVerified      bool                 `json:"email_verified"`
-	EmailVisibility    Visibility           `json:"email_visibility"`
-	Gender             *Gender              `json:"gender,omitempty"`
-	GenderVisibility   Visibility           `json:"gender_visibility"`
-	Language           string               `json:"language"`
-	LastLoginAt        time.Time            `json:"last_login_at"`
-	LastLoginIp        *string              `json:"last_login_ip,omitempty"`
-	LikesReceived      int                  `json:"likes_received"`
-	Nickname           string               `json:"nickname"`
-	PollsCreated       int                  `json:"polls_created"`
-	QuestionsCreated   int                  `json:"questions_created"`
-	RegisteredAt       time.Time            `json:"registered_at"`
-	RegisteredIp       string               `json:"registered_ip"`
-	TotalAnswers       int                  `json:"total_answers"`
-	Uuid               openapi_types.UUID   `json:"uuid"`
+	AvatarUrl          string              `json:"avatar_url"`
+	Bio                string              `json:"bio"`
+	Birthday           *openapi_types.Date `json:"birthday,omitempty"`
+	BirthdayVisibility Visibility          `json:"birthday_visibility"`
+	CorrectAnswers     int                 `json:"correct_answers"`
+	Country            *string             `json:"country,omitempty"`
+	CountryVisibility  Visibility          `json:"country_visibility"`
+	Email              openapi_types.Email `json:"email"`
+	EmailVerified      bool                `json:"email_verified"`
+	EmailVisibility    Visibility          `json:"email_visibility"`
+	Gender             *Gender             `json:"gender,omitempty"`
+	GenderVisibility   Visibility          `json:"gender_visibility"`
+	Language           string              `json:"language"`
+	LastLoginAt        time.Time           `json:"last_login_at"`
+	LastLoginIp        *string             `json:"last_login_ip,omitempty"`
+	LikesReceived      int                 `json:"likes_received"`
+	Nickname           string              `json:"nickname"`
+	PollsCreated       int                 `json:"polls_created"`
+	QuestionsCreated   int                 `json:"questions_created"`
+	RegisteredAt       time.Time           `json:"registered_at"`
+	RegisteredIp       string              `json:"registered_ip"`
+	TotalAnswers       int                 `json:"total_answers"`
+	Uuid               openapi_types.UUID  `json:"uuid"`
 }
 
 // UserProfile defines model for UserProfile.
@@ -921,6 +921,18 @@ type GetUsersParams struct {
 
 // GetUsersParamsSortBy defines parameters for GetUsers.
 type GetUsersParamsSortBy string
+
+// GetUserPollsParams defines parameters for GetUserPolls.
+type GetUserPollsParams struct {
+	Page  *int `form:"page,omitempty" json:"page,omitempty"`
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
+// GetUserQuestionsParams defines parameters for GetUserQuestions.
+type GetUserQuestionsParams struct {
+	Page  *int `form:"page,omitempty" json:"page,omitempty"`
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+}
 
 // PostChangePasswordJSONRequestBody defines body for PostChangePassword for application/json ContentType.
 type PostChangePasswordJSONRequestBody PostChangePasswordJSONBody
@@ -1183,6 +1195,12 @@ type ClientInterface interface {
 
 	// GetUser request
 	GetUser(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetUserPolls request
+	GetUserPolls(ctx context.Context, id openapi_types.UUID, params *GetUserPollsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetUserQuestions request
+	GetUserQuestions(ctx context.Context, id openapi_types.UUID, params *GetUserQuestionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) PostChangePasswordWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -1787,6 +1805,30 @@ func (c *Client) GetUsers(ctx context.Context, params *GetUsersParams, reqEditor
 
 func (c *Client) GetUser(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetUserRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetUserPolls(ctx context.Context, id openapi_types.UUID, params *GetUserPollsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetUserPollsRequest(c.Server, id, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetUserQuestions(ctx context.Context, id openapi_types.UUID, params *GetUserQuestionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetUserQuestionsRequest(c.Server, id, params)
 	if err != nil {
 		return nil, err
 	}
@@ -3474,6 +3516,152 @@ func NewGetUserRequest(server string, id openapi_types.UUID) (*http.Request, err
 	return req, nil
 }
 
+// NewGetUserPollsRequest generates requests for GetUserPolls
+func NewGetUserPollsRequest(server string, id openapi_types.UUID, params *GetUserPollsParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "id", id, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/users/%s/polls", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetUserQuestionsRequest generates requests for GetUserQuestions
+func NewGetUserQuestionsRequest(server string, id openapi_types.UUID, params *GetUserQuestionsParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "id", id, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/users/%s/questions", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -3651,6 +3839,12 @@ type ClientWithResponsesInterface interface {
 
 	// GetUserWithResponse request
 	GetUserWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetUserResponse, error)
+
+	// GetUserPollsWithResponse request
+	GetUserPollsWithResponse(ctx context.Context, id openapi_types.UUID, params *GetUserPollsParams, reqEditors ...RequestEditorFn) (*GetUserPollsResponse, error)
+
+	// GetUserQuestionsWithResponse request
+	GetUserQuestionsWithResponse(ctx context.Context, id openapi_types.UUID, params *GetUserQuestionsParams, reqEditors ...RequestEditorFn) (*GetUserQuestionsResponse, error)
 }
 
 type PostChangePasswordResponse struct {
@@ -4740,6 +4934,76 @@ func (r GetUserResponse) ContentType() string {
 	return ""
 }
 
+type GetUserPollsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Polls []Poll `json:"polls"`
+		Total int    `json:"total"`
+	}
+	JSON404 *NotFound
+	JSON500 *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetUserPollsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetUserPollsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetUserPollsResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type GetUserQuestionsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Questions []Question `json:"questions"`
+		Total     int        `json:"total"`
+	}
+	JSON404 *NotFound
+	JSON500 *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetUserQuestionsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetUserQuestionsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetUserQuestionsResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 // PostChangePasswordWithBodyWithResponse request with arbitrary body returning *PostChangePasswordResponse
 func (c *ClientWithResponses) PostChangePasswordWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostChangePasswordResponse, error) {
 	rsp, err := c.PostChangePasswordWithBody(ctx, contentType, body, reqEditors...)
@@ -5179,6 +5443,24 @@ func (c *ClientWithResponses) GetUserWithResponse(ctx context.Context, id openap
 		return nil, err
 	}
 	return ParseGetUserResponse(rsp)
+}
+
+// GetUserPollsWithResponse request returning *GetUserPollsResponse
+func (c *ClientWithResponses) GetUserPollsWithResponse(ctx context.Context, id openapi_types.UUID, params *GetUserPollsParams, reqEditors ...RequestEditorFn) (*GetUserPollsResponse, error) {
+	rsp, err := c.GetUserPolls(ctx, id, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetUserPollsResponse(rsp)
+}
+
+// GetUserQuestionsWithResponse request returning *GetUserQuestionsResponse
+func (c *ClientWithResponses) GetUserQuestionsWithResponse(ctx context.Context, id openapi_types.UUID, params *GetUserQuestionsParams, reqEditors ...RequestEditorFn) (*GetUserQuestionsResponse, error) {
+	rsp, err := c.GetUserQuestions(ctx, id, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetUserQuestionsResponse(rsp)
 }
 
 // ParsePostChangePasswordResponse parses an HTTP response from a PostChangePasswordWithResponse call
@@ -6634,6 +6916,92 @@ func ParseGetUserResponse(rsp *http.Response) (*GetUserResponse, error) {
 	return response, nil
 }
 
+// ParseGetUserPollsResponse parses an HTTP response from a GetUserPollsWithResponse call
+func ParseGetUserPollsResponse(rsp *http.Response) (*GetUserPollsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetUserPollsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Polls []Poll `json:"polls"`
+			Total int    `json:"total"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetUserQuestionsResponse parses an HTTP response from a GetUserQuestionsWithResponse call
+func ParseGetUserQuestionsResponse(rsp *http.Response) (*GetUserQuestionsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetUserQuestionsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Questions []Question `json:"questions"`
+			Total     int        `json:"total"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Change password
@@ -6735,6 +7103,12 @@ type ServerInterface interface {
 	// Get user by ID
 	// (GET /users/{id})
 	GetUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Get user's created polls
+	// (GET /users/{id}/polls)
+	GetUserPolls(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserPollsParams)
+	// Get user's created question
+	// (GET /users/{id}/questions)
+	GetUserQuestions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserQuestionsParams)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
@@ -6936,6 +7310,18 @@ func (_ Unimplemented) GetUsers(w http.ResponseWriter, r *http.Request, params G
 // Get user by ID
 // (GET /users/{id})
 func (_ Unimplemented) GetUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get user's created polls
+// (GET /users/{id}/polls)
+func (_ Unimplemented) GetUserPolls(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserPollsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get user's created question
+// (GET /users/{id}/questions)
+func (_ Unimplemented) GetUserQuestions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserQuestionsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -8023,6 +8409,116 @@ func (siw *ServerInterfaceWrapper) GetUser(w http.ResponseWriter, r *http.Reques
 	handler.ServeHTTP(w, r)
 }
 
+// GetUserPolls operation middleware
+func (siw *ServerInterfaceWrapper) GetUserPolls(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetUserPollsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", r.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "limit"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetUserPolls(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetUserQuestions operation middleware
+func (siw *ServerInterfaceWrapper) GetUserQuestions(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetUserQuestionsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", r.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "limit"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetUserQuestions(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 type UnescapedCookieParamError struct {
 	ParamName string
 	Err       error
@@ -8234,6 +8730,12 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/users/{id}", wrapper.GetUser)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/users/{id}/polls", wrapper.GetUserPolls)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/users/{id}/questions", wrapper.GetUserQuestions)
 	})
 
 	return r
@@ -10324,6 +10826,118 @@ func (response GetUser500JSONResponse) VisitGetUserResponse(w http.ResponseWrite
 	return err
 }
 
+type GetUserPollsRequestObject struct {
+	Id     openapi_types.UUID `json:"id"`
+	Params GetUserPollsParams
+}
+
+type GetUserPollsResponseObject interface {
+	VisitGetUserPollsResponse(w http.ResponseWriter) error
+}
+
+type GetUserPolls200JSONResponse struct {
+	Polls []Poll `json:"polls"`
+	Total int    `json:"total"`
+}
+
+func (response GetUserPolls200JSONResponse) VisitGetUserPollsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetUserPolls404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response GetUserPolls404JSONResponse) VisitGetUserPollsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetUserPolls500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetUserPolls500JSONResponse) VisitGetUserPollsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetUserQuestionsRequestObject struct {
+	Id     openapi_types.UUID `json:"id"`
+	Params GetUserQuestionsParams
+}
+
+type GetUserQuestionsResponseObject interface {
+	VisitGetUserQuestionsResponse(w http.ResponseWriter) error
+}
+
+type GetUserQuestions200JSONResponse struct {
+	Questions []Question `json:"questions"`
+	Total     int        `json:"total"`
+}
+
+func (response GetUserQuestions200JSONResponse) VisitGetUserQuestionsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetUserQuestions404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response GetUserQuestions404JSONResponse) VisitGetUserQuestionsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetUserQuestions500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetUserQuestions500JSONResponse) VisitGetUserQuestionsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 	// Change password
@@ -10425,6 +11039,12 @@ type StrictServerInterface interface {
 	// Get user by ID
 	// (GET /users/{id})
 	GetUser(ctx context.Context, request GetUserRequestObject) (GetUserResponseObject, error)
+	// Get user's created polls
+	// (GET /users/{id}/polls)
+	GetUserPolls(ctx context.Context, request GetUserPollsRequestObject) (GetUserPollsResponseObject, error)
+	// Get user's created question
+	// (GET /users/{id}/questions)
+	GetUserQuestions(ctx context.Context, request GetUserQuestionsRequestObject) (GetUserQuestionsResponseObject, error)
 }
 
 type StrictHandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error)
@@ -11407,6 +12027,60 @@ func (sh *strictHandler) GetUser(w http.ResponseWriter, r *http.Request, id open
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetUserResponseObject); ok {
 		if err := validResponse.VisitGetUserResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetUserPolls operation middleware
+func (sh *strictHandler) GetUserPolls(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserPollsParams) {
+	var request GetUserPollsRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetUserPolls(ctx, request.(GetUserPollsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetUserPolls")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetUserPollsResponseObject); ok {
+		if err := validResponse.VisitGetUserPollsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetUserQuestions operation middleware
+func (sh *strictHandler) GetUserQuestions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserQuestionsParams) {
+	var request GetUserQuestionsRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetUserQuestions(ctx, request.(GetUserQuestionsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetUserQuestions")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetUserQuestionsResponseObject); ok {
+		if err := validResponse.VisitGetUserQuestionsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

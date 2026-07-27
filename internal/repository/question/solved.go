@@ -51,7 +51,6 @@ func CheckMultipleQuestionsSolved(
 		return make(map[int64]bool), nil
 	}
 
-	questionTbl := table.Questions
 	submissionTbl := table.QuestionSubmissions
 
 	// 构建 ID 列表
@@ -61,15 +60,15 @@ func CheckMultipleQuestionsSolved(
 	}
 
 	stmt := pg.SELECT(
-		questionTbl.ID,
+		submissionTbl.QuestionID,
 	).FROM(
-		submissionTbl.INNER_JOIN(questionTbl, questionTbl.ID.EQ(submissionTbl.QuestionID)),
+		submissionTbl,
 	).WHERE(
 		submissionTbl.UserID.EQ(pg.Int64(userID)).
-			AND(questionTbl.ID.IN(idList...)).
+			AND(submissionTbl.QuestionID.IN(idList...)).
 			AND(submissionTbl.IsCorrect.IS_TRUE()).
 			AND(submissionTbl.IsPractice.IS_FALSE()),
-	).GROUP_BY(questionTbl.ID)
+	).GROUP_BY(submissionTbl.QuestionID)
 
 	var results []struct {
 		QuestionID int64 `alias:"questions.id"`

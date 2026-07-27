@@ -288,34 +288,28 @@ func VerifyAndUseToken(
 	hashBytes := sha256.Sum256([]byte(rawToken))
 	tokenHash := hex.EncodeToString(hashBytes[:])
 
-	// 2. 查询数据库中未过期且未使用的 Token
+	// 2. 查询并更新中未过期且未使用的 Token
 	now := time.Now()
-	stmt := pg.SELECT(tbl.AllColumns).
-		FROM(tbl).
+	stmt := tbl.UPDATE().
+		SET(
+			tbl.IsUsed.SET(pg.Bool(true)),
+		).
 		WHERE(
 			tbl.TokenHash.EQ(pg.String(tokenHash)).
 				AND(tbl.TokenType.EQ(pg.String(tokenType.String()))).
-				AND(tbl.IsUsed.EQ(pg.Bool(false))).
+				AND(tbl.IsUsed.IS_FALSE()).
 				AND(tbl.ExpiresAt.GT(pg.TimestampzT(now))),
-		)
+		).
+		RETURNING(tbl.AllColumns)
 
 	var tokenRecord model.UserTokens
 	err := stmt.QueryContext(ctx, db, &tokenRecord)
 	if err != nil {
+		// 找不到token或过期
 		if errors.Is(err, qrm.ErrNoRows) {
-			return nil, errors.New("invalid or expired token")
+			return nil, common.ErrInvalidToken
 		}
 		return nil, err
-	}
-
-	// 3. 标记 Token 为已使用
-	updateStmt := tbl.UPDATE(tbl.IsUsed).
-		SET(true).
-		WHERE(tbl.ID.EQ(pg.Int(tokenRecord.ID)))
-
-	_, err = updateStmt.ExecContext(ctx, db)
-	if err != nil {
-		return nil, errors.WrapPrefix(err, "mark token as used failed", 0)
 	}
 
 	return &tokenRecord, nil

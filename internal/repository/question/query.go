@@ -75,10 +75,49 @@ func GetQuestions(
 	}, nil
 }
 
+func GetQuestionsByCreator(
+	ctx context.Context,
+	db qrm.DB,
+	params dao.QuestionListParams,
+) (*dao.QuestionListResult, error) {
+	return nil, nil
+}
+
+func GetSolvedQuestions(
+	ctx context.Context,
+	db qrm.DB,
+	params dao.QuestionListParams,
+) (*dao.QuestionListResult, error) {
+	return nil, nil
+}
+
 func buildQuestionCondition(params dao.QuestionListParams) pg.BoolExpression {
 	tbl := table.Questions
-	translationTbl := table.QuestionTranslations
-	condition := tbl.Public.IS_TRUE().AND(tbl.IsPublished.IS_TRUE())
+	transTbl := table.QuestionTranslations
+
+	condition := pg.Bool(true)
+
+	if params.IsPublic != nil {
+		if *params.IsPublic {
+			condition = condition.AND(tbl.Public.IS_TRUE())
+		} else {
+			condition = condition.AND(tbl.Public.IS_FALSE())
+		}
+	}
+
+	if params.IsPublished != nil {
+		if *params.IsPublished {
+			condition = condition.AND(tbl.IsPublished.IS_TRUE())
+		} else {
+			condition = condition.AND(tbl.IsPublished.IS_FALSE())
+		}
+	}
+
+	// 添加创建者过滤
+	if params.Author != nil {
+		userID := *params.Author
+		condition = condition.AND(tbl.CreatedBy.EQ(pg.Int64(userID)))
+	}
 
 	// 添加分类过滤
 	if params.Category != nil {
@@ -99,8 +138,9 @@ func buildQuestionCondition(params dao.QuestionListParams) pg.BoolExpression {
 	// 添加关键字搜索（在翻译表的question_text中搜索）
 	if params.Query != nil && *params.Query != "" {
 		searchTerm := "%" + strings.ToLower(*params.Query) + "%"
-		condition = condition.AND(pg.LOWER(translationTbl.QuestionText).LIKE(pg.String(searchTerm)))
+		condition = condition.AND(pg.LOWER(transTbl.QuestionText).LIKE(pg.String(searchTerm)))
 	}
+
 	return condition
 }
 
@@ -108,7 +148,7 @@ func buildQuestionOrder(params dao.QuestionListParams) pg.OrderByClause {
 	tbl := table.Questions
 	var orderExpr pg.Expression
 
-	switch *params.SortBy {
+	switch params.SortBy {
 	case "PublishDate": // 上线时间
 		orderExpr = tbl.PublishedAt
 	case "Difficulty":

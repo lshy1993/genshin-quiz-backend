@@ -82,7 +82,7 @@ func UserModelToPrivate(
 		Birthday:     birthday,
 		Country:      &country,
 		Gender:       genderDTO,
-		Email:        (*types.Email)(&user.Email),
+		Email:        (types.Email)(user.Email),
 		Language:     user.Language,
 		RegisteredIp: createdIP,
 		RegisteredAt: user.CreatedAt,

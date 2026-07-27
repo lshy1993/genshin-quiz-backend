@@ -111,6 +111,33 @@ func UpdateUser(
 	return &result, nil
 }
 
+func SetUserEmailVerified(
+	ctx context.Context,
+	db qrm.DB,
+	userID int64,
+) error {
+	tbl := table.Users
+	updateStmt := tbl.UPDATE().
+		SET(
+			tbl.EmailVerified.SET(pg.Bool(true)),
+			tbl.UpdatedAt.SET(pg.CURRENT_TIMESTAMP()),
+		).
+		WHERE(tbl.ID.EQ(pg.Int64(userID))).
+		RETURNING(tbl.ID)
+
+	var result struct {
+		ID int64 `alias:"id"`
+	}
+	err := updateStmt.QueryContext(ctx, db, &result)
+	if err != nil {
+		if errors.Is(err, qrm.ErrNoRows) {
+			return common.ErrUserNotFound
+		}
+		return errors.WrapPrefix(err, "update user failed", 0)
+	}
+	return nil
+}
+
 func InsertUserProfile(
 	ctx context.Context,
 	db qrm.DB,

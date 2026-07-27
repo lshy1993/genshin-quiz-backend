@@ -27,7 +27,7 @@ func GetHome(
 	questionResult, err := question_repo.GetQuestions(ctx, app.DB, dao.QuestionListParams{
 		Page:       1,
 		NumPerPage: 5,
-		SortBy:     &questionSortBy,
+		SortBy:     questionSortBy,
 		SortDesc:   true,
 		Language:   language,
 	})
@@ -42,12 +42,12 @@ func GetHome(
 
 	sortBy := "created_at"
 	result, err := poll_repo.GetPolls(ctx, app.DB, dao.PollListParams{
-		Page:     1,
-		Limit:    5,
-		Type:     "all",
-		SortBy:   sortBy,
-		SortDesc: true,
-		Language: language,
+		Page:       1,
+		NumPerPage: 5,
+		Type:       "all",
+		SortBy:     sortBy,
+		SortDesc:   true,
+		Language:   language,
 	})
 	if err != nil {
 		return nil, err

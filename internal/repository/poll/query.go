@@ -24,7 +24,7 @@ func GetPolls(
 	transTbl := table.PollTranslations
 	userTbl := table.Users
 
-	offset := (params.Page - 1) * params.Limit
+	offset := (params.Page - 1) * params.NumPerPage
 	if offset < 0 {
 		offset = 0
 	}
@@ -48,7 +48,7 @@ func GetPolls(
 			buildPollCondition(params),
 		).
 		ORDER_BY(buildPollOrderBy(params)).
-		LIMIT(int64(params.Limit)).
+		LIMIT(int64(params.NumPerPage)).
 		OFFSET(int64(offset))
 
 	// 获取总数
@@ -79,7 +79,28 @@ func GetPolls(
 func buildPollCondition(params dao.PollListParams) pg.BoolExpression {
 	tbl := table.Polls
 	transTbl := table.PollTranslations
-	condition := tbl.Public.IS_TRUE()
+
+	condition := pg.Bool(true)
+
+	if params.IsPublic != nil {
+		if *params.IsPublic {
+			condition = condition.AND(tbl.Public.IS_TRUE())
+		} else {
+			condition = condition.AND(tbl.Public.IS_FALSE())
+		}
+	}
+
+	// 添加创建者过滤
+	if params.Author != nil {
+		userID := *params.Author
+		condition = condition.AND(tbl.CreatedBy.EQ(pg.Int64(userID)))
+	}
+
+	// 添加分类过滤
+	if params.Category != nil {
+		cat := string(*params.Category)
+		condition = condition.AND(tbl.Category.EQ(pg.NewEnumValue(cat)))
+	}
 
 	// 类型筛选：all, available, expired
 	now := pg.CURRENT_TIMESTAMP()

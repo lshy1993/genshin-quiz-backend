@@ -9,6 +9,8 @@ import (
 	"genshin-quiz/internal/dao/transformer"
 	poll_repo "genshin-quiz/internal/repository/poll"
 	"genshin-quiz/internal/webserver/middleware"
+
+	"github.com/go-jet/jet/v2/qrm"
 )
 
 func GetPolls(
@@ -43,23 +45,36 @@ func GetPolls(
 	}
 
 	// 调用 repository 层获取数据
-	result, err := poll_repo.GetPolls(
-		ctx,
-		app.DB,
-		dao.PollListParams{
-			Page:     page,
-			Limit:    limit,
-			Type:     pollType,
-			Query:    req.Params.Query,
-			Language: req.Params.Language,
-			SortBy:   sortBy,
-			SortDesc: sortDesc,
-		},
-	)
+	param := dao.PollListParams{
+		Page:       page,
+		NumPerPage: limit,
+		Type:       pollType,
+		Query:      req.Params.Query,
+		Language:   req.Params.Language,
+		SortBy:     sortBy,
+		SortDesc:   sortDesc,
+	}
+	result, err := poll_repo.GetPolls(ctx, app.DB, param)
 	if err != nil {
 		return nil, err
 	}
 
+	dtos, err := buildPollsWithLike(ctx, app.DB, result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &oapi.GetPolls200JSONResponse{
+		Total: result.Total,
+		Polls: dtos,
+	}, nil
+}
+
+func buildPollsWithLike(
+	ctx context.Context,
+	db qrm.DB,
+	result *dao.PollListResult,
+) ([]oapi.Poll, error) {
 	// 获取当前用户信息（可选）
 	var userClaims *middleware.UserClaims
 	if claims, ok := middleware.GetUserFromContextOnly(ctx); ok {
@@ -73,7 +88,7 @@ func GetPolls(
 	}
 
 	// 批量获取所有投票的点赞数
-	likesCountMap, err := poll_repo.GetMultiplePollsLikesCount(ctx, app.DB, pollIDs)
+	likesCountMap, err := poll_repo.GetMultiplePollsLikesCount(ctx, db, pollIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +107,7 @@ func GetPolls(
 			// 检查用户是否已投票
 			userVotes, err := poll_repo.GetUserVotedOptions(
 				ctx,
-				app.DB,
+				db,
 				userClaims.UserID,
 				poll.Poll.ID,
 			)
@@ -103,7 +118,7 @@ func GetPolls(
 			// 获取点赞状态
 			userLikeStatus, err := poll_repo.GetPollLikeStatus(
 				ctx,
-				app.DB,
+				db,
 				userClaims.UserID,
 				poll.Poll.ID,
 			)
@@ -116,8 +131,5 @@ func GetPolls(
 		dtos = append(dtos, dto)
 	}
 
-	return &oapi.GetPolls200JSONResponse{
-		Total: result.Total,
-		Polls: dtos,
-	}, nil
+	return dtos, nil
 }

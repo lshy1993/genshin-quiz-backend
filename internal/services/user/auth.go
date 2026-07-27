@@ -7,7 +7,7 @@ import (
 	"genshin-quiz/internal/enum"
 	user_repo "genshin-quiz/internal/repository/user"
 	"genshin-quiz/internal/webserver/middleware"
-	"log"
+	"genshin-quiz/logger"
 	"time"
 
 	"genshin-quiz/internal/common"
@@ -47,7 +47,7 @@ func ForgotPassword(
 
 	// 发送给邮箱
 	finalURL := util.GenerateResetLink(app.Config.Domain, rawToken)
-	log.Println(finalURL)
+	logger.L.Debug(finalURL)
 	err = app.SendEmail(email, "Email verification", finalURL)
 	if err != nil {
 		return nil, err
@@ -185,7 +185,7 @@ func SendVerificationEmail(
 	}
 	// 发送给邮箱
 	finalURL := util.GenerateEmailVerifyLink(app.Config.Domain, rawToken)
-	log.Println(finalURL)
+	logger.L.Debug(finalURL)
 	err = app.SendEmail(email, "Email verification", finalURL)
 	if err != nil {
 		return nil, err
@@ -220,7 +220,15 @@ func VerifyEmail(
 		return nil, common.ErrInvalidToken
 	}
 	// 3.标记用户邮箱已验证
-	log.Println(tokenRecord.TokenHash)
+	err = user_repo.SetUserEmailVerified(ctx, tx, tokenRecord.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 提交事务
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
 
 	return &oapi.PostVerifyEmail200Response{}, nil
 }

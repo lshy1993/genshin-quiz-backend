@@ -3,6 +3,8 @@ package handler
 import (
 	"context"
 	"genshin-quiz/generated/oapi"
+	poll_services "genshin-quiz/internal/services/poll"
+	question_services "genshin-quiz/internal/services/question"
 	services "genshin-quiz/internal/services/user"
 )
 
@@ -48,4 +50,26 @@ func (h *Handler) UpdateUser(
 		return nil, err
 	}
 	return (oapi.UpdateUser200JSONResponse)(*res), nil
+}
+
+func (h *Handler) GetUserPolls(
+	ctx context.Context,
+	req oapi.GetUserPollsRequestObject,
+) (oapi.GetUserPollsResponseObject, error) {
+	res, err := poll_services.GetPollsByUser(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return (oapi.GetUserPolls200JSONResponse)(*res), nil
+}
+
+func (h *Handler) GetUserQuestions(
+	ctx context.Context,
+	req oapi.GetUserQuestionsRequestObject,
+) (oapi.GetUserQuestionsResponseObject, error) {
+	res, err := question_services.GetQuestionsByUser(ctx, h.app, req)
+	if err != nil {
+		return nil, err
+	}
+	return (oapi.GetUserQuestions200JSONResponse)(*res), nil
 }
