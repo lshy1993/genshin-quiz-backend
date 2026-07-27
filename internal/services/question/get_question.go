@@ -17,11 +17,16 @@ func GetQuestion(
 	req oapi.GetQuestionRequestObject,
 ) (*oapi.Question, error) {
 	// 调用仓库层获取问题详情
-	res, err := question_repo.GetQuestionByUUID(ctx, app.DB, req.Id, nil)
+	res, err := question_repo.GetQuestionByUUID(ctx, app.DB, req.Id)
 	if err != nil {
 		return nil, err
 	}
 	questionDBId := res.Question.ID
+	// 获取翻译
+	trans, err := question_repo.GetQuestionTransByID(ctx, app.DB, questionDBId)
+	if err != nil {
+		return nil, err
+	}
 	// 获取选项
 	options, err := question_repo.GetQuestionOptions(ctx, app.DB, questionDBId)
 	if err != nil {
@@ -46,7 +51,7 @@ func GetQuestion(
 	detailedQuestion := dao.DetailedQuestion{
 		Question:           res.Question,
 		User:               res.User,
-		Translation:        res.Translation,
+		Translation:        trans,
 		Options:            *options,
 		OptionTranslations: *optionTranslations,
 		SubmissionCount:    *count,

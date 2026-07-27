@@ -5,10 +5,9 @@ import (
 
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
-	"genshin-quiz/internal/common"
 	dao "genshin-quiz/internal/dao"
 	question_repo "genshin-quiz/internal/repository/question"
-	"genshin-quiz/internal/webserver/middleware"
+	user_repo "genshin-quiz/internal/repository/user"
 )
 
 func GetQuestionsByUser(
@@ -16,10 +15,9 @@ func GetQuestionsByUser(
 	app *config.App,
 	req oapi.GetUserQuestionsRequestObject,
 ) (*oapi.GetUserQuestions200JSONResponse, error) {
-	// 从 context 中获取用户信息
-	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
-	if !ok {
-		return nil, common.ErrUserNotInContext
+	userInfo, err := user_repo.GetUserInfoByUUID(ctx, app.DB, req.Id)
+	if err != nil {
+		return nil, err
 	}
 
 	page := 1 // 修正：页码从1开始，不是0
@@ -36,14 +34,14 @@ func GetQuestionsByUser(
 	param := dao.QuestionListParams{
 		Page:       page,
 		NumPerPage: limit,
-		Author:     &userClaims.UserID,
+		Author:     &userInfo.ID,
 	}
 	result, err := question_repo.GetQuestions(ctx, app.DB, param)
 	if err != nil {
 		return nil, err
 	}
 
-	dtos, err := buildQuestionsWith(ctx, app.DB, result)
+	dtos, err := question_repo.BuildQuestionsWithTransaction(ctx, app.DB, result)
 	if err != nil {
 		return nil, err
 	}

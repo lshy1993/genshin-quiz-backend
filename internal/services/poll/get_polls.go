@@ -6,11 +6,7 @@ import (
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/dao"
-	"genshin-quiz/internal/dao/transformer"
 	poll_repo "genshin-quiz/internal/repository/poll"
-	"genshin-quiz/internal/webserver/middleware"
-
-	"github.com/go-jet/jet/v2/qrm"
 )
 
 func GetPolls(
@@ -59,7 +55,7 @@ func GetPolls(
 		return nil, err
 	}
 
-	dtos, err := buildPollsWithLike(ctx, app.DB, result)
+	dtos, err := poll_repo.BuildPollsWithLike(ctx, app.DB, result)
 	if err != nil {
 		return nil, err
 	}
@@ -68,68 +64,4 @@ func GetPolls(
 		Total: result.Total,
 		Polls: dtos,
 	}, nil
-}
-
-func buildPollsWithLike(
-	ctx context.Context,
-	db qrm.DB,
-	result *dao.PollListResult,
-) ([]oapi.Poll, error) {
-	// 获取当前用户信息（可选）
-	var userClaims *middleware.UserClaims
-	if claims, ok := middleware.GetUserFromContextOnly(ctx); ok {
-		userClaims = claims
-	}
-
-	// 提取所有投票的ID用于批量查询
-	pollIDs := make([]int64, 0, len(result.Polls))
-	for _, poll := range result.Polls {
-		pollIDs = append(pollIDs, poll.Poll.ID)
-	}
-
-	// 批量获取所有投票的点赞数
-	likesCountMap, err := poll_repo.GetMultiplePollsLikesCount(ctx, db, pollIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	// 转换为 DTO
-	dtos := make([]oapi.Poll, 0, len(result.Polls))
-	for _, poll := range result.Polls {
-		// 覆盖投票的点赞数为实时计算的值
-		poll.Poll.LikesCount = likesCountMap[poll.Poll.ID]
-
-		voted := false
-		likeStatus := int16(0)
-
-		// 如果用户已登录，检查投票状态和点赞状态
-		if userClaims != nil {
-			// 检查用户是否已投票
-			userVotes, err := poll_repo.GetUserVotedOptions(
-				ctx,
-				db,
-				userClaims.UserID,
-				poll.Poll.ID,
-			)
-			if err == nil && userVotes != nil && len(*userVotes) > 0 {
-				voted = true
-			}
-
-			// 获取点赞状态
-			userLikeStatus, err := poll_repo.GetPollLikeStatus(
-				ctx,
-				db,
-				userClaims.UserID,
-				poll.Poll.ID,
-			)
-			if err == nil && userLikeStatus != nil {
-				likeStatus = *userLikeStatus
-			}
-		}
-
-		dto := transformer.ConvertSimplePollToDTO(poll, voted, likeStatus)
-		dtos = append(dtos, dto)
-	}
-
-	return dtos, nil
 }

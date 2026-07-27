@@ -6,9 +6,8 @@ import (
 )
 
 type SimplePoll struct {
-	Poll        model.Polls
-	Translation model.PollTranslations
-	User        model.Users
+	Poll model.Polls
+	User model.Users
 }
 
 type DetailedPoll struct {

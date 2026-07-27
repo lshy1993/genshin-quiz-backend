@@ -60,7 +60,7 @@ func (h *Handler) GetUserPolls(
 	if err != nil {
 		return nil, err
 	}
-	return (oapi.GetUserPolls200JSONResponse)(*res), nil
+	return *res, nil
 }
 
 func (h *Handler) GetUserQuestions(
@@ -71,5 +71,5 @@ func (h *Handler) GetUserQuestions(
 	if err != nil {
 		return nil, err
 	}
-	return (oapi.GetUserQuestions200JSONResponse)(*res), nil
+	return *res, nil
 }

@@ -9,16 +9,14 @@ import (
 )
 
 type SimpleQuestion struct {
-	Question    model.Questions
-	User        model.Users
-	Translation model.QuestionTranslations
-	// Solved      bool
+	Question model.Questions
+	User     model.Users
 }
 
 type DetailedQuestion struct {
 	Question           model.Questions
 	User               model.Users
-	Translation        model.QuestionTranslations
+	Translation        []model.QuestionTranslations
 	Options            []model.QuestionOptions
 	OptionTranslations []model.QuestionOptionTranslations
 	SubmissionCount    int64

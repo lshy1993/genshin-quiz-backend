@@ -6,11 +6,7 @@ import (
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
 	dao "genshin-quiz/internal/dao"
-	"genshin-quiz/internal/dao/transformer"
 	question_repo "genshin-quiz/internal/repository/question"
-	"genshin-quiz/internal/webserver/middleware"
-
-	"github.com/go-jet/jet/v2/qrm"
 )
 
 func GetQuestions(
@@ -52,7 +48,7 @@ func GetQuestions(
 		return nil, err
 	}
 
-	dtos, err := buildQuestionsWith(ctx, app.DB, result)
+	dtos, err := question_repo.BuildQuestionsWithTransaction(ctx, app.DB, result)
 	if err != nil {
 		return nil, err
 	}
@@ -61,41 +57,4 @@ func GetQuestions(
 		Questions: dtos,
 		Total:     result.Total,
 	}, nil
-}
-
-func buildQuestionsWith(
-	ctx context.Context,
-	db qrm.DB,
-	result *dao.QuestionListResult,
-) ([]oapi.Question, error) {
-	// 检查用户是否已解答这些题目（如果用户已登录）
-	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
-
-	var solvedMap map[int64]bool
-	var err error
-	if ok {
-		questionIDs := make([]int64, 0, len(result.Questions))
-		for _, q := range result.Questions {
-			questionIDs = append(questionIDs, q.Question.ID)
-		}
-
-		solvedMap, err = question_repo.CheckMultipleQuestionsSolved(
-			ctx,
-			db,
-			userClaims.UserID,
-			questionIDs,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		// log.Println("Solved Map:", solvedMap)
-	}
-
-	dtos := make([]oapi.Question, 0, len(result.Questions))
-	for _, q := range result.Questions {
-		dtos = append(dtos, transformer.ConvertSimpleToQuestion(q, solvedMap[q.Question.ID], 0))
-	}
-
-	return dtos, nil
 }

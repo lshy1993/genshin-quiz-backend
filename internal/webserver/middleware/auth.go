@@ -211,7 +211,7 @@ func isPublicEndpoint(path, method string) bool {
 		"/polls":       {"GET"},
 		"/polls/*":     {"GET"}, // POST/PUT需要认证
 		"/users":       {"GET"},
-		"/user/*":      {"GET"}, // 通配符支持 /user/{id} POST/PUT需要认证
+		"/users/*":     {"GET"}, // 通配符支持 /users/{id} POST/PUT需要认证
 	}
 	// 精确匹配
 	if methods, exists := publicEndpoints[path]; exists {

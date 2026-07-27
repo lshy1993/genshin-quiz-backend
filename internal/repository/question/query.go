@@ -6,7 +6,10 @@ import (
 
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
+	"genshin-quiz/generated/oapi"
 	dao "genshin-quiz/internal/dao"
+	"genshin-quiz/internal/dao/transformer"
+	"genshin-quiz/internal/webserver/middleware"
 
 	"genshin-quiz/internal/common"
 	"genshin-quiz/internal/util"
@@ -22,7 +25,6 @@ func GetQuestions(
 	params dao.QuestionListParams,
 ) (*dao.QuestionListResult, error) {
 	tbl := table.Questions
-	transTbl := table.QuestionTranslations
 	userTbl := table.Users
 
 	offset := (params.Page - 1) * params.NumPerPage
@@ -30,18 +32,11 @@ func GetQuestions(
 		offset = 0
 	}
 
-	// 获取默认语言
-	defaultLang := util.GetDefaultLanguage(params.Language)
-
 	stmt := pg.SELECT(
 		tbl.AllColumns,
-		transTbl.AllColumns,
 		userTbl.AllColumns,
 	).FROM(
-		tbl.LEFT_JOIN(
-			transTbl,
-			tbl.ID.EQ(transTbl.QuestionID).AND(transTbl.Language.EQ(pg.String(defaultLang))),
-		).
+		tbl.
 			LEFT_JOIN(userTbl, tbl.CreatedBy.EQ(userTbl.ID)),
 	).
 		WHERE(
@@ -73,22 +68,6 @@ func GetQuestions(
 		Questions: questions,
 		Total:     int(countResult.Count),
 	}, nil
-}
-
-func GetQuestionsByCreator(
-	ctx context.Context,
-	db qrm.DB,
-	params dao.QuestionListParams,
-) (*dao.QuestionListResult, error) {
-	return nil, nil
-}
-
-func GetSolvedQuestions(
-	ctx context.Context,
-	db qrm.DB,
-	params dao.QuestionListParams,
-) (*dao.QuestionListResult, error) {
-	return nil, nil
 }
 
 func buildQuestionCondition(params dao.QuestionListParams) pg.BoolExpression {
@@ -138,7 +117,19 @@ func buildQuestionCondition(params dao.QuestionListParams) pg.BoolExpression {
 	// 添加关键字搜索（在翻译表的question_text中搜索）
 	if params.Query != nil && *params.Query != "" {
 		searchTerm := "%" + strings.ToLower(*params.Query) + "%"
-		condition = condition.AND(pg.LOWER(transTbl.QuestionText).LIKE(pg.String(searchTerm)))
+
+		condition = condition.AND(
+			pg.EXISTS(
+				pg.SELECT(pg.Int(1)).
+					FROM(transTbl).
+					WHERE(
+						transTbl.QuestionID.EQ(tbl.ID).
+							AND(
+								pg.LOWER(transTbl.QuestionText).LIKE(pg.String(searchTerm)),
+							),
+					),
+			),
+		)
 	}
 
 	return condition
@@ -178,23 +169,17 @@ func GetQuestionByUUID(
 	ctx context.Context,
 	db qrm.DB,
 	uuid uuid.UUID,
-	language *string,
 ) (*dao.SimpleQuestion, error) {
 	tbl := table.Questions
 	transTbl := table.QuestionTranslations
 	userTbl := table.Users
-
-	// 获取默认语言
-	defaultLang := util.GetDefaultLanguageFromString(language)
 
 	stmt := pg.SELECT(
 		tbl.AllColumns,
 		transTbl.AllColumns,
 		userTbl.UserUUID,
 	).FROM(
-		tbl.LEFT_JOIN(transTbl,
-			tbl.ID.EQ(transTbl.QuestionID).AND(transTbl.Language.EQ(pg.String(defaultLang))),
-		).LEFT_JOIN(userTbl, userTbl.ID.EQ(tbl.CreatedBy)),
+		tbl.LEFT_JOIN(userTbl, userTbl.ID.EQ(tbl.CreatedBy)),
 	).WHERE(
 		tbl.QuestionUUID.EQ(pg.UUID(uuid)),
 	)
@@ -209,47 +194,34 @@ func GetQuestionByUUID(
 		return nil, common.ErrQuestionNotFound
 	}
 
-	question := result[0]
-
-	// 如果没有获取到指定语言的翻译，则 fallback 到任意语言
-	if question.Translation.Language == "" {
-		fallbackTrans, err := getQuestionTranslationFallback(ctx, db, question.Question.ID)
-		if err != nil {
-			return nil, err
-		}
-		if fallbackTrans != nil {
-			question.Translation = *fallbackTrans
-		}
-	}
-
-	return &question, nil
+	return &result[0], nil
 }
 
 // getQuestionTranslationFallback 获取题目的任意语言翻译（用于 fallback）.
-func getQuestionTranslationFallback(
-	ctx context.Context,
-	db qrm.DB,
-	questionID int64,
-) (*model.QuestionTranslations, error) {
-	tbl := table.QuestionTranslations
+// func getQuestionTranslationFallback(
+// 	ctx context.Context,
+// 	db qrm.DB,
+// 	questionID int64,
+// ) (*model.QuestionTranslations, error) {
+// 	tbl := table.QuestionTranslations
 
-	stmt := pg.SELECT(tbl.AllColumns).
-		FROM(tbl).
-		WHERE(tbl.QuestionID.EQ(pg.Int64(questionID))).
-		LIMIT(1)
+// 	stmt := pg.SELECT(tbl.AllColumns).
+// 		FROM(tbl).
+// 		WHERE(tbl.QuestionID.EQ(pg.Int64(questionID))).
+// 		LIMIT(1)
 
-	var trans []model.QuestionTranslations
-	err := stmt.QueryContext(ctx, db, &trans)
-	if err != nil {
-		return nil, err
-	}
+// 	var trans []model.QuestionTranslations
+// 	err := stmt.QueryContext(ctx, db, &trans)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	if len(trans) == 0 {
-		return nil, common.ErrNotFound
-	}
+// 	if len(trans) == 0 {
+// 		return nil, common.ErrNotFound
+// 	}
 
-	return &trans[0], nil
-}
+// 	return &trans[0], nil
+// }
 
 func GetQuestionIDByUUID(
 	ctx context.Context,
@@ -274,32 +246,6 @@ func GetQuestionIDByUUID(
 	}
 
 	return &dbID[0].ID, nil
-}
-
-func GetQuestionTranslation(
-	ctx context.Context,
-	db qrm.DB,
-	questionID int64,
-	language *[]string,
-) (*[]model.QuestionTranslations, error) {
-	tbl := table.QuestionTranslations
-
-	// langExp := []pg.Expression{}
-	// for _, lang := range *language {
-	// 	langExp = append(langExp, pg.String(string(lang)))
-	// }
-
-	stmt := pg.SELECT(tbl.AllColumns).
-		FROM(tbl).
-		WHERE(tbl.QuestionID.EQ(pg.Int64(questionID)))
-
-	var dto []model.QuestionTranslations
-	err := stmt.QueryContext(ctx, db, &dto)
-	if err != nil {
-		return nil, err
-	}
-
-	return &dto, nil
 }
 
 func GetQuestionOptions(
@@ -542,4 +488,65 @@ func GetOptionIDsByUUIDs(
 	}
 
 	return result, nil
+}
+
+func BuildQuestionsWithTransaction(
+	ctx context.Context,
+	db qrm.DB,
+	result *dao.QuestionListResult,
+) ([]oapi.Question, error) {
+	idList := make([]int64, 0)
+	for _, q := range result.Questions {
+		idList = append(idList, q.Question.ID)
+	}
+
+	var solvedMap map[int64]bool
+	var likedMap map[int64]int16
+
+	// 获取翻译
+	trans, err := GetQuestionTransByIDs(ctx, db, idList)
+	if err != nil {
+		return nil, err
+	}
+
+	// 检查用户是否已解答这些题目（如果用户已登录）
+	if userClaims, ok := middleware.GetUserFromContextOnly(ctx); ok {
+		questionIDs := make([]int64, 0, len(result.Questions))
+		for _, q := range result.Questions {
+			questionIDs = append(questionIDs, q.Question.ID)
+		}
+
+		solvedMap, err = CheckMultipleQuestionsSolved(
+			ctx,
+			db,
+			userClaims.UserID,
+			questionIDs,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		likedMap, err = GetMultipleQuestionsLikeStatus(
+			ctx,
+			db,
+			userClaims.UserID,
+			questionIDs,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		// log.Println("Solved Map:", solvedMap)
+	}
+
+	dtos := make([]oapi.Question, 0, len(result.Questions))
+	for _, q := range result.Questions {
+		id := q.Question.ID
+		dtos = append(
+			dtos,
+			transformer.ConvertSimpleToQuestion(q, trans[id], solvedMap[id], likedMap[id]),
+		)
+	}
+
+	return dtos, nil
 }

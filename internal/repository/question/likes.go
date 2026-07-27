@@ -51,19 +51,19 @@ func GetMultipleQuestionsLikeStatus(
 	ctx context.Context,
 	db qrm.DB,
 	userID int64,
-	questionUUIDs []uuid.UUID,
-) (map[uuid.UUID]*int16, error) {
-	if len(questionUUIDs) == 0 {
-		return make(map[uuid.UUID]*int16), nil
+	questionIDs []int64,
+) (map[int64]int16, error) {
+	if len(questionIDs) == 0 {
+		return make(map[int64]int16), nil
 	}
 
 	questionTbl := table.Questions
 	likesTbl := table.QuestionLikes
 
-	// 构建 UUID 列表
-	uuidList := make([]pg.Expression, 0, len(questionUUIDs))
-	for _, uuid := range questionUUIDs {
-		uuidList = append(uuidList, pg.UUID(uuid))
+	// 构建 ID 列表
+	idList := make([]pg.Expression, 0, len(questionIDs))
+	for _, id := range questionIDs {
+		idList = append(idList, pg.Int64(id))
 	}
 
 	stmt := pg.SELECT(
@@ -73,12 +73,12 @@ func GetMultipleQuestionsLikeStatus(
 		likesTbl.INNER_JOIN(questionTbl, questionTbl.ID.EQ(likesTbl.QuestionID)),
 	).WHERE(
 		likesTbl.UserID.EQ(pg.Int64(userID)).
-			AND(questionTbl.QuestionUUID.IN(uuidList...)),
+			AND(questionTbl.ID.IN(idList...)),
 	)
 
 	var results []struct {
-		QuestionUUID uuid.UUID `alias:"questions.question_uuid"`
-		Value        int16     `alias:"question_likes.value"`
+		QuestionID int64 `alias:"questions.id"`
+		Value      int16 `alias:"question_likes.value"`
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
@@ -86,17 +86,11 @@ func GetMultipleQuestionsLikeStatus(
 	}
 
 	// 构建结果 map
-	likeStatusMap := make(map[uuid.UUID]*int16)
-
-	// 初始化所有题目为未点赞
-	for _, uuid := range questionUUIDs {
-		likeStatusMap[uuid] = nil
-	}
-
+	likeStatusMap := make(map[int64]int16)
 	// 设置已点赞的题目状态
 	for _, result := range results {
 		value := result.Value
-		likeStatusMap[result.QuestionUUID] = &value
+		likeStatusMap[result.QuestionID] = value
 	}
 
 	return likeStatusMap, nil

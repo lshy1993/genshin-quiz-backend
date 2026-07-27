@@ -1,6 +1,7 @@
 package transformer
 
 import (
+	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/dao"
 )
@@ -8,15 +9,17 @@ import (
 // 将SimplePoll（不包含选项详情）模型转换为 OAPI.
 func ConvertSimplePollToDTO(
 	poll dao.SimplePoll,
+	trans []model.PollTranslations,
 	voted bool,
 	likeStatus int16,
 ) oapi.Poll {
 	// 构建多语言标题和描述（简单模式只有一种语言）
-	title := make(map[string]string)
+	title := make(oapi.LocalizedText)
 	description := make(oapi.LocalizedText)
-	title[poll.Translation.Language] = poll.Translation.Title
-	if poll.Translation.Description != nil {
-		description[poll.Translation.Language] = *poll.Translation.Description
+
+	for _, q := range trans {
+		description[q.Language] = *q.Description
+		title[q.Language] = q.Title
 	}
 
 	participants := int(poll.Poll.ParticipantsCount)

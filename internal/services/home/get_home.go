@@ -6,10 +6,8 @@ import (
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/dao"
-	"genshin-quiz/internal/dao/transformer"
 	poll_repo "genshin-quiz/internal/repository/poll"
 	question_repo "genshin-quiz/internal/repository/question"
-	"genshin-quiz/internal/webserver/middleware"
 )
 
 func GetHome(
@@ -23,8 +21,35 @@ func GetHome(
 		language = &lang
 	}
 
+	// 获取
+	latestQuestions, err := getLatestQuestions(ctx, app, language)
+	if err != nil {
+		return nil, err
+	}
+	latestPolls, err := getLatestPolls(ctx, app, language)
+	if err != nil {
+		return nil, err
+	}
+	popularPolls, err := getPopularPolls(ctx, app, language)
+	if err != nil {
+		return nil, err
+	}
+
+	return &oapi.GetHome200JSONResponse{
+		PopularExams:    []oapi.Exam{},
+		LatestQuestions: latestQuestions,
+		LatestPolls:     latestPolls,
+		PopularPolls:    popularPolls,
+	}, nil
+}
+
+func getLatestQuestions(
+	ctx context.Context,
+	app *config.App,
+	language *[]string,
+) ([]oapi.Question, error) {
 	questionSortBy := "PublishDate"
-	questionResult, err := question_repo.GetQuestions(ctx, app.DB, dao.QuestionListParams{
+	result, err := question_repo.GetQuestions(ctx, app.DB, dao.QuestionListParams{
 		Page:       1,
 		NumPerPage: 5,
 		SortBy:     questionSortBy,
@@ -35,11 +60,19 @@ func GetHome(
 		return nil, err
 	}
 
-	latestQuestions := make([]oapi.Question, 0, len(questionResult.Questions))
-	for _, q := range questionResult.Questions {
-		latestQuestions = append(latestQuestions, transformer.ConvertSimpleToQuestion(q, false, 0))
+	dtos, err := question_repo.BuildQuestionsWithTransaction(ctx, app.DB, result)
+	if err != nil {
+		return nil, err
 	}
 
+	return dtos, nil
+}
+
+func getPopularPolls(
+	ctx context.Context,
+	app *config.App,
+	language *[]string,
+) ([]oapi.Poll, error) {
 	sortBy := "created_at"
 	result, err := poll_repo.GetPolls(ctx, app.DB, dao.PollListParams{
 		Page:       1,
@@ -53,47 +86,35 @@ func GetHome(
 		return nil, err
 	}
 
-	var userClaims *middleware.UserClaims
-	if claims, ok := middleware.GetUserFromContextOnly(ctx); ok {
-		userClaims = claims
+	dtos, err := poll_repo.BuildPollsWithLike(ctx, app.DB, result)
+	if err != nil {
+		return nil, err
 	}
 
-	latestVotes := make([]oapi.Poll, 0, len(result.Polls))
-	popularVotes := make([]oapi.Poll, 0, len(result.Polls))
-	for _, poll := range result.Polls {
-		voted := false
-		likeStatus := int16(0)
-		if userClaims != nil {
-			userVotes, err := poll_repo.GetUserVotedOptions(
-				ctx,
-				app.DB,
-				userClaims.UserID,
-				poll.Poll.ID,
-			)
-			if err == nil && userVotes != nil && len(*userVotes) > 0 {
-				voted = true
-			}
+	return dtos, nil
+}
 
-			userLikeStatus, err := poll_repo.GetPollLikeStatus(
-				ctx,
-				app.DB,
-				userClaims.UserID,
-				poll.Poll.ID,
-			)
-			if err == nil && userLikeStatus != nil {
-				likeStatus = *userLikeStatus
-			}
-		}
-
-		dto := transformer.ConvertSimplePollToDTO(poll, voted, likeStatus)
-		latestVotes = append(latestVotes, dto)
-		popularVotes = append(popularVotes, dto)
+func getLatestPolls(
+	ctx context.Context,
+	app *config.App,
+	language *[]string,
+) ([]oapi.Poll, error) {
+	sortBy := "created_at"
+	result, err := poll_repo.GetPolls(ctx, app.DB, dao.PollListParams{
+		Page:       1,
+		NumPerPage: 5,
+		Type:       "all",
+		SortBy:     sortBy,
+		SortDesc:   true,
+		Language:   language,
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	return &oapi.GetHome200JSONResponse{
-		PopularExams:    []oapi.Exam{},
-		LatestQuestions: latestQuestions,
-		LatestPolls:     latestVotes,
-		PopularPolls:    popularVotes,
-	}, nil
+	dtos, err := poll_repo.BuildPollsWithLike(ctx, app.DB, result)
+	if err != nil {
+		return nil, err
+	}
+	return dtos, nil
 }

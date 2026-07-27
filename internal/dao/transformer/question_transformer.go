@@ -8,6 +8,7 @@ import (
 
 func ConvertSimpleToQuestion(
 	res dao.SimpleQuestion,
+	trans []model.QuestionTranslations,
 	solved bool,
 	userLikeStatus int16,
 ) oapi.Question {
@@ -15,9 +16,10 @@ func ConvertSimpleToQuestion(
 	correct := int(res.Question.CorrectCount)
 	likes := int(res.Question.Likes)
 	likeStatus := oapi.LikeStatus(userLikeStatus)
-	mapedStr := oapi.LocalizedText{
-		"zh-CN": "res.Translation.QuestionText",
-		"en-US": "Hello",
+
+	mappedStr := oapi.LocalizedText{}
+	for _, q := range trans {
+		mappedStr[q.Language] = q.QuestionText
 	}
 
 	return oapi.Question{
@@ -33,7 +35,7 @@ func ConvertSimpleToQuestion(
 		LikesCount:          likes,
 		Options:             nil, // 简单模式不返回选项
 		Public:              res.Question.Public,
-		QuestionText:        mapedStr,
+		QuestionText:        mappedStr,
 		QuestionType:        oapi.QuestionType(res.Question.QuestionType),
 		Solved:              solved,
 	}
@@ -60,11 +62,11 @@ func ConvertDetailToQuestion(
 		options = append(options, dto)
 	}
 
-	expStr := oapi.LocalizedText{
-		"zh-CN": *res.Translation.Explanation,
-	}
-	textStr := oapi.LocalizedText{
-		"zh-CN": res.Translation.QuestionText,
+	textStrMap := oapi.LocalizedText{}
+	expStrMap := oapi.LocalizedText{}
+	for _, q := range res.Translation {
+		expStrMap[q.Language] = *q.Explanation
+		textStrMap[q.Language] = q.QuestionText
 	}
 
 	return oapi.Question{
@@ -74,13 +76,13 @@ func ConvertDetailToQuestion(
 		CreatedAt:           res.Question.CreatedAt,
 		CreatedBy:           res.User.UserUUID,
 		Difficulty:          oapi.Difficulty(res.Question.Difficulty),
-		Explanation:         &expStr,
+		Explanation:         &expStrMap,
 		Id:                  res.Question.QuestionUUID,
 		LikeStatus:          likeStatus,
 		LikesCount:          likes,
 		Options:             options,
 		Public:              res.Question.Public,
-		QuestionText:        textStr,
+		QuestionText:        textStrMap,
 		QuestionType:        oapi.QuestionType(res.Question.QuestionType),
 		Solved:              solved,
 	}

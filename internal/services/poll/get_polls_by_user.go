@@ -5,10 +5,9 @@ import (
 
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
-	"genshin-quiz/internal/common"
 	"genshin-quiz/internal/dao"
 	poll_repo "genshin-quiz/internal/repository/poll"
-	"genshin-quiz/internal/webserver/middleware"
+	user_repo "genshin-quiz/internal/repository/user"
 )
 
 func GetPollsByUser(
@@ -16,10 +15,9 @@ func GetPollsByUser(
 	app *config.App,
 	req oapi.GetUserPollsRequestObject,
 ) (*oapi.GetUserPolls200JSONResponse, error) {
-	// 从 context 中获取登录用户信息(允许为空)
-	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
-	if !ok {
-		return nil, common.ErrUserNotInContext
+	userInfo, err := user_repo.GetUserInfoByUUID(ctx, app.DB, req.Id)
+	if err != nil {
+		return nil, err
 	}
 
 	page := 1
@@ -36,7 +34,7 @@ func GetPollsByUser(
 	param := dao.PollListParams{
 		Page:       page,
 		NumPerPage: limit,
-		Author:     &userClaims.UserID,
+		Author:     &userInfo.ID,
 		Type:       "all",
 		SortBy:     "",
 		SortDesc:   false,
@@ -46,7 +44,10 @@ func GetPollsByUser(
 		return nil, err
 	}
 
-	dtos, err := buildPollsWithLike(ctx, app.DB, result)
+	dtos, err := poll_repo.BuildPollsWithLike(ctx, app.DB, result)
+	if err != nil {
+		return nil, err
+	}
 
 	return &oapi.GetUserPolls200JSONResponse{
 		Polls: dtos,

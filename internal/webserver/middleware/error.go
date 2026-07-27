@@ -121,7 +121,14 @@ func HandleResponseErrorWithLog(
 			// 处理自定义的 APIError 根据状态码返回相应的响应
 			switch apiErr.Code {
 			case 400:
-				writeErrorResponse(w, apiErr.Code, apiErr.Message, "BAD_REQUEST", apiErr.Detail, false)
+				writeErrorResponse(
+					w,
+					apiErr.Code,
+					apiErr.Message,
+					"BAD_REQUEST",
+					apiErr.Detail,
+					false,
+				)
 				return
 			case 401:
 				// Debug: 打印错误详情供调试
@@ -134,10 +141,24 @@ func HandleResponseErrorWithLog(
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			case 403:
-				writeErrorResponse(w, apiErr.Code, apiErr.Message, "FORBIDDEN", apiErr.Detail, false)
+				writeErrorResponse(
+					w,
+					apiErr.Code,
+					apiErr.Message,
+					"FORBIDDEN",
+					apiErr.Detail,
+					false,
+				)
 				return
 			case 404:
-				writeErrorResponse(w, apiErr.Code, apiErr.Message, "NOT_FOUND", apiErr.Detail, false)
+				writeErrorResponse(
+					w,
+					apiErr.Code,
+					apiErr.Message,
+					"NOT_FOUND",
+					apiErr.Detail,
+					false,
+				)
 				return
 			case 409:
 				writeErrorResponse(w, apiErr.Code, apiErr.Message, "CONFLICT", apiErr.Detail, false)

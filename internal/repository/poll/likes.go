@@ -46,39 +46,39 @@ func GetPollLikeStatus(
 	return &results[0].Value, nil
 }
 
-// GetMultiplePollsLikeStatus 批量获取用户对多个投票的点赞状态.
-func GetMultiplePollsLikeStatus(
+// GetPollsLikeStatusByUser 批量获取用户对多个投票的点赞状态.
+func GetPollsLikeStatusByUser(
 	ctx context.Context,
 	db qrm.DB,
 	userID int64,
-	pollUUIDs []uuid.UUID,
-) (map[uuid.UUID]*int16, error) {
-	if len(pollUUIDs) == 0 {
-		return make(map[uuid.UUID]*int16), nil
+	pollIDs []int64,
+) (map[int64]int16, error) {
+	if len(pollIDs) == 0 {
+		return make(map[int64]int16), nil
 	}
 
 	pollTbl := table.Polls
 	likesTbl := table.PollLikes
 
 	// 构建 UUID 列表
-	uuidList := make([]pg.Expression, 0, len(pollUUIDs))
-	for _, uuid := range pollUUIDs {
-		uuidList = append(uuidList, pg.UUID(uuid))
+	idList := make([]pg.Expression, 0, len(pollIDs))
+	for _, id := range pollIDs {
+		idList = append(idList, pg.Int64(id))
 	}
 
 	stmt := pg.SELECT(
-		pollTbl.PollUUID,
+		pollTbl.ID,
 		likesTbl.Value,
 	).FROM(
 		likesTbl.INNER_JOIN(pollTbl, pollTbl.ID.EQ(likesTbl.PollID)),
 	).WHERE(
 		likesTbl.UserID.EQ(pg.Int64(userID)).
-			AND(pollTbl.PollUUID.IN(uuidList...)),
+			AND(pollTbl.ID.IN(idList...)),
 	)
 
 	var results []struct {
-		PollUUID uuid.UUID `alias:"polls.poll_uuid"`
-		Value    int16     `alias:"poll_likes.value"`
+		PollID int64 `alias:"polls.id"`
+		Value  int16 `alias:"poll_likes.value"`
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
@@ -86,17 +86,12 @@ func GetMultiplePollsLikeStatus(
 	}
 
 	// 构建结果 map
-	likeStatusMap := make(map[uuid.UUID]*int16)
-
-	// 初始化所有投票为未点赞
-	for _, uuid := range pollUUIDs {
-		likeStatusMap[uuid] = nil
-	}
+	likeStatusMap := make(map[int64]int16)
 
 	// 设置已点赞的投票状态
 	for _, result := range results {
 		value := result.Value
-		likeStatusMap[result.PollUUID] = &value
+		likeStatusMap[result.PollID] = value
 	}
 
 	return likeStatusMap, nil
