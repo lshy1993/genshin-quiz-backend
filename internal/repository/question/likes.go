@@ -5,9 +5,9 @@ import (
 
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
+	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
-	"github.com/google/uuid"
 )
 
 // GetQuestionLikeStatus 获取用户对指定问题的点赞状态.
@@ -33,7 +33,7 @@ func GetQuestionLikeStatus(
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "GetQuestionLikeStatus failed", 0)
 	}
 
 	// 如果没有找到记录，返回默认值 0 表示未点赞
@@ -82,7 +82,7 @@ func GetMultipleQuestionsLikeStatus(
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get multi question like status failed", 0)
 	}
 
 	// 构建结果 map
@@ -101,26 +101,10 @@ func UpsertQuestionLike(
 	ctx context.Context,
 	db qrm.DB,
 	userID int64,
-	questionUUID uuid.UUID,
+	questionID int64,
 	value int16, // 1=点赞, -1=点踩, 0=取消
 ) error {
-	questionTbl := table.Questions
 	likesTbl := table.QuestionLikes
-
-	// 首先获取 question_id
-	questionIDStmt := pg.SELECT(questionTbl.ID).
-		FROM(questionTbl).
-		WHERE(questionTbl.QuestionUUID.EQ(pg.UUID(questionUUID)))
-
-	var questionIDResult struct {
-		ID int64 `alias:"questions.id"`
-	}
-	err := questionIDStmt.QueryContext(ctx, db, &questionIDResult)
-	if err != nil {
-		return err
-	}
-
-	questionID := questionIDResult.ID
 
 	if value == 0 {
 		// 删除点赞记录
@@ -128,8 +112,11 @@ func UpsertQuestionLike(
 			likesTbl.QuestionID.EQ(pg.Int64(questionID)).
 				AND(likesTbl.UserID.EQ(pg.Int64(userID))),
 		)
-		_, err = deleteStmt.ExecContext(ctx, db)
-		return err
+		_, err := deleteStmt.ExecContext(ctx, db)
+		if err != nil {
+			return errors.WrapPrefix(err, "delete question like failed", 0)
+		}
+		return nil
 	}
 
 	// 插入或更新点赞记录
@@ -153,8 +140,12 @@ func UpsertQuestionLike(
 		),
 	)
 
-	_, err = upsertStmt.ExecContext(ctx, db)
-	return err
+	_, err := upsertStmt.ExecContext(ctx, db)
+	if err != nil {
+		return errors.WrapPrefix(err, "upsert question like failed", 0)
+	}
+
+	return nil
 }
 
 // GetQuestionLikesCount 获取问题的总点赞数（实时计算）。

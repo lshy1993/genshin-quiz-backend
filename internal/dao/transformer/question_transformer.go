@@ -51,22 +51,24 @@ func ConvertDetailToQuestion(
 	likes := int(res.Question.Likes)
 	likeStatus := oapi.LikeStatus(userLikeStatus)
 
-	optionMap := make(map[int64]model.QuestionOptions)
-	for _, opt := range res.Options {
-		optionMap[opt.ID] = opt
+	// 构建标题
+	questionText := make(oapi.LocalizedText)
+	explanation := make(oapi.LocalizedText)
+	for _, trans := range res.Translation {
+		questionText[trans.Language] = trans.QuestionText
+
+		if trans.Explanation != nil {
+			explanation[trans.Language] = *trans.Explanation
+		}
 	}
 
+	// 构建选项
 	options := make([]oapi.QuestionOption, 0, len(res.Options))
-	for _, translation := range res.OptionTranslations {
-		dto := ToQuestionOption(optionMap[translation.OptionID], translation, solved)
+	for _, opt := range res.Options {
+		// 获取翻译
+		translation := res.OptionTranslations[opt.ID]
+		dto := ToQuestionOption(opt, translation, solved)
 		options = append(options, dto)
-	}
-
-	textStrMap := oapi.LocalizedText{}
-	expStrMap := oapi.LocalizedText{}
-	for _, q := range res.Translation {
-		expStrMap[q.Language] = *q.Explanation
-		textStrMap[q.Language] = q.QuestionText
 	}
 
 	return oapi.Question{
@@ -76,13 +78,13 @@ func ConvertDetailToQuestion(
 		CreatedAt:           res.Question.CreatedAt,
 		CreatedBy:           res.User.UserUUID,
 		Difficulty:          oapi.Difficulty(res.Question.Difficulty),
-		Explanation:         &expStrMap,
+		Explanation:         &explanation,
 		Id:                  res.Question.QuestionUUID,
 		LikeStatus:          likeStatus,
 		LikesCount:          likes,
 		Options:             options,
 		Public:              res.Question.Public,
-		QuestionText:        textStrMap,
+		QuestionText:        questionText,
 		QuestionType:        oapi.QuestionType(res.Question.QuestionType),
 		Solved:              solved,
 	}
@@ -90,17 +92,15 @@ func ConvertDetailToQuestion(
 
 func ToQuestionOption(
 	option model.QuestionOptions,
-	translation model.QuestionOptionTranslations,
+	translations oapi.LocalizedText,
 	solved bool,
 ) oapi.QuestionOption {
 	count := int(option.SelectedCount)
-	text := oapi.LocalizedText{}
-	text[translation.Language] = translation.OptionText
 
 	dto := oapi.QuestionOption{
 		Id:            option.OptionUUID,
 		MediaUrl:      option.ImgURL,
-		Text:          &text,
+		Text:          &translations,
 		SelectedCount: count,
 		OptionType:    oapi.OptionType(option.OptionType),
 	}

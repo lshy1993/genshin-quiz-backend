@@ -95,6 +95,7 @@ func UpdateUser(
 		return nil, err
 	}
 
+	// 提交事务
 	if err := tx.Commit(); err != nil {
 		return nil, errors.WrapPrefix(err, "failed to commit transaction", 0)
 	}

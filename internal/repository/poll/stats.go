@@ -5,6 +5,7 @@ import (
 
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
+	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 )
@@ -142,7 +143,7 @@ func RecalculatePollStats(
 	}
 	err := participantsStmt.QueryContext(ctx, db, &participantsResult)
 	if err != nil {
-		return err
+		return errors.WrapPrefix(err, "get vote user count failed", 0)
 	}
 
 	// 统计总票数（所有投票的总和）
@@ -159,7 +160,7 @@ func RecalculatePollStats(
 	}
 	err = totalVotesStmt.QueryContext(ctx, db, &totalVotesResult)
 	if err != nil {
-		return err
+		return errors.WrapPrefix(err, "get total votes failed", 0)
 	}
 
 	totalVotes := int64(0)
@@ -176,7 +177,10 @@ func RecalculatePollStats(
 	)
 
 	_, err = updateStmt.ExecContext(ctx, db)
-	return err
+	if err != nil {
+		return errors.WrapPrefix(err, "update poll stats failed", 0)
+	}
+	return nil
 }
 
 /*
@@ -255,7 +259,7 @@ func RecalculatePollOptionStats(
 	}
 	err := optionsStmt.QueryContext(ctx, db, &options)
 	if err != nil {
-		return err
+		return errors.WrapPrefix(err, "get poll options failed", 0)
 	}
 
 	// 统计每个选项的总票数
@@ -280,7 +284,7 @@ func RecalculatePollOptionStats(
 	}
 	err = stmt.QueryContext(ctx, db, &results)
 	if err != nil {
-		return err
+		return errors.WrapPrefix(err, "get poll each option vote count failed", 0)
 	}
 
 	// 构建选项ID到票数的映射
@@ -304,7 +308,7 @@ func RecalculatePollOptionStats(
 		)
 		_, err := updateStmt.ExecContext(ctx, db)
 		if err != nil {
-			return err
+			return errors.WrapPrefix(err, "update poll each option stats failed", 0)
 		}
 	}
 

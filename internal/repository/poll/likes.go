@@ -5,6 +5,7 @@ import (
 
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
+	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
@@ -33,7 +34,7 @@ func GetPollLikeStatus(
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get poll like status failed", 0)
 	}
 
 	// 如果没有找到记录，返回 nil 表示未点赞
@@ -82,7 +83,7 @@ func GetPollsLikeStatusByUser(
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get poll like status by user failed", 0)
 	}
 
 	// 构建结果 map

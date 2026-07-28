@@ -23,25 +23,32 @@ func PostLikeQuestion(
 	questionUUID := req.Id
 	value := int16(req.Body.Like)
 
-	tx, err := app.DB.BeginTx(ctx, nil)
+	questionInfo, err := question_repo.GetQuestionByUUID(ctx, app.DB, questionUUID)
 	if err != nil {
 		return err
 	}
 
-	// 更新点赞状态
-	err = question_repo.UpsertQuestionLike(ctx, tx, userClaims.UserID, questionUUID, value)
+	qDbID := questionInfo.Question.ID
+
+	tx, err := app.DB.BeginTx(ctx, nil)
 	if err != nil {
-		tx.Rollback()
+		return err
+	}
+	defer tx.Rollback()
+
+	// 更新点赞状态
+	err = question_repo.UpsertQuestionLike(ctx, tx, userClaims.UserID, qDbID, value)
+	if err != nil {
 		return err
 	}
 	// 更新问题的点赞数
-	err = question_repo.UpdateQuestionLikeCount(ctx, tx, questionUUID, value)
+	err = question_repo.UpdateQuestionLikeCount(ctx, tx, qDbID, value)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
-	err = tx.Commit()
-	if err != nil {
+
+	// 提交事务
+	if err := tx.Commit(); err != nil {
 		return err
 	}
 

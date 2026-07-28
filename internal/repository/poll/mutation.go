@@ -6,6 +6,7 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
+	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 )
@@ -159,5 +160,8 @@ func UpsertUserVote(
 		)
 
 	_, err := insertStmt.ExecContext(ctx, db)
-	return err
+	if err != nil {
+		return errors.WrapPrefix(err, "upsert user vote failed", 0)
+	}
+	return nil
 }

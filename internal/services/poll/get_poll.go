@@ -8,6 +8,7 @@ import (
 	"genshin-quiz/internal/dao"
 	"genshin-quiz/internal/dao/transformer"
 	poll_repo "genshin-quiz/internal/repository/poll"
+	"genshin-quiz/internal/util"
 	"genshin-quiz/internal/webserver/middleware"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
@@ -19,11 +20,17 @@ func GetPoll(
 	req oapi.GetPollRequestObject,
 ) (*oapi.GetPoll200JSONResponse, error) {
 	// 调用仓库层获取投票详情（使用默认语言）
-	res, err := poll_repo.GetPollByUUID(ctx, app.DB, req.Id, nil)
+	res, err := poll_repo.GetPollByUUID(ctx, app.DB, req.Id)
 	if err != nil {
 		return nil, err
 	}
 	pollDBId := res.Poll.ID
+
+	// 获取翻译
+	translations, err := poll_repo.GetPollTransByID(ctx, app.DB, pollDBId)
+	if err != nil {
+		return nil, err
+	}
 
 	// 获取选项
 	options, err := poll_repo.GetPollOptions(ctx, app.DB, pollDBId)
@@ -32,8 +39,8 @@ func GetPoll(
 	}
 
 	// 获取选项ID列表
-	ids := make([]int64, 0, len(*options))
-	for _, opt := range *options {
+	ids := make([]int64, 0, len(options))
+	for _, opt := range options {
 		ids = append(ids, opt.ID)
 	}
 
@@ -42,14 +49,15 @@ func GetPoll(
 	if err != nil {
 		return nil, err
 	}
+	transMap := util.BuildPollOptionTranslationMap(optionTranslations)
 
 	// 构建 DetailedPoll
 	detailedPoll := dao.DetailedPoll{
 		Poll:               res.Poll,
 		User:               res.User,
-		Translation:        res.Translation,
-		Options:            *options,
-		OptionTranslations: *optionTranslations,
+		Translation:        translations,
+		Options:            options,
+		OptionTranslations: transMap,
 	}
 
 	// 获取投票的实时点赞数
@@ -72,7 +80,7 @@ func GetPoll(
 
 		// 构建选项ID到选项UUID的映射
 		optionIDToUUID := make(map[int64]openapi_types.UUID)
-		for _, opt := range *options {
+		for _, opt := range options {
 			optionIDToUUID[opt.ID] = opt.OptionUUID
 		}
 

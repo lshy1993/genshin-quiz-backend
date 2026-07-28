@@ -5,6 +5,7 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
+	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 )
@@ -23,7 +24,7 @@ func GetPollTransByID(
 	var rows []model.PollTranslations
 	err := stmt.QueryContext(ctx, db, &rows)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get poll translation by id failed", 0)
 	}
 
 	return rows, nil
@@ -56,7 +57,7 @@ func GetPollTransByIDs(
 	var rows []model.PollTranslations
 	err := stmt.QueryContext(ctx, db, &rows)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get poll translation by ids failed", 0)
 	}
 
 	result := make(map[int64][]model.PollTranslations, len(rows))

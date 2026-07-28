@@ -30,6 +30,7 @@ func PostCreateQuestion(
 	if err != nil {
 		return nil, err
 	}
+	defer tx.Rollback()
 
 	now := time.Now()
 	log.Println("Creating question by user ID:", userClaims.UserID)
@@ -47,7 +48,6 @@ func PostCreateQuestion(
 	}
 	createdQuestion, err := question_repo.InsertQuestion(ctx, tx, insertModel)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 	// 提问翻译
@@ -74,7 +74,6 @@ func PostCreateQuestion(
 	// 批量插入翻译数据
 	err = question_repo.InsertQuestionTranslations(ctx, tx, transModels)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
@@ -96,7 +95,6 @@ func PostCreateQuestion(
 	// 插入选项
 	insertedOptions, err := question_repo.InsertQuestionOptions(ctx, tx, optionModels)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
@@ -123,7 +121,6 @@ func PostCreateQuestion(
 	// 插入选项翻译
 	err = question_repo.InsertOptionTranslations(ctx, tx, optionTransModels)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 

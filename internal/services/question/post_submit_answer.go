@@ -58,6 +58,7 @@ func PostSubmitAnswer(
 	if err != nil {
 		return nil, err
 	}
+	defer tx.Rollback()
 
 	// 记录提交结果
 	now := time.Now()
@@ -73,14 +74,12 @@ func PostSubmitAnswer(
 	}
 	submissionResult, err := question_repo.InsertSubmission(ctx, tx, insertData)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
 	// 记录用户选择的选项
 	err = question_repo.InsertSubmissionOptions(ctx, tx, submissionResult.ID, optionIDs)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
@@ -88,26 +87,22 @@ func PostSubmitAnswer(
 		// 更新问题统计
 		err = question_repo.UpdateQuestionSolved(ctx, tx, *questionID, correct)
 		if err != nil {
-			tx.Rollback()
 			return nil, err
 		}
 		// 更新选项统计
 		err = question_repo.UpdateOptionSelected(ctx, tx, optionIDs)
 		if err != nil {
-			tx.Rollback()
 			return nil, err
 		}
 
 		// 实时更新用户统计信息
 		err = user_repo.UpdateUserSubmissionStats(ctx, tx, userClaims.UserID, correct)
 		if err != nil {
-			tx.Rollback()
 			return nil, err
 		}
 	}
 	// 提交事务
-	err = tx.Commit()
-	if err != nil {
+	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 

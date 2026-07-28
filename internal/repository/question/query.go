@@ -14,6 +14,7 @@ import (
 	"genshin-quiz/internal/common"
 	"genshin-quiz/internal/util"
 
+	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
@@ -171,12 +172,10 @@ func GetQuestionByUUID(
 	uuid uuid.UUID,
 ) (*dao.SimpleQuestion, error) {
 	tbl := table.Questions
-	transTbl := table.QuestionTranslations
 	userTbl := table.Users
 
 	stmt := pg.SELECT(
 		tbl.AllColumns,
-		transTbl.AllColumns,
 		userTbl.UserUUID,
 	).FROM(
 		tbl.LEFT_JOIN(userTbl, userTbl.ID.EQ(tbl.CreatedBy)),
@@ -187,7 +186,7 @@ func GetQuestionByUUID(
 	var result []dao.SimpleQuestion
 	err := stmt.QueryContext(ctx, db, &result)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "query question by uuid failed", 0)
 	}
 
 	if len(result) == 0 {
@@ -252,7 +251,7 @@ func GetQuestionOptions(
 	ctx context.Context,
 	db qrm.DB,
 	questionID int64,
-) (*[]model.QuestionOptions, error) {
+) ([]model.QuestionOptions, error) {
 	tbl := table.QuestionOptions
 
 	stmt := pg.SELECT(tbl.AllColumns).
@@ -263,10 +262,10 @@ func GetQuestionOptions(
 	var options []model.QuestionOptions
 	err := stmt.QueryContext(ctx, db, &options)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get question options failed", 0)
 	}
 
-	return &options, nil
+	return options, nil
 }
 
 func GetQuestionCorrectOptionUUIDs(
@@ -329,8 +328,7 @@ func GetQuestionOptionTranslations(
 	ctx context.Context,
 	db qrm.DB,
 	optionIDs []int64,
-	language *[]string,
-) (*[]model.QuestionOptionTranslations, error) {
+) ([]model.QuestionOptionTranslations, error) {
 	tbl := table.QuestionOptionTranslations
 
 	optionIDExpressions := util.BuildInt64Expressions(optionIDs)
@@ -342,10 +340,10 @@ func GetQuestionOptionTranslations(
 	var dto []model.QuestionOptionTranslations
 	err := stmt.QueryContext(ctx, db, &dto)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get option translations failed", 0)
 	}
 
-	return &dto, nil
+	return dto, nil
 }
 
 func GetQuestionSubmissions(
@@ -456,7 +454,7 @@ func GetQuestionSubmissionCount(
 	}
 	err := stmt.QueryContext(ctx, db, &result)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get question submissions failed", 0)
 	}
 
 	return &result.Count, nil

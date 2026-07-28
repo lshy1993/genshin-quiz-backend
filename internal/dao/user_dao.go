@@ -8,7 +8,9 @@ import (
 
 type UserInfoWithAuth struct {
 	model.Users
-	model.UserCredentials
+	IdentityType string  `alias:"user_credentials.identity_type"`
+	Identifier   string  `alias:"user_credentials.identifier"`
+	Credential   *string `alias:"user_credentials.credential"`
 }
 type UpdateUserProfileParams struct {
 	Gender   *int16

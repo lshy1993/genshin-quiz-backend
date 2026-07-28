@@ -13,6 +13,7 @@ import (
 	"genshin-quiz/internal/util"
 	"genshin-quiz/internal/webserver/middleware"
 
+	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
@@ -162,61 +163,27 @@ func GetPollByUUID(
 	ctx context.Context,
 	db qrm.DB,
 	voteUUID uuid.UUID,
-	language *[]string,
-) (*dao.DetailedPoll, error) {
+) (*dao.SimplePoll, error) {
 	tbl := table.Polls
-	transTbl := table.PollTranslations
 	userTbl := table.Users
-
-	// 获取默认语言
-	defaultLang := util.GetDefaultLanguage(language)
 
 	stmt := pg.SELECT(
 		tbl.AllColumns,
-		transTbl.AllColumns,
 		userTbl.AllColumns,
 	).FROM(
-		tbl.LEFT_JOIN(
-			transTbl,
-			tbl.ID.EQ(transTbl.PollID).AND(transTbl.Language.EQ(pg.String(defaultLang))),
-		).LEFT_JOIN(userTbl, tbl.CreatedBy.EQ(userTbl.ID)),
+		tbl.LEFT_JOIN(userTbl, tbl.CreatedBy.EQ(userTbl.ID)),
 	).WHERE(
 		tbl.PollUUID.EQ(pg.UUID(voteUUID)),
 	)
 
-	var result []struct {
-		model.Polls
-		model.PollTranslations
-		model.Users
-	}
+	var result dao.SimplePoll
 
 	err := stmt.QueryContext(ctx, db, &result)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get poll by uuid failed", 0)
 	}
 
-	if len(result) == 0 {
-		return nil, common.ErrPollNotFound
-	}
-
-	detailedPoll := &dao.DetailedPoll{
-		Poll:        result[0].Polls,
-		User:        result[0].Users,
-		Translation: result[0].PollTranslations,
-	}
-
-	// 如果没有获取到指定语言的翻译，则 fallback 到任意语言
-	if detailedPoll.Translation.Language == "" {
-		fallbackTrans, err := getPollTranslationFallback(ctx, db, detailedPoll.Poll.ID)
-		if err != nil {
-			return nil, err
-		}
-		if fallbackTrans != nil {
-			detailedPoll.Translation = *fallbackTrans
-		}
-	}
-
-	return detailedPoll, nil
+	return &result, nil
 }
 
 // getPollTranslationFallback 获取投票的任意语言翻译（用于 fallback）.
@@ -249,7 +216,7 @@ func GetPollOptions(
 	ctx context.Context,
 	db qrm.DB,
 	voteID int64,
-) (*[]model.PollOptions, error) {
+) ([]model.PollOptions, error) {
 	tbl := table.PollOptions
 
 	stmt := pg.SELECT(tbl.AllColumns).
@@ -260,10 +227,10 @@ func GetPollOptions(
 	var options []model.PollOptions
 	err := stmt.QueryContext(ctx, db, &options)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get poll options failed", 0)
 	}
 
-	return &options, nil
+	return options, nil
 }
 
 func GetPollOptionTranslations(
@@ -271,9 +238,9 @@ func GetPollOptionTranslations(
 	db qrm.DB,
 	optionIDs []int64,
 	language *[]string,
-) (*[]model.PollOptionTranslations, error) {
+) ([]model.PollOptionTranslations, error) {
 	if len(optionIDs) == 0 {
-		return &[]model.PollOptionTranslations{}, nil
+		return []model.PollOptionTranslations{}, nil
 	}
 
 	tbl := table.PollOptionTranslations
@@ -294,10 +261,10 @@ func GetPollOptionTranslations(
 	var translations []model.PollOptionTranslations
 	err := stmt.QueryContext(ctx, db, &translations)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get poll option translations failed", 0)
 	}
 
-	return &translations, nil
+	return translations, nil
 }
 
 func GetUserVotedOptions(

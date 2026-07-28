@@ -2,13 +2,13 @@ package user_repo
 
 import (
 	"context"
-	"errors"
 
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
 	"genshin-quiz/internal/common"
 
+	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
@@ -33,7 +33,7 @@ func GetUserByEmail(
 		return nil, common.ErrUserNotFound
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get user base by email failed", 0)
 	}
 
 	return &user[0], nil
@@ -55,7 +55,7 @@ func GetUserInfoByID(
 		if errors.Is(err, qrm.ErrNoRows) {
 			return nil, common.ErrUserNotFound // 如果是记录不存在的错误，返回标准错误
 		}
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get user base by id failed", 0)
 	}
 
 	return &user, nil
@@ -74,7 +74,7 @@ func GetUserProfileByID(
 	var profile model.UserProfiles
 	err := stmt.QueryContext(ctx, db, &profile)
 	if err != nil {
-		return nil, err // 真正的系统错误
+		return nil, errors.WrapPrefix(err, "get user profile failed", 0)
 	}
 
 	return &profile, nil
@@ -93,7 +93,7 @@ func GetUserPrivaciesByID(
 	var privacies model.UserPrivacies
 	err := stmt.QueryContext(ctx, db, &privacies)
 	if err != nil {
-		return nil, err // 真正的系统错误
+		return nil, errors.WrapPrefix(err, "get user Privacies failed", 0)
 	}
 
 	return &privacies, nil
@@ -112,7 +112,7 @@ func GetUserStatisticsByID(
 	var stats model.UserStats
 	err := stmt.QueryContext(ctx, db, &stats)
 	if err != nil {
-		return nil, err // 真正的系统错误
+		return nil, errors.WrapPrefix(err, "get user Statistics failed", 0)
 	}
 
 	return &stats, nil
@@ -131,7 +131,7 @@ func GetUserInfoByUUID(
 	var users []*model.Users
 	err := stmt.QueryContext(ctx, db, &users)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get user base failed", 0)
 	}
 	if len(users) == 0 {
 		return nil, common.ErrUserNotFound
@@ -158,7 +158,7 @@ func GetUserInfosByUUIDs(
 	var users []*model.Users
 	err := stmt.QueryContext(ctx, db, &users)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get user info by uuids failed", 0)
 	}
 
 	return users, nil
@@ -175,7 +175,7 @@ func CheckUserExists(
 			return false, nil
 		}
 		// 其他错误返回
-		return false, err
+		return false, errors.WrapPrefix(err, "get user exists failed", 0)
 	}
 
 	return true, nil

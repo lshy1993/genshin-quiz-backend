@@ -5,6 +5,7 @@ import (
 
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
+	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 )
@@ -34,7 +35,7 @@ func CheckQuestionSolved(
 	}
 	err := stmt.QueryContext(ctx, db, &result)
 	if err != nil {
-		return false, err
+		return false, errors.WrapPrefix(err, "CheckQuestionSolved failed", 0)
 	}
 
 	return result.Count > 0, nil

@@ -13,9 +13,9 @@ type SimplePoll struct {
 type DetailedPoll struct {
 	Poll               model.Polls
 	User               model.Users
-	Translation        model.PollTranslations
+	Translation        []model.PollTranslations
 	Options            []model.PollOptions
-	OptionTranslations []model.PollOptionTranslations
+	OptionTranslations map[int64]oapi.LocalizedText
 	SubmissionCount    int64
 }
 

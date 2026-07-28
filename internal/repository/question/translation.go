@@ -5,6 +5,7 @@ import (
 	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
+	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 )
@@ -23,7 +24,7 @@ func GetQuestionTransByID(
 	var rows []model.QuestionTranslations
 	err := stmt.QueryContext(ctx, db, &rows)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get question translations failed", 0)
 	}
 
 	return rows, nil

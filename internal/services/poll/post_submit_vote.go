@@ -27,7 +27,7 @@ func PostVotePoll(
 		return nil, common.ErrUserNotInContext
 	}
 
-	pollInfo, err := poll_repo.GetPollByUUID(ctx, app.DB, req.Id, nil)
+	pollInfo, err := poll_repo.GetPollByUUID(ctx, app.DB, req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("vote not found: %w", err)
 	}
@@ -42,7 +42,7 @@ func PostVotePoll(
 		return nil, fmt.Errorf("failed to get vote options: %w", err)
 	}
 
-	optionVotes, err := validateAndParseVotes(req.Body.Options, *options, pollInfo.Poll)
+	optionVotes, err := validateAndParseVotes(req.Body.Options, options, pollInfo.Poll)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func saveUserVotes(
 ) error {
 	tx, err := app.DB.BeginTx(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("failed to begin transaction: %w", err)
+		return err
 	}
 	defer tx.Rollback()
 
@@ -139,20 +139,20 @@ func saveUserVotes(
 			UpdatedAt: now,
 		}
 		if err := poll_repo.UpsertUserVote(ctx, tx, userVote); err != nil {
-			return fmt.Errorf("failed to insert user vote: %w", err)
+			return err
 		}
 	}
 
 	if err := poll_repo.RecalculatePollStats(ctx, tx, voteID); err != nil {
-		return fmt.Errorf("failed to update vote stats: %w", err)
+		return err
 	}
 
 	if err := poll_repo.RecalculatePollOptionStats(ctx, tx, voteID); err != nil {
-		return fmt.Errorf("failed to update option stats: %w", err)
+		return err
 	}
 
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("failed to commit transaction: %w", err)
+		return err
 	}
 
 	return nil

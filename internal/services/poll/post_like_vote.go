@@ -30,6 +30,7 @@ func PostLikePoll(
 	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
 
 	// 获取投票 ID
 	pollTbl := table.Polls
@@ -42,7 +43,6 @@ func PostLikePoll(
 	}
 	err = pollIDStmt.QueryContext(ctx, tx, &pollIDResult)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -51,19 +51,17 @@ func PostLikePoll(
 	// 更新点赞状态
 	err = poll_repo.UpsertPollLike(ctx, tx, userClaims.UserID, pollUUID, value)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
 	// 更新投票的点赞数
 	err = poll_repo.UpdatePollLikeCount(ctx, tx, pollID)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
-	err = tx.Commit()
-	if err != nil {
+	// 提交事务
+	if err := tx.Commit(); err != nil {
 		return err
 	}
 

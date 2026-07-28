@@ -8,7 +8,6 @@ import (
 
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
-	"github.com/google/uuid"
 )
 
 func InsertQuestion(
@@ -210,7 +209,7 @@ func UpdateQuestionSolved(
 func UpdateQuestionLikeCount(
 	ctx context.Context,
 	db qrm.DB,
-	questionUUID uuid.UUID,
+	questionID int64,
 	value int16,
 ) error {
 	tbl := table.Questions
@@ -226,7 +225,7 @@ func UpdateQuestionLikeCount(
 		SET(
 			tbl.Likes.SET(tbl.Likes.ADD(pg.Int(likeCount))),
 		).WHERE(
-		tbl.QuestionUUID.EQ(pg.UUID(questionUUID)),
+		tbl.ID.EQ(pg.Int64(questionID)),
 	)
 
 	_, err := updateStmt.ExecContext(ctx, db)

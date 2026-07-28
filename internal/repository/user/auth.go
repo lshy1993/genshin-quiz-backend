@@ -88,7 +88,7 @@ func InsertLoginLog(
 	credType, err := loginProviderToInt16(loginType)
 	if err != nil {
 		// 返回 400 Bad Request，而不是让非法数据流入数据库
-		return nil, err
+		return nil, errors.WrapPrefix(err, "cred provider wrong", 0)
 	}
 
 	now := time.Now()
@@ -176,6 +176,8 @@ func GetPasswordByEmail(
 	authTbl := table.UserCredentials
 	stmt := pg.SELECT(
 		tbl.AllColumns,
+		authTbl.IdentityType,
+		authTbl.Identifier,
 		authTbl.Credential,
 	).
 		FROM(tbl.LEFT_JOIN(

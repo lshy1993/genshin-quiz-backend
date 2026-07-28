@@ -12,6 +12,7 @@ import (
 
 	"genshin-quiz/internal/common"
 
+	"github.com/go-errors/errors"
 	"github.com/go-jet/jet/v2/qrm"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -27,7 +28,7 @@ func LoginUser(
 	// 获取用户信息
 	authInfo, err := user_repo.GetPasswordByEmail(ctx, app.DB, string(email))
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "login user failed", 0)
 	}
 
 	hashedPwd := authInfo.Credential
@@ -42,19 +43,18 @@ func LoginUser(
 	}
 
 	// TODO:获取用户的其他统计信息
-	userProfile, err := user_repo.GetUserProfileByID(ctx, app.DB, authInfo.UserID)
+	userID := authInfo.Users.ID
+	userProfile, err := user_repo.GetUserProfileByID(ctx, app.DB, userID)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "login user failed", 0)
 	}
-
-	userPrivacies, err := user_repo.GetUserPrivaciesByID(ctx, app.DB, authInfo.UserID)
+	userPrivacies, err := user_repo.GetUserPrivaciesByID(ctx, app.DB, userID)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "login user failed", 0)
 	}
-
-	userStats, err := user_repo.GetUserStatisticsByID(ctx, app.DB, authInfo.UserID)
+	userStats, err := user_repo.GetUserStatisticsByID(ctx, app.DB, userID)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "login user failed", 0)
 	}
 
 	// 登录流程
@@ -83,7 +83,7 @@ func realLogin(
 	// 生成 JWT
 	tokenString, err := middleware.GenerateJWT(user.ID, user.Email, secret)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "GenerateJWT failed", 0)
 	}
 	// 从 Context 提取 IP 和 User-Agent
 	ip, _ := ctx.Value(middleware.RealIPKey).(string)

@@ -1,6 +1,8 @@
 package util
 
 import (
+	"genshin-quiz/generated/db/genshinquiz/public/model"
+	"genshin-quiz/generated/oapi"
 	"net/url"
 	"strings"
 
@@ -75,4 +77,36 @@ func LanguageOrDefault(lang *string) string {
 		return "zh-CN"
 	}
 	return *lang
+}
+
+func BuildOptionTranslationMap(
+	rows []model.QuestionOptionTranslations,
+) map[int64]oapi.LocalizedText {
+	result := make(map[int64]oapi.LocalizedText)
+
+	for _, row := range rows {
+		if _, ok := result[row.OptionID]; !ok {
+			result[row.OptionID] = make(oapi.LocalizedText)
+		}
+
+		result[row.OptionID][row.Language] = row.OptionText
+	}
+
+	return result
+}
+
+func BuildPollOptionTranslationMap(
+	rows []model.PollOptionTranslations,
+) map[int64]oapi.LocalizedText {
+	result := make(map[int64]oapi.LocalizedText)
+
+	for _, row := range rows {
+		if _, ok := result[row.OptionID]; !ok {
+			result[row.OptionID] = make(oapi.LocalizedText)
+		}
+
+		result[row.OptionID][row.Language] = row.OptionText
+	}
+
+	return result
 }
