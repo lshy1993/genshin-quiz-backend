@@ -22,11 +22,11 @@ steps:
       ]
 
   # 2. 执行数据库迁移
-  - name: "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:$COMMIT_SHA"
+  - name: "ghcr.io/pressly/goose/v3:latest"
     id: "Run Database Migrations"
-    entrypoint: "./goose"
+    entrypoint: "goose"
     args: ["-dir", "./migrations", "postgres", "$$DATABASE_URL", "up"]
-    secretEnv: ["DATABASE_URL"] # 推荐结合 Secret Manager 使用，比普通环境变量更安全
+    secretEnv: ["DATABASE_URL"]
 
   # 3. 部署到 Cloud Run
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
