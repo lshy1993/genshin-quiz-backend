@@ -39,7 +39,7 @@ steps:
   # 2. 执行数据库迁移
   - name: "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:$COMMIT_SHA"
     id: "Run Database Migrations"
-    entrypoint: "goose"
+    entrypoint: "./goose"
     args: ["-dir", "./migrations", "postgres", "$$DATABASE_URL", "up"]
     secretEnv: ["DATABASE_URL"]
 
