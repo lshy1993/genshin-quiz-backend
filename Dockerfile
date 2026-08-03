@@ -15,7 +15,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go build -o /bin/server ./cmd/server
 
 RUN --mount=type=cache,target=/go/pkg/mod \
-    go build -o /bin/goose github.com/pressly/goose/v3/cmd/goose@latest
+    GOBIN=/bin go install github.com/pressly/goose/v3/cmd/goose@latest
 
 FROM alpine:3.22 AS server
 RUN apk add --no-cache ca-certificates
