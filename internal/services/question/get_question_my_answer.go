@@ -12,13 +12,13 @@ func GetQuestionMySubmissions(
 	ctx context.Context,
 	app *config.App,
 	req oapi.GetQuestionMySubmissionsRequestObject,
-) (*[]oapi.MySubmission, error) {
+) (*[]oapi.QuestionSubmission, error) {
 	submissions, err := question_repo.GetQuestionSubmissions(ctx, app.DB, req.Id)
 	if err != nil {
 		return nil, err
 	}
 	if len(*submissions) == 0 {
-		return &[]oapi.MySubmission{}, nil
+		return &[]oapi.QuestionSubmission{}, nil
 	}
 
 	submissionIDs := make([]int64, 0, len(*submissions))
@@ -35,13 +35,13 @@ func GetQuestionMySubmissions(
 		return nil, err
 	}
 
-	dtos := make([]oapi.MySubmission, 0, len(*submissions))
+	dtos := make([]oapi.QuestionSubmission, 0, len(*submissions))
 	for _, submission := range *submissions {
 		timeSpent := 0
 		if submission.TimeTaken != nil {
 			timeSpent = int(*submission.TimeTaken)
 		}
-		dto := oapi.MySubmission{
+		dto := oapi.QuestionSubmission{
 			IsCorrect:         submission.IsCorrect,
 			SelectedOptionIds: (*submissionMap)[submission.ID],
 			SubmittedAt:       submission.CreatedAt,

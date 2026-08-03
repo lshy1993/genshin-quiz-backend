@@ -17,10 +17,13 @@ type userLoginLogsTable struct {
 	postgres.Table
 
 	// Columns
-	ID        postgres.ColumnInteger
-	UserID    postgres.ColumnInteger
-	IPAddress postgres.ColumnString
-	LoginAt   postgres.ColumnTimestampz
+	ID             postgres.ColumnInteger
+	UserID         postgres.ColumnInteger
+	IPAddress      postgres.ColumnString
+	UserAgent      postgres.ColumnString
+	CredentialType postgres.ColumnInteger // Login provider: 0=password, 1=google, 2=apple, 3=github
+	Status         postgres.ColumnInteger // Login result: 0=success, 1=failed, 2=blocked
+	LoginAt        postgres.ColumnTimestampz
 
 	AllColumns     postgres.ColumnList
 	MutableColumns postgres.ColumnList
@@ -62,23 +65,29 @@ func newUserLoginLogsTable(schemaName, tableName, alias string) *UserLoginLogsTa
 
 func newUserLoginLogsTableImpl(schemaName, tableName, alias string) userLoginLogsTable {
 	var (
-		IDColumn        = postgres.IntegerColumn("id")
-		UserIDColumn    = postgres.IntegerColumn("user_id")
-		IPAddressColumn = postgres.StringColumn("ip_address")
-		LoginAtColumn   = postgres.TimestampzColumn("login_at")
-		allColumns      = postgres.ColumnList{IDColumn, UserIDColumn, IPAddressColumn, LoginAtColumn}
-		mutableColumns  = postgres.ColumnList{UserIDColumn, IPAddressColumn, LoginAtColumn}
-		defaultColumns  = postgres.ColumnList{IDColumn, LoginAtColumn}
+		IDColumn             = postgres.IntegerColumn("id")
+		UserIDColumn         = postgres.IntegerColumn("user_id")
+		IPAddressColumn      = postgres.StringColumn("ip_address")
+		UserAgentColumn      = postgres.StringColumn("user_agent")
+		CredentialTypeColumn = postgres.IntegerColumn("credential_type")
+		StatusColumn         = postgres.IntegerColumn("status")
+		LoginAtColumn        = postgres.TimestampzColumn("login_at")
+		allColumns           = postgres.ColumnList{IDColumn, UserIDColumn, IPAddressColumn, UserAgentColumn, CredentialTypeColumn, StatusColumn, LoginAtColumn}
+		mutableColumns       = postgres.ColumnList{UserIDColumn, IPAddressColumn, UserAgentColumn, CredentialTypeColumn, StatusColumn, LoginAtColumn}
+		defaultColumns       = postgres.ColumnList{IDColumn, CredentialTypeColumn, StatusColumn, LoginAtColumn}
 	)
 
 	return userLoginLogsTable{
 		Table: postgres.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:        IDColumn,
-		UserID:    UserIDColumn,
-		IPAddress: IPAddressColumn,
-		LoginAt:   LoginAtColumn,
+		ID:             IDColumn,
+		UserID:         UserIDColumn,
+		IPAddress:      IPAddressColumn,
+		UserAgent:      UserAgentColumn,
+		CredentialType: CredentialTypeColumn,
+		Status:         StatusColumn,
+		LoginAt:        LoginAtColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

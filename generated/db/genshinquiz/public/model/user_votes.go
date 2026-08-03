@@ -13,7 +13,7 @@ import (
 
 type UserVotes struct {
 	ID        int64 `sql:"primary_key"`
-	VoteID    int64
+	PollID    int64
 	UserID    int64
 	OptionID  int64
 	VoteCount int32

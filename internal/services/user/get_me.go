@@ -5,6 +5,7 @@ import (
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/common"
+	"genshin-quiz/internal/dao/transformer"
 	user_repo "genshin-quiz/internal/repository/user"
 	"genshin-quiz/internal/webserver/middleware"
 )
@@ -13,7 +14,7 @@ func GetMe(
 	ctx context.Context,
 	app *config.App,
 	req oapi.GetCurrentUserRequestObject,
-) (*oapi.User, error) {
+) (*oapi.UserPrivate, error) {
 	userClaims, ok := middleware.GetUserFromContextOnly(ctx)
 	if !ok {
 		return nil, common.ErrUserNotInContext
@@ -24,32 +25,30 @@ func GetMe(
 	if err != nil {
 		return nil, err
 	}
+	userProfile, err := user_repo.GetUserProfileByID(ctx, app.DB, userClaims.UserID)
+	if err != nil {
+		return nil, err
+	}
+	userPrivacies, err := user_repo.GetUserPrivaciesByID(ctx, app.DB, userClaims.UserID)
+	if err != nil {
+		return nil, err
+	}
+	userStats, err := user_repo.GetUserStatisticsByID(ctx, app.DB, userClaims.UserID)
+	if err != nil {
+		return nil, err
+	}
+	loginInfo, err := user_repo.GetLatestLoginLogByID(ctx, app.DB, userClaims.UserID)
+	if err != nil {
+		return nil, err
+	}
 
-	avatar := ""
-	if userInfo.AvatarURL != nil {
-		avatar = *userInfo.AvatarURL
-	}
-	country := "Unknown"
-	if userInfo.Location != nil {
-		country = *userInfo.Location
-	}
-	displayName := ""
-	if userInfo.DisplayName != nil {
-		displayName = *userInfo.DisplayName
-	}
+	res := transformer.UserModelToPrivate(
+		*userInfo,
+		*userProfile,
+		*userPrivacies,
+		*userStats,
+		*loginInfo,
+	)
 
-	return &oapi.User{
-		Uuid:             userInfo.UserUUID,
-		AvatarUrl:        avatar,
-		Country:          country,
-		Ip:               "",
-		Language:         userInfo.Language,
-		LastLoginAt:      userInfo.CreatedAt,
-		Nickname:         displayName,
-		RegisteredAt:     userInfo.CreatedAt,
-		QuestionsCreated: int(userInfo.QuestionsCreated),
-		TotalAnswers:     int(userInfo.TotalSubmissions),
-		CorrectAnswers:   int(userInfo.CorrectSubmissions),
-		Votes:            int(userInfo.TotalVotes),
-	}, nil
+	return &res, nil
 }

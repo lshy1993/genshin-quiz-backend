@@ -8,30 +8,36 @@ import (
 
 func ConvertSimpleToQuestion(
 	res dao.SimpleQuestion,
+	trans []model.QuestionTranslations,
 	solved bool,
 	userLikeStatus int16,
 ) oapi.Question {
 	answered := int(res.Question.SubmitCount)
 	correct := int(res.Question.CorrectCount)
 	likes := int(res.Question.Likes)
-	likeStatus := oapi.QuestionLikeStatus(userLikeStatus)
+	likeStatus := oapi.LikeStatus(userLikeStatus)
+
+	mappedStr := oapi.LocalizedText{}
+	for _, q := range trans {
+		mappedStr[q.Language] = q.QuestionText
+	}
 
 	return oapi.Question{
-		AnswerCount:  &answered,
-		Category:     oapi.QuestionCategory(res.Question.Category),
-		CorrectCount: &correct,
-		CreatedAt:    res.Question.CreatedAt,
-		CreatedBy:    res.User.UserUUID,
-		Difficulty:   oapi.QuestionDifficulty(res.Question.Difficulty),
-		Explanation:  nil, // 简单模式不返回解释
-		Id:           res.Question.QuestionUUID,
-		LikeStatus:   &likeStatus,
-		Likes:        &likes,
-		Options:      nil, // 简单模式不返回选项
-		Public:       res.Question.Public,
-		QuestionText: res.Translation.QuestionText,
-		QuestionType: oapi.QuestionType(res.Question.QuestionType),
-		Solved:       &solved,
+		AnswersCount:        answered,
+		Category:            oapi.Category(res.Question.Category),
+		CorrectAnswersCount: correct,
+		CreatedAt:           res.Question.CreatedAt,
+		CreatedBy:           res.User.UserUUID,
+		Difficulty:          oapi.Difficulty(res.Question.Difficulty),
+		Explanation:         nil, // 简单模式不返回解释
+		Id:                  res.Question.QuestionUUID,
+		LikeStatus:          likeStatus,
+		LikesCount:          likes,
+		Options:             nil, // 简单模式不返回选项
+		Public:              res.Question.Public,
+		QuestionText:        mappedStr,
+		QuestionType:        oapi.QuestionType(res.Question.QuestionType),
+		Solved:              solved,
 	}
 }
 
@@ -43,62 +49,60 @@ func ConvertDetailToQuestion(
 	answer := int(res.SubmissionCount)
 	correct := int(res.Question.CorrectCount)
 	likes := int(res.Question.Likes)
-	likeStatus := oapi.QuestionLikeStatus(userLikeStatus)
+	likeStatus := oapi.LikeStatus(userLikeStatus)
 
-	optionMap := make(map[int64]model.QuestionOptions)
-	for _, opt := range res.Options {
-		optionMap[opt.ID] = opt
+	// 构建标题
+	questionText := make(oapi.LocalizedText)
+	explanation := make(oapi.LocalizedText)
+	for _, trans := range res.Translation {
+		questionText[trans.Language] = trans.QuestionText
+
+		if trans.Explanation != nil {
+			explanation[trans.Language] = *trans.Explanation
+		}
 	}
 
+	// 构建选项
 	options := make([]oapi.QuestionOption, 0, len(res.Options))
-	languageSet := make(map[string]bool)
-	for _, translation := range res.OptionTranslations {
-		dto := ToQuestionOption(optionMap[translation.OptionID], translation, solved)
+	for _, opt := range res.Options {
+		// 获取翻译
+		translation := res.OptionTranslations[opt.ID]
+		dto := ToQuestionOption(opt, translation, solved)
 		options = append(options, dto)
-		languageSet[translation.Language] = true
-	}
-
-	// 将 map 转换为 slice
-	languages := make([]string, 0, len(languageSet))
-	for lang := range languageSet {
-		languages = append(languages, lang)
 	}
 
 	return oapi.Question{
-		AnswerCount:  &answer,
-		Category:     oapi.QuestionCategory(res.Question.Category),
-		CorrectCount: &correct,
-		CreatedAt:    res.Question.CreatedAt,
-		CreatedBy:    res.User.UserUUID,
-		Difficulty:   oapi.QuestionDifficulty(res.Question.Difficulty),
-		Explanation:  res.Translation.Explanation,
-		Id:           res.Question.QuestionUUID,
-		Languages:    languages,
-		LikeStatus:   &likeStatus,
-		Likes:        &likes,
-		Options:      options,
-		Public:       res.Question.Public,
-		QuestionText: res.Translation.QuestionText,
-		QuestionType: oapi.QuestionType(res.Question.QuestionType),
-		Solved:       &solved,
+		AnswersCount:        answer,
+		Category:            oapi.Category(res.Question.Category),
+		CorrectAnswersCount: correct,
+		CreatedAt:           res.Question.CreatedAt,
+		CreatedBy:           res.User.UserUUID,
+		Difficulty:          oapi.Difficulty(res.Question.Difficulty),
+		Explanation:         &explanation,
+		Id:                  res.Question.QuestionUUID,
+		LikeStatus:          likeStatus,
+		LikesCount:          likes,
+		Options:             options,
+		Public:              res.Question.Public,
+		QuestionText:        questionText,
+		QuestionType:        oapi.QuestionType(res.Question.QuestionType),
+		Solved:              solved,
 	}
 }
 
 func ToQuestionOption(
 	option model.QuestionOptions,
-	translation model.QuestionOptionTranslations,
+	translations oapi.LocalizedText,
 	solved bool,
 ) oapi.QuestionOption {
 	count := int(option.SelectedCount)
-	text := map[string]string{}
-	text[translation.Language] = translation.OptionText
 
 	dto := oapi.QuestionOption{
-		Id:    &option.OptionUUID,
-		Count: &count,
-		Image: option.ImgURL,
-		Text:  &text,
-		Type:  oapi.QuestionOptionType(option.OptionType),
+		Id:            option.OptionUUID,
+		MediaUrl:      option.ImgURL,
+		Text:          &translations,
+		SelectedCount: count,
+		OptionType:    oapi.OptionType(option.OptionType),
 	}
 	if solved {
 		dto.IsAnswer = &option.IsAnswer

@@ -2,11 +2,36 @@ package user_repo
 
 import (
 	"context"
+	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 )
+
+func InsertUserStats(
+	ctx context.Context,
+	db qrm.DB,
+	userID int64,
+) (*model.UserStats, error) {
+	tbl := table.UserStats
+
+	insertStmt := tbl.INSERT(
+		tbl.UserID,
+	).MODEL(model.UserStats{
+		UserID: userID,
+		// TotalSubmissions / CorrectSubmissions / QuestionsCreated /
+		// VotesCast / PollsCreated / LikesReceived 全部走数据库列默认值 0
+	}).RETURNING(tbl.AllColumns)
+
+	var stats model.UserStats
+	err := insertStmt.QueryContext(ctx, db, &stats)
+	if err != nil {
+		return nil, err
+	}
+
+	return &stats, nil
+}
 
 func UpdateUserSubmissionStats(
 	ctx context.Context,
@@ -14,7 +39,7 @@ func UpdateUserSubmissionStats(
 	userID int64,
 	isCorrect bool,
 ) error {
-	tbl := table.Users
+	tbl := table.UserStats
 
 	// 构建更新语句
 	if isCorrect {
@@ -22,7 +47,7 @@ func UpdateUserSubmissionStats(
 		updateStmt := tbl.UPDATE().SET(
 			tbl.TotalSubmissions.SET(tbl.TotalSubmissions.ADD(pg.Int(1))),
 			tbl.CorrectSubmissions.SET(tbl.CorrectSubmissions.ADD(pg.Int(1))),
-		).WHERE(tbl.ID.EQ(pg.Int64(userID)))
+		).WHERE(tbl.UserID.EQ(pg.Int64(userID)))
 
 		_, err := updateStmt.ExecContext(ctx, db)
 		return err
@@ -31,7 +56,7 @@ func UpdateUserSubmissionStats(
 	// 如果答案错误，只更新总提交数
 	updateStmt := tbl.UPDATE().SET(
 		tbl.TotalSubmissions.SET(tbl.TotalSubmissions.ADD(pg.Int(1))),
-	).WHERE(tbl.ID.EQ(pg.Int64(userID)))
+	).WHERE(tbl.UserID.EQ(pg.Int64(userID)))
 
 	_, err := updateStmt.ExecContext(ctx, db)
 	return err
@@ -42,7 +67,7 @@ func RecalculateUserStats(
 	db qrm.DB,
 	userID int64,
 ) error {
-	userTbl := table.Users
+	userTbl := table.UserStats
 	submissionTbl := table.QuestionSubmissions
 	questionTbl := table.Questions
 
@@ -87,7 +112,7 @@ func RecalculateUserStats(
 		userTbl.TotalSubmissions.SET(pg.Int64(submissionResult.TotalSubmissions)),
 		userTbl.CorrectSubmissions.SET(pg.Int64(submissionResult.CorrectSubmissions)),
 		userTbl.QuestionsCreated.SET(pg.Int64(questionResult.QuestionsCreated)),
-	).WHERE(userTbl.ID.EQ(pg.Int64(userID)))
+	).WHERE(userTbl.UserID.EQ(pg.Int64(userID)))
 
 	_, err = updateStmt.ExecContext(ctx, db)
 	return err

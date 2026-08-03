@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"time"
 
 	"genshin-quiz/config"
@@ -30,9 +30,10 @@ func PostCreateQuestion(
 	if err != nil {
 		return nil, err
 	}
+	defer tx.Rollback()
 
 	now := time.Now()
-	fmt.Println("Creating question by user ID:", userClaims.UserID)
+	log.Println("Creating question by user ID:", userClaims.UserID)
 	// 提问表主体
 	insertModel := model.Questions{
 		QuestionUUID: uuid.New(),
@@ -47,7 +48,6 @@ func PostCreateQuestion(
 	}
 	createdQuestion, err := question_repo.InsertQuestion(ctx, tx, insertModel)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 	// 提问翻译
@@ -74,23 +74,19 @@ func PostCreateQuestion(
 	// 批量插入翻译数据
 	err = question_repo.InsertQuestionTranslations(ctx, tx, transModels)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
 	// 选项生成数据
 	optionModels := make([]model.QuestionOptions, 0, len(req.Body.Options))
 	for _, option := range req.Body.Options {
-		isAnswer := false
-		if option.IsAnswer != nil {
-			isAnswer = *option.IsAnswer
-		}
+		isAnswer := option.IsAnswer
 
 		optionModel := model.QuestionOptions{
 			QuestionID: createdQuestion.ID,
 			OptionUUID: uuid.New(),
-			OptionType: model.QuestionOptionType(option.Type),
-			ImgURL:     option.Image,
+			OptionType: model.QuestionOptionType(option.OptionType),
+			ImgURL:     option.MediaUrl,
 			IsAnswer:   isAnswer,
 			CreatedAt:  now,
 		}
@@ -99,7 +95,6 @@ func PostCreateQuestion(
 	// 插入选项
 	insertedOptions, err := question_repo.InsertQuestionOptions(ctx, tx, optionModels)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
@@ -126,7 +121,6 @@ func PostCreateQuestion(
 	// 插入选项翻译
 	err = question_repo.InsertOptionTranslations(ctx, tx, optionTransModels)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
@@ -137,12 +131,12 @@ func PostCreateQuestion(
 
 	// Convert to API response format
 	response := oapi.PostCreateQuestion201JSONResponse{
-		Category:     oapi.QuestionCategory(createdQuestion.Category),
-		Difficulty:   oapi.QuestionDifficulty(createdQuestion.Difficulty),
+		Category:     oapi.Category(createdQuestion.Category),
+		Difficulty:   oapi.Difficulty(createdQuestion.Difficulty),
 		QuestionType: oapi.QuestionType(createdQuestion.QuestionType),
-		QuestionText: req.Body.QuestionText,   // 直接使用请求中的翻译数据
-		Explanation:  req.Body.Explanation,    // 直接使用请求中的解释数据
-		Options:      []oapi.QuestionOption{}, // Add options
+		QuestionText: req.Body.QuestionText,                // 直接使用请求中的翻译数据
+		Explanation:  req.Body.Explanation,                 // 直接使用请求中的解释数据
+		Options:      []oapi.CreateQuestionOptionRequest{}, // Add options
 		Public:       createdQuestion.Public,
 	}
 

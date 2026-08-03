@@ -1,6 +1,11 @@
 package util
 
 import (
+	"genshin-quiz/generated/db/genshinquiz/public/model"
+	"genshin-quiz/generated/oapi"
+	"net/url"
+	"strings"
+
 	"github.com/google/uuid"
 
 	pg "github.com/go-jet/jet/v2/postgres"
@@ -42,4 +47,66 @@ func GetDefaultLanguageFromString(language *string) string {
 		return *language
 	}
 	return "zh" // 默认中文
+}
+
+func buildAuthLink(domain, basePath, rawToken string) string {
+	domain = strings.TrimSuffix(domain, "/")
+	u, err := url.Parse(domain + basePath)
+	if err != nil {
+		// 一般静态路径解析不会报错，如果报错属于程序 Bug
+		panic(err)
+	}
+
+	q := u.Query()
+	q.Set("token", rawToken)
+	u.RawQuery = q.Encode()
+
+	return u.String()
+}
+
+func GenerateResetLink(domain, rawToken string) string {
+	return buildAuthLink(domain, "/reset-password", rawToken)
+}
+
+func GenerateEmailVerifyLink(domain, rawToken string) string {
+	return buildAuthLink(domain, "/verify-email", rawToken)
+}
+
+func LanguageOrDefault(lang *string) string {
+	if lang == nil {
+		return "zh-CN"
+	}
+	return *lang
+}
+
+func BuildOptionTranslationMap(
+	rows []model.QuestionOptionTranslations,
+) map[int64]oapi.LocalizedText {
+	result := make(map[int64]oapi.LocalizedText)
+
+	for _, row := range rows {
+		if _, ok := result[row.OptionID]; !ok {
+			result[row.OptionID] = make(oapi.LocalizedText)
+		}
+
+		result[row.OptionID][row.Language] = row.OptionText
+	}
+
+	return result
+}
+
+func BuildPollOptionTranslationMap(
+	rows []model.PollOptionTranslations,
+) map[int64]oapi.LocalizedText {
+	result := make(map[int64]oapi.LocalizedText)
+
+	for _, row := range rows {
+		if _, ok := result[row.OptionID]; !ok {
+			result[row.OptionID] = make(oapi.LocalizedText)
+		}
+
+		result[row.OptionID][row.Language] = row.OptionText
+	}
+
+	return result
 }

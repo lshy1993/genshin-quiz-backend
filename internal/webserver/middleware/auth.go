@@ -101,7 +101,7 @@ func parseAndValidateToken(
 		return nil, err
 	}
 
-	if requireAdmin && util.IsAdmin(*userInfo.UserRole) {
+	if requireAdmin && util.IsAdmin(userInfo.UserRole) {
 		return nil, common.ErrAdminAuthError
 	}
 
@@ -199,14 +199,19 @@ func isPublicEndpoint(path, method string) bool {
 		"/auth/register":        {"POST"},
 		"/auth/login":           {"POST"},
 		"/auth/forgot-password": {"POST"},
+		"/auth/reset-password":  {"POST"},
+		"/auth/verify-email":    {"POST"},
 
 		// 公开的只读API - 不需要认证
+		"/home":        {"GET"},
 		"/questions":   {"GET"},
 		"/questions/*": {"GET"}, // 通配符支持 /questions/{id}
 		"/exams":       {"GET"},
 		"/exams/*":     {"GET"}, // 通配符支持 /exams/{id}
-		"/votes":       {"GET"},
-		"/votes/*":     {"GET"}, // 只有GET操作公开，POST/PUT需要认证
+		"/polls":       {"GET"},
+		"/polls/*":     {"GET"}, // POST/PUT需要认证
+		"/users":       {"GET"},
+		"/users/*":     {"GET"}, // 通配符支持 /users/{id} POST/PUT需要认证
 	}
 	// 精确匹配
 	if methods, exists := publicEndpoints[path]; exists {

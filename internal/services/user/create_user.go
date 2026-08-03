@@ -4,16 +4,13 @@ import (
 	"context"
 	"errors"
 	"genshin-quiz/config"
-	"genshin-quiz/generated/db/genshinquiz/public/model"
 	"genshin-quiz/generated/oapi"
-	"genshin-quiz/internal/dao/transformer"
 	user_repo "genshin-quiz/internal/repository/user"
-	"genshin-quiz/internal/webserver/middleware"
+	"genshin-quiz/internal/util"
 
 	"genshin-quiz/internal/common"
 
 	go_errors "github.com/go-errors/errors"
-	"github.com/go-jet/jet/v2/qrm"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -35,81 +32,65 @@ func RegisterUser(
 		return nil, common.ErrUserAlreadyExists
 	}
 
-	// 创建用户
 	tx, err := app.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, go_errors.WrapPrefix(err, "failed to begin transaction", 0)
 	}
-	res, err := user_repo.InsertUser(ctx, tx, string(email), language)
+	defer tx.Rollback()
+
+	// 创建用户
+	res, err := user_repo.InsertUser(ctx, tx, string(email), util.LanguageOrDefault(language))
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-	err = user_repo.InsertUserAuth(ctx, tx, res.ID, pwd)
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, go_errors.WrapPrefix(err, "hash password failed", 0)
+	}
+	hashedPwdStr := string(hashedPwd)
+	userID := res.ID
+	// use new auth
+	err = user_repo.InsertUserAuth(ctx, tx, userID, "password", string(email), &hashedPwdStr)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-	response, err := realLogin(ctx, tx, app.Config.JWTSecret, res)
+	// 创建关联表的行
+	profile, err := user_repo.InsertUserProfile(ctx, tx, userID)
+	if err != nil {
+		tx.Rollback()
+		return nil, go_errors.WrapPrefix(err, "failed to insert user profile", 0)
+	}
+	privacies, err := user_repo.InsertUserPrivacies(ctx, tx, userID)
+	if err != nil {
+		tx.Rollback()
+		return nil, go_errors.WrapPrefix(err, "failed to insert user privacies", 0)
+	}
+	stats, err := user_repo.InsertUserStats(ctx, tx, userID)
+	if err != nil {
+		tx.Rollback()
+		return nil, go_errors.WrapPrefix(err, "failed to insert user stats", 0)
+	}
+
+	response, err := realLogin(
+		ctx,
+		tx,
+		app.Config.JWTSecret,
+		"password",
+		res,
+		profile,
+		privacies,
+		stats,
+	)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	err = tx.Commit()
-	if err != nil {
+	if err := tx.Commit(); err != nil {
 		return nil, go_errors.WrapPrefix(err, "failed to commit transaction", 0)
 	}
 
 	return response, nil
-}
-
-func LoginUser(
-	ctx context.Context,
-	app *config.App,
-	req oapi.PostLoginUserRequestObject,
-) (*oapi.AuthResponse, error) {
-	email := req.Body.Email
-	pwd := req.Body.Password
-
-	// 获取用户信息
-	authInfo, err := user_repo.GetPasswordByEmail(ctx, app.DB, string(email))
-	if err != nil {
-		return nil, err
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(authInfo.Auth.PasswordHash), []byte(pwd))
-	if err != nil {
-		// 密码错误
-		return nil, common.ErrInvalidCredentials
-	}
-
-	// 登录流程
-	return realLogin(ctx, app.DB, app.Config.JWTSecret, &authInfo.User)
-}
-
-func realLogin(
-	ctx context.Context,
-	db qrm.DB,
-	secret string,
-	res *model.Users,
-) (*oapi.AuthResponse, error) {
-	// 生成 JWT
-	tokenString, err := middleware.GenerateJWT(res.ID, res.Email, secret)
-	if err != nil {
-		return nil, err
-	}
-
-	// 写登录日志
-	ip, _ := ctx.Value("real_ip").(string)
-	loginInfo, err := user_repo.InsertLoginLog(ctx, db, res.ID, ip)
-	if err != nil {
-		return nil, err
-	}
-	// TODO:获取用户的其他统计信息
-
-	return &oapi.AuthResponse{
-		Token: tokenString,
-		User:  transformer.UserModelToDTO(*res, *loginInfo),
-	}, nil
 }

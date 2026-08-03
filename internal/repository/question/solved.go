@@ -5,6 +5,7 @@ import (
 
 	"genshin-quiz/generated/db/genshinquiz/public/table"
 
+	"github.com/go-errors/errors"
 	pg "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 )
@@ -34,7 +35,7 @@ func CheckQuestionSolved(
 	}
 	err := stmt.QueryContext(ctx, db, &result)
 	if err != nil {
-		return false, err
+		return false, errors.WrapPrefix(err, "CheckQuestionSolved failed", 0)
 	}
 
 	return result.Count > 0, nil
@@ -51,42 +52,35 @@ func CheckMultipleQuestionsSolved(
 		return make(map[int64]bool), nil
 	}
 
-	questionTbl := table.Questions
 	submissionTbl := table.QuestionSubmissions
 
-	// 构建 ID 列表
+	// 构建 ID exp
 	idList := make([]pg.Expression, 0, len(questionIDs))
 	for _, id := range questionIDs {
 		idList = append(idList, pg.Int64(id))
 	}
 
 	stmt := pg.SELECT(
-		questionTbl.ID,
+		submissionTbl.QuestionID,
 	).FROM(
-		submissionTbl.INNER_JOIN(questionTbl, questionTbl.ID.EQ(submissionTbl.QuestionID)),
+		submissionTbl,
 	).WHERE(
 		submissionTbl.UserID.EQ(pg.Int64(userID)).
-			AND(questionTbl.ID.IN(idList...)).
+			AND(submissionTbl.QuestionID.IN(idList...)).
 			AND(submissionTbl.IsCorrect.IS_TRUE()).
 			AND(submissionTbl.IsPractice.IS_FALSE()),
-	).GROUP_BY(questionTbl.ID)
+	).GROUP_BY(submissionTbl.QuestionID)
 
 	var results []struct {
-		QuestionID int64 `alias:"questions.id"`
+		QuestionID int64 `alias:"question_submissions.question_id"`
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get multi question solved failed", 0)
 	}
 
 	// 构建结果 map
-	solvedMap := make(map[int64]bool)
-
-	// 初始化所有题目为未解答
-	for _, id := range questionIDs {
-		solvedMap[id] = false
-	}
-
+	solvedMap := make(map[int64]bool, len(results))
 	// 标记已解答的题目
 	for _, result := range results {
 		solvedMap[result.QuestionID] = true

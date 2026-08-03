@@ -3,12 +3,12 @@ package config
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
+	"genshin-quiz/internal/enum"
+	"genshin-quiz/logger"
 	"log"
 	"os"
 	"strconv"
-	"syscall"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
@@ -16,8 +16,8 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
+	"github.com/resend/resend-go/v3"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 type App struct {
@@ -26,6 +26,7 @@ type App struct {
 	JWTAuth *jwtauth.JWTAuth
 	Logger  *zap.Logger
 	Storage *azblob.SharedKeyCredential
+	Resend  *resend.Client
 
 	Config   AppConfig
 	Database DatabaseConfig
@@ -38,9 +39,11 @@ type AppConfig struct {
 	Port        string
 	DatabaseURL string
 	JWTSecret   string
-	Environment string
+	Environment enum.Environment
 	Version     string
 	SentryDSN   string
+	Domain      string
+	ResendKey   string
 }
 
 type DatabaseConfig struct {
@@ -71,14 +74,25 @@ type ServerConfig struct {
 	WriteTimeout time.Duration
 }
 
-const PROD = "production"
-
 func getEnv(key, defaultValue string) string {
 	value := os.Getenv(key)
 	if value == "" {
 		return defaultValue
 	}
 	return value
+}
+
+func getEnvAsEnv(key string) enum.Environment {
+	val := os.Getenv(key)
+
+	env := enum.Environment(val)
+	// 校验获取到的字符串是否属于合法的枚举
+	switch env {
+	case enum.DEV, enum.TEST, enum.PROD:
+		return env
+	default:
+		return enum.DEV
+	}
 }
 
 func getEnvAsInt(key string, defaultValue int) int {
@@ -98,46 +112,6 @@ func getEnvAsDuration(key string, defaultValue string) time.Duration {
 		return value
 	}
 	return time.Minute * 5
-}
-
-func (app *App) initializeLogger() (*zap.Logger, error) {
-	var config zap.Config
-
-	if app.Config.Environment == PROD {
-		config = zap.NewProductionConfig()
-		config.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
-		// 生产环境不使用彩色输出
-		config.EncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
-	} else {
-		config = zap.NewDevelopmentConfig()
-		config.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
-		// 开发环境使用彩色输出
-		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	}
-
-	config.EncoderConfig.TimeKey = "timestamp"
-	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-
-	// 设置更友好的时间格式和颜色编码
-	if app.Config.Environment != PROD {
-		config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("15:04:05.000")
-		// 使用短路径显示 caller 信息
-		config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
-	}
-
-	logger, _ := config.Build(zap.AddStacktrace(zapcore.ErrorLevel))
-	// Set up defer immediately after logger is created
-	defer func() {
-		err := logger.Sync()
-		if err != nil &&
-			!errors.Is(err, syscall.EINVAL) && // invalid argument
-			!errors.Is(err, syscall.EBADF) && // bad file descriptor
-			!errors.Is(err, syscall.ENOTTY) {
-			panic(err.Error())
-		}
-	}()
-
-	return logger, nil
 }
 
 func (app *App) initializeDatabase() (*sql.DB, error) {
@@ -182,31 +156,92 @@ func (app *App) initializeDatabase() (*sql.DB, error) {
 
 func (app *App) initializeSentry() error {
 	// 只在非 debug 环境（生产环境）且设置了 Sentry DSN 时才初始化
-	if app.Config.Environment != PROD {
-		app.Logger.Info("Sentry disabled in non-production environment")
-		return nil
-	}
+	// if app.Config.Environment != enum.PROD {
+	// 	app.Logger.Info("Sentry disabled in non-production environment")
+	// 	return nil
+	// }
 
 	if app.Config.SentryDSN == "" {
 		app.Logger.Info("Sentry DSN not configured, skipping Sentry initialization")
 		return nil
 	}
 
+	var tracesSampleRate float64
+	if app.Config.Environment == enum.PROD {
+		tracesSampleRate = 0.2 // 生产环境采样 20%
+	} else {
+		tracesSampleRate = 1.0 // 开发环境全量收集/调试
+	}
+
 	err := sentry.Init(sentry.ClientOptions{
 		Dsn:              app.Config.SentryDSN,
-		Environment:      app.Config.Environment,
-		Debug:            app.Config.Environment == "development",
-		SampleRate:       1.0, // 在生产环境中可能需要调整采样率
-		TracesSampleRate: 1.0, // 可选，开启 tracing
-		EnableTracing:    app.Config.Environment == PROD,
+		Environment:      string(app.Config.Environment),
+		Debug:            app.Config.Environment == enum.DEV,
+		SampleRate:       1.0,              // 在生产环境中可能需要调整采样率
+		TracesSampleRate: tracesSampleRate, // 可选，开启 tracing
+		EnableTracing:    true,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to initialize Sentry: %w", err)
 	}
 
 	app.Logger.Info("Sentry initialized successfully",
-		zap.String("environment", app.Config.Environment),
+		zap.String("environment", string(app.Config.Environment)),
 		zap.String("version", app.Config.Version),
+	)
+	return nil
+}
+
+func (app *App) initializeResend() *resend.Client {
+	if app.Config.ResendKey == "" {
+		app.Logger.Info("Resend key not configured, CANNOT use mail service")
+		return nil
+	}
+	client := resend.NewClient(app.Config.ResendKey)
+	app.Logger.Info("Resend mail service initialized successfully")
+	return client
+}
+
+func (app *App) getFromAddress() string {
+	if app.Config.Environment == enum.DEV || app.Config.Domain == "localhost" {
+		// 开发环境下使用 Resend 官方测试地址
+		return "YourApp Dev <onboarding@resend.dev>"
+	}
+
+	// Staging / Production 使用真实域名
+	return fmt.Sprintf("YourApp <noreply@%s>", app.Config.Domain)
+}
+
+func (app *App) getToAddress(to string) string {
+	if app.Config.Environment == enum.DEV || app.Config.Domain == "localhost" {
+		return "lshy1993@live.com"
+	}
+	return to
+}
+
+func (app *App) SendEmail(to, subject, htmlBody string) error {
+	// 防护拦截：如果邮件服务未正常挂载，记录日志并直接安全退出
+	if app.Resend == nil {
+		app.Logger.Warn("Email service is not configured/available, skipping email send")
+		return nil
+	}
+
+	params := &resend.SendEmailRequest{
+		From:    app.getFromAddress(),
+		To:      []string{app.getToAddress(to)},
+		Subject: subject,
+		Html:    htmlBody,
+	}
+
+	sent, err := app.Resend.Emails.Send(params)
+	if err != nil {
+		app.Logger.Error("Failed to send email via Resend", zap.Error(err))
+		return err
+	}
+
+	app.Logger.Info("Email sent successfully",
+		zap.String("id", sent.Id),
+		zap.String("to", to),
 	)
 	return nil
 }
@@ -220,9 +255,11 @@ func NewApp() *App {
 				"postgres://user:password@localhost/genshin_quiz?sslmode=disable",
 			),
 			JWTSecret:   getEnv("JWT_SECRET", "your-secret-key"),
-			Environment: getEnv("ENVIRONMENT", "development"),
+			Environment: getEnvAsEnv("ENVIRONMENT"),
 			Version:     getEnv("VERSION", "dev"),
 			SentryDSN:   getEnv("SENTRY_DSN", ""),
+			Domain:      getEnv("APP_DOMAIN", "http://localhost:3000"),
+			ResendKey:   getEnv("RESEND_KEY", ""),
 		},
 
 		Database: DatabaseConfig{
@@ -250,23 +287,27 @@ func NewApp() *App {
 		},
 	}
 
-	logger, err := app.initializeLogger()
-	if err != nil {
+	if err := logger.Init(string(app.Config.Environment)); err != nil {
 		log.Fatalf("Failed to initialize logger: %v", err)
 	}
-	app.Logger = logger
+	app.Logger = logger.L
 
 	app.Logger.Info("Current App Config", zap.Any("config", app.Config))
 
-	err = app.initializeSentry()
+	// 初始化sentry
+	err := app.initializeSentry()
 	if err != nil {
 		app.Logger.Error("Failed to initialize Sentry", zap.Error(err))
 		// 不要因为 Sentry 初始化失败而崩溃应用
 	}
 
+	// 初始化resend邮件服务
+	app.Resend = app.initializeResend()
+
+	// pg数据库
 	db, err := app.initializeDatabase()
 	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
+		app.Logger.Fatal("Failed to initialize database:", zap.Error(err))
 	}
 	app.DB = db
 

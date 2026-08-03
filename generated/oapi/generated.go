@@ -20,102 +20,60 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-// Defines values for ExamLikeStatus.
+// Defines values for Category.
 const (
-	ExamLikeStatusMinus1 ExamLikeStatus = -1
-	ExamLikeStatusN0     ExamLikeStatus = 0
-	ExamLikeStatusN1     ExamLikeStatus = 1
+	CategoryArtifact   Category = "artifact"
+	CategoryCharacter  Category = "character"
+	CategoryCombat     Category = "combat"
+	CategoryFun        Category = "fun"
+	CategoryGameplay   Category = "gameplay"
+	CategoryLore       Category = "lore"
+	CategoryMusic      Category = "music"
+	CategoryOther      Category = "other"
+	CategoryStatistics Category = "statistics"
+	CategoryWeapon     Category = "weapon"
+	CategoryWorld      Category = "world"
 )
 
-// Valid indicates whether the value is a known member of the ExamLikeStatus enum.
-func (e ExamLikeStatus) Valid() bool {
+// Valid indicates whether the value is a known member of the Category enum.
+func (e Category) Valid() bool {
 	switch e {
-	case ExamLikeStatusMinus1:
+	case CategoryArtifact:
 		return true
-	case ExamLikeStatusN0:
+	case CategoryCharacter:
 		return true
-	case ExamLikeStatusN1:
+	case CategoryCombat:
+		return true
+	case CategoryFun:
+		return true
+	case CategoryGameplay:
+		return true
+	case CategoryLore:
+		return true
+	case CategoryMusic:
+		return true
+	case CategoryOther:
+		return true
+	case CategoryStatistics:
+		return true
+	case CategoryWeapon:
+		return true
+	case CategoryWorld:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for QuestionLikeStatus.
+// Defines values for Difficulty.
 const (
-	QuestionLikeStatusMinus1 QuestionLikeStatus = -1
-	QuestionLikeStatusN0     QuestionLikeStatus = 0
-	QuestionLikeStatusN1     QuestionLikeStatus = 1
+	Easy   Difficulty = "easy"
+	Hard   Difficulty = "hard"
+	Medium Difficulty = "medium"
 )
 
-// Valid indicates whether the value is a known member of the QuestionLikeStatus enum.
-func (e QuestionLikeStatus) Valid() bool {
-	switch e {
-	case QuestionLikeStatusMinus1:
-		return true
-	case QuestionLikeStatusN0:
-		return true
-	case QuestionLikeStatusN1:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for QuestionCategory.
-const (
-	QuestionCategoryArtifact   QuestionCategory = "artifact"
-	QuestionCategoryCharacter  QuestionCategory = "character"
-	QuestionCategoryCombat     QuestionCategory = "combat"
-	QuestionCategoryFun        QuestionCategory = "fun"
-	QuestionCategoryGameplay   QuestionCategory = "gameplay"
-	QuestionCategoryLore       QuestionCategory = "lore"
-	QuestionCategoryMusic      QuestionCategory = "music"
-	QuestionCategoryOther      QuestionCategory = "other"
-	QuestionCategoryStatistics QuestionCategory = "statistics"
-	QuestionCategoryWeapon     QuestionCategory = "weapon"
-	QuestionCategoryWorld      QuestionCategory = "world"
-)
-
-// Valid indicates whether the value is a known member of the QuestionCategory enum.
-func (e QuestionCategory) Valid() bool {
-	switch e {
-	case QuestionCategoryArtifact:
-		return true
-	case QuestionCategoryCharacter:
-		return true
-	case QuestionCategoryCombat:
-		return true
-	case QuestionCategoryFun:
-		return true
-	case QuestionCategoryGameplay:
-		return true
-	case QuestionCategoryLore:
-		return true
-	case QuestionCategoryMusic:
-		return true
-	case QuestionCategoryOther:
-		return true
-	case QuestionCategoryStatistics:
-		return true
-	case QuestionCategoryWeapon:
-		return true
-	case QuestionCategoryWorld:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for QuestionDifficulty.
-const (
-	Easy   QuestionDifficulty = "easy"
-	Hard   QuestionDifficulty = "hard"
-	Medium QuestionDifficulty = "medium"
-)
-
-// Valid indicates whether the value is a known member of the QuestionDifficulty enum.
-func (e QuestionDifficulty) Valid() bool {
+// Valid indicates whether the value is a known member of the Difficulty enum.
+func (e Difficulty) Valid() bool {
 	switch e {
 	case Easy:
 		return true
@@ -128,16 +86,64 @@ func (e QuestionDifficulty) Valid() bool {
 	}
 }
 
-// Defines values for QuestionOptionType.
+// Defines values for Gender.
 const (
-	Image QuestionOptionType = "image"
-	Text  QuestionOptionType = "text"
+	GenderFemale  Gender = "female"
+	GenderMale    Gender = "male"
+	GenderOther   Gender = "other"
+	GenderUnknown Gender = "unknown"
 )
 
-// Valid indicates whether the value is a known member of the QuestionOptionType enum.
-func (e QuestionOptionType) Valid() bool {
+// Valid indicates whether the value is a known member of the Gender enum.
+func (e Gender) Valid() bool {
+	switch e {
+	case GenderFemale:
+		return true
+	case GenderMale:
+		return true
+	case GenderOther:
+		return true
+	case GenderUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for LikeStatus.
+const (
+	Minus1 LikeStatus = -1
+	N0     LikeStatus = 0
+	N1     LikeStatus = 1
+)
+
+// Valid indicates whether the value is a known member of the LikeStatus enum.
+func (e LikeStatus) Valid() bool {
+	switch e {
+	case Minus1:
+		return true
+	case N0:
+		return true
+	case N1:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OptionType.
+const (
+	Image OptionType = "image"
+	Music OptionType = "music"
+	Text  OptionType = "text"
+)
+
+// Valid indicates whether the value is a known member of the OptionType enum.
+func (e OptionType) Valid() bool {
 	switch e {
 	case Image:
+		return true
+	case Music:
 		return true
 	case Text:
 		return true
@@ -167,84 +173,39 @@ func (e QuestionType) Valid() bool {
 	}
 }
 
-// Defines values for VoteLikeStatus.
+// Defines values for Visibility.
 const (
-	VoteLikeStatusMinus1 VoteLikeStatus = -1
-	VoteLikeStatusN0     VoteLikeStatus = 0
-	VoteLikeStatusN1     VoteLikeStatus = 1
+	Private Visibility = "private"
+	Public  Visibility = "public"
 )
 
-// Valid indicates whether the value is a known member of the VoteLikeStatus enum.
-func (e VoteLikeStatus) Valid() bool {
+// Valid indicates whether the value is a known member of the Visibility enum.
+func (e Visibility) Valid() bool {
 	switch e {
-	case VoteLikeStatusMinus1:
+	case Private:
 		return true
-	case VoteLikeStatusN0:
-		return true
-	case VoteLikeStatusN1:
+	case Public:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for VoteOptionType.
+// Defines values for GetPollsParamsType.
 const (
-	VoteOptionTypeImage VoteOptionType = "image"
-	VoteOptionTypeMusic VoteOptionType = "music"
-	VoteOptionTypeText  VoteOptionType = "text"
+	All       GetPollsParamsType = "all"
+	Available GetPollsParamsType = "available"
+	Expired   GetPollsParamsType = "expired"
 )
 
-// Valid indicates whether the value is a known member of the VoteOptionType enum.
-func (e VoteOptionType) Valid() bool {
+// Valid indicates whether the value is a known member of the GetPollsParamsType enum.
+func (e GetPollsParamsType) Valid() bool {
 	switch e {
-	case VoteOptionTypeImage:
+	case All:
 		return true
-	case VoteOptionTypeMusic:
+	case Available:
 		return true
-	case VoteOptionTypeText:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostLikeExamJSONBodyLike.
-const (
-	PostLikeExamJSONBodyLikeMinus1 PostLikeExamJSONBodyLike = -1
-	PostLikeExamJSONBodyLikeN0     PostLikeExamJSONBodyLike = 0
-	PostLikeExamJSONBodyLikeN1     PostLikeExamJSONBodyLike = 1
-)
-
-// Valid indicates whether the value is a known member of the PostLikeExamJSONBodyLike enum.
-func (e PostLikeExamJSONBodyLike) Valid() bool {
-	switch e {
-	case PostLikeExamJSONBodyLikeMinus1:
-		return true
-	case PostLikeExamJSONBodyLikeN0:
-		return true
-	case PostLikeExamJSONBodyLikeN1:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostLikeQuestionJSONBodyLike.
-const (
-	PostLikeQuestionJSONBodyLikeMinus1 PostLikeQuestionJSONBodyLike = -1
-	PostLikeQuestionJSONBodyLikeN0     PostLikeQuestionJSONBodyLike = 0
-	PostLikeQuestionJSONBodyLikeN1     PostLikeQuestionJSONBodyLike = 1
-)
-
-// Valid indicates whether the value is a known member of the PostLikeQuestionJSONBodyLike enum.
-func (e PostLikeQuestionJSONBodyLike) Valid() bool {
-	switch e {
-	case PostLikeQuestionJSONBodyLikeMinus1:
-		return true
-	case PostLikeQuestionJSONBodyLikeN0:
-		return true
-	case PostLikeQuestionJSONBodyLikeN1:
+	case Expired:
 		return true
 	default:
 		return false
@@ -275,54 +236,15 @@ func (e GetUsersParamsSortBy) Valid() bool {
 	}
 }
 
-// Defines values for GetVotesParamsType.
-const (
-	All       GetVotesParamsType = "all"
-	Available GetVotesParamsType = "available"
-	Expired   GetVotesParamsType = "expired"
-)
-
-// Valid indicates whether the value is a known member of the GetVotesParamsType enum.
-func (e GetVotesParamsType) Valid() bool {
-	switch e {
-	case All:
-		return true
-	case Available:
-		return true
-	case Expired:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for PostLikeVoteJSONBodyLike.
-const (
-	PostLikeVoteJSONBodyLikeMinus1 PostLikeVoteJSONBodyLike = -1
-	PostLikeVoteJSONBodyLikeN0     PostLikeVoteJSONBodyLike = 0
-	PostLikeVoteJSONBodyLikeN1     PostLikeVoteJSONBodyLike = 1
-)
-
-// Valid indicates whether the value is a known member of the PostLikeVoteJSONBodyLike enum.
-func (e PostLikeVoteJSONBodyLike) Valid() bool {
-	switch e {
-	case PostLikeVoteJSONBodyLikeMinus1:
-		return true
-	case PostLikeVoteJSONBodyLikeN0:
-		return true
-	case PostLikeVoteJSONBodyLikeN1:
-		return true
-	default:
-		return false
-	}
-}
-
 // AuthResponse defines model for AuthResponse.
 type AuthResponse struct {
 	// Token JWT token
-	Token string `json:"token"`
-	User  User   `json:"user"`
+	Token string      `json:"token"`
+	User  UserPrivate `json:"user"`
 }
+
+// Category 分类
+type Category string
 
 // CommonError defines model for CommonError.
 type CommonError struct {
@@ -331,53 +253,362 @@ type CommonError struct {
 	Message string `json:"message"`
 }
 
-// Exam defines model for Exam.
-type Exam struct {
-	Categories  *[]QuestionCategory `json:"categories,omitempty"`
-	CreatedAt   time.Time           `json:"created_at"`
-	CreatedBy   openapi_types.UUID  `json:"created_by"`
-	Description *string             `json:"description,omitempty"`
+// CreateExamRequest defines model for CreateExamRequest.
+type CreateExamRequest struct {
+	Categories []Category `json:"categories"`
+
+	// Description Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Description *LocalizedText `json:"description,omitempty"`
 
 	// Difficulty 难度等级
-	Difficulty QuestionDifficulty `json:"difficulty"`
+	Difficulty Difficulty     `json:"difficulty"`
+	Public     bool           `json:"public"`
+	Questions  []ExamQuestion `json:"questions"`
+
+	// TimeLimit Time limit in seconds
+	TimeLimit int `json:"time_limit"`
+
+	// Title Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Title LocalizedText `json:"title"`
+}
+
+// CreatePollOptionRequest defines model for CreatePollOptionRequest.
+type CreatePollOptionRequest = PollOptionBase
+
+// CreatePollRequest defines model for CreatePollRequest.
+type CreatePollRequest struct {
+	// Category 分类
+	Category Category `json:"category"`
+
+	// Description Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Description *LocalizedText   `json:"description,omitempty"`
+	ExpireAt    *time.Time       `json:"expire_at,omitempty"`
+	Options     []PollOptionBase `json:"options"`
+
+	// Password 投票密码
+	Password *string   `json:"password,omitempty"`
+	Public   bool      `json:"public"`
+	StartAt  time.Time `json:"start_at"`
+	Tags     *[]string `json:"tags,omitempty"`
+
+	// Title Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Title          LocalizedText `json:"title"`
+	VotesPerOption int           `json:"votes_per_option"`
+	VotesPerUser   int           `json:"votes_per_user"`
+}
+
+// CreateQuestionOptionRequest defines model for CreateQuestionOptionRequest.
+type CreateQuestionOptionRequest struct {
+	// IsAnswer 是否为正确答案
+	IsAnswer   bool       `json:"is_answer"`
+	MediaUrl   *string    `json:"media_url,omitempty"`
+	OptionType OptionType `json:"option_type"`
+
+	// Text Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Text *LocalizedText `json:"text,omitempty"`
+}
+
+// CreateQuestionRequest defines model for CreateQuestionRequest.
+type CreateQuestionRequest struct {
+	// Category 分类
+	Category Category `json:"category"`
+
+	// Difficulty 难度等级
+	Difficulty Difficulty `json:"difficulty"`
+
+	// Explanation Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Explanation *LocalizedText                `json:"explanation,omitempty"`
+	Options     []CreateQuestionOptionRequest `json:"options"`
+
+	// Public 是否公开可见
+	Public bool `json:"public"`
+
+	// QuestionText Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	QuestionText LocalizedText `json:"question_text"`
+
+	// QuestionType 题目类型
+	QuestionType QuestionType `json:"question_type"`
+}
+
+// Difficulty 难度等级
+type Difficulty string
+
+// Exam defines model for Exam.
+type Exam struct {
+	Categories []Category         `json:"categories"`
+	CreatedAt  time.Time          `json:"created_at"`
+	CreatedBy  openapi_types.UUID `json:"created_by"`
+
+	// Description Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Description *LocalizedText `json:"description,omitempty"`
+
+	// Difficulty 难度等级
+	Difficulty Difficulty         `json:"difficulty"`
 	Id         openapi_types.UUID `json:"id"`
 
 	// LikeStatus 点赞状态：-1踩, 0未操作, 1赞
-	LikeStatus *ExamLikeStatus `json:"likeStatus,omitempty"`
+	LikeStatus LikeStatus `json:"like_status"`
 
-	// Likes 点赞数
-	Likes     *int `json:"likes,omitempty"`
-	Public    bool `json:"public"`
-	Questions []struct {
-		// OrderIndex 在本测验中的顺序
-		OrderIndex *int `json:"order_index,omitempty"`
-
-		// Points 本题分值
-		Points *int `json:"points,omitempty"`
-
-		// QuestionId 题目ID
-		QuestionId openapi_types.UUID `json:"question_id"`
-	} `json:"questions"`
+	// LikesCount 点赞数
+	LikesCount int            `json:"likes_count"`
+	Public     bool           `json:"public"`
+	Questions  []ExamQuestion `json:"questions"`
 
 	// TimeLimit Time limit in seconds
-	TimeLimit *int      `json:"time_limit,omitempty"`
-	Title     string    `json:"title"`
-	UpdatedAt time.Time `json:"updated_at"`
+	TimeLimit int `json:"time_limit"`
+
+	// Title Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Title     LocalizedText `json:"title"`
+	UpdatedAt time.Time     `json:"updated_at"`
 }
 
-// ExamLikeStatus 点赞状态：-1踩, 0未操作, 1赞
-type ExamLikeStatus int
+// ExamBase defines model for ExamBase.
+type ExamBase struct {
+	Categories []Category `json:"categories"`
+
+	// Description Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Description *LocalizedText `json:"description,omitempty"`
+
+	// Difficulty 难度等级
+	Difficulty Difficulty `json:"difficulty"`
+	Public     bool       `json:"public"`
+
+	// TimeLimit Time limit in seconds
+	TimeLimit int `json:"time_limit"`
+
+	// Title Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Title LocalizedText `json:"title"`
+}
+
+// ExamQuestion defines model for ExamQuestion.
+type ExamQuestion struct {
+	OrderIndex *float32            `json:"order_index,omitempty"`
+	Points     *float32            `json:"points,omitempty"`
+	QuestionId *openapi_types.UUID `json:"question_id,omitempty"`
+}
+
+// Gender defines model for Gender.
+type Gender string
 
 // HomePageData defines model for HomePageData.
 type HomePageData struct {
+	LatestPolls     []Poll     `json:"latestPolls"`
 	LatestQuestions []Question `json:"latestQuestions"`
-	LatestVotes     []Vote     `json:"latestVotes"`
 	PopularExams    []Exam     `json:"popularExams"`
-	PopularVotes    []Vote     `json:"popularVotes"`
+	PopularPolls    []Poll     `json:"popularPolls"`
 }
 
-// MySubmission defines model for MySubmission.
-type MySubmission struct {
+// LikeStatus 点赞状态：-1踩, 0未操作, 1赞
+type LikeStatus int
+
+// LocalizedText Localized text keyed by language code.
+// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+type LocalizedText map[string]string
+
+// OptionType defines model for OptionType.
+type OptionType string
+
+// Poll defines model for Poll.
+type Poll struct {
+	// Category 分类
+	Category  Category           `json:"category"`
+	CreatedAt time.Time          `json:"created_at"`
+	CreatedBy openapi_types.UUID `json:"created_by"`
+
+	// Description Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Description *LocalizedText     `json:"description,omitempty"`
+	ExpireAt    *time.Time         `json:"expire_at,omitempty"`
+	Id          openapi_types.UUID `json:"id"`
+
+	// LikeStatus 点赞状态：-1踩, 0未操作, 1赞
+	LikeStatus LikeStatus `json:"like_status"`
+	LikesCount int        `json:"likes_count"`
+
+	// MyVotes 当前用户已投票的选项及票数
+	MyVotes []PollVote   `json:"my_votes"`
+	Options []PollOption `json:"options"`
+
+	// ParticipantsCount 参与投票的用户数
+	ParticipantsCount int       `json:"participants_count"`
+	Public            bool      `json:"public"`
+	StartAt           time.Time `json:"start_at"`
+	Tags              *[]string `json:"tags,omitempty"`
+
+	// Title Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Title LocalizedText `json:"title"`
+
+	// TotalVotesCount 总投票数
+	TotalVotesCount int `json:"total_votes_count"`
+	VotesPerOption  int `json:"votes_per_option"`
+	VotesPerUser    int `json:"votes_per_user"`
+}
+
+// PollBase defines model for PollBase.
+type PollBase struct {
+	// Category 分类
+	Category Category `json:"category"`
+
+	// Description Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Description *LocalizedText `json:"description,omitempty"`
+	ExpireAt    *time.Time     `json:"expire_at,omitempty"`
+	Public      bool           `json:"public"`
+	StartAt     time.Time      `json:"start_at"`
+	Tags        *[]string      `json:"tags,omitempty"`
+
+	// Title Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Title          LocalizedText `json:"title"`
+	VotesPerOption int           `json:"votes_per_option"`
+	VotesPerUser   int           `json:"votes_per_user"`
+}
+
+// PollOption defines model for PollOption.
+type PollOption struct {
+	// Description Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Description *LocalizedText     `json:"description,omitempty"`
+	Id          openapi_types.UUID `json:"id"`
+	MediaUrl    *string            `json:"media_url,omitempty"`
+	OptionType  OptionType         `json:"option_type"`
+
+	// Text Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Text LocalizedText `json:"text"`
+
+	// VotesCount 获得的累计票数
+	VotesCount int `json:"votes_count"`
+}
+
+// PollOptionBase defines model for PollOptionBase.
+type PollOptionBase struct {
+	// Description Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Description *LocalizedText `json:"description,omitempty"`
+	MediaUrl    *string        `json:"media_url,omitempty"`
+	OptionType  OptionType     `json:"option_type"`
+
+	// Text Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Text LocalizedText `json:"text"`
+}
+
+// PollVote 投票时单个选项的投票信息
+type PollVote struct {
+	// OptionId 选项ID
+	OptionId openapi_types.UUID `json:"option_id"`
+
+	// Votes 给该选项投的票数
+	Votes int `json:"votes"`
+}
+
+// Question defines model for Question.
+type Question struct {
+	// AnswersCount 总答题人数
+	AnswersCount int `json:"answers_count"`
+
+	// Category 分类
+	Category Category `json:"category"`
+
+	// CorrectAnswersCount 总答对人数
+	CorrectAnswersCount int                `json:"correct_answers_count"`
+	CreatedAt           time.Time          `json:"created_at"`
+	CreatedBy           openapi_types.UUID `json:"created_by"`
+
+	// Difficulty 难度等级
+	Difficulty Difficulty `json:"difficulty"`
+
+	// Explanation Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Explanation *LocalizedText     `json:"explanation,omitempty"`
+	Id          openapi_types.UUID `json:"id"`
+
+	// LikeStatus 点赞状态：-1踩, 0未操作, 1赞
+	LikeStatus LikeStatus `json:"like_status"`
+
+	// LikesCount 点赞数
+	LikesCount int              `json:"likes_count"`
+	Options    []QuestionOption `json:"options"`
+
+	// Public 是否公开可见
+	Public bool `json:"public"`
+
+	// QuestionText Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	QuestionText LocalizedText `json:"question_text"`
+
+	// QuestionType 题目类型
+	QuestionType QuestionType `json:"question_type"`
+
+	// Solved 是否已经通过了
+	Solved bool `json:"solved"`
+}
+
+// QuestionBase defines model for QuestionBase.
+type QuestionBase struct {
+	// Category 分类
+	Category Category `json:"category"`
+
+	// Difficulty 难度等级
+	Difficulty Difficulty `json:"difficulty"`
+
+	// Explanation Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Explanation *LocalizedText `json:"explanation,omitempty"`
+
+	// Public 是否公开可见
+	Public bool `json:"public"`
+
+	// QuestionText Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	QuestionText LocalizedText `json:"question_text"`
+
+	// QuestionType 题目类型
+	QuestionType QuestionType `json:"question_type"`
+}
+
+// QuestionOption defines model for QuestionOption.
+type QuestionOption struct {
+	Id openapi_types.UUID `json:"id"`
+
+	// IsAnswer 是否为正确答案
+	IsAnswer   *bool      `json:"is_answer,omitempty"`
+	MediaUrl   *string    `json:"media_url,omitempty"`
+	OptionType OptionType `json:"option_type"`
+
+	// SelectedCount 选中次数
+	SelectedCount int `json:"selected_count"`
+
+	// Text Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Text *LocalizedText `json:"text,omitempty"`
+}
+
+// QuestionOptionBase defines model for QuestionOptionBase.
+type QuestionOptionBase struct {
+	MediaUrl   *string    `json:"media_url,omitempty"`
+	OptionType OptionType `json:"option_type"`
+
+	// Text Localized text keyed by language code.
+	// Example: {"en-US": "Hello", "ja-JP": "こんにちは", "zh-CN": "你好"}
+	Text *LocalizedText `json:"text,omitempty"`
+}
+
+// QuestionSubmission defines model for QuestionSubmission.
+type QuestionSubmission struct {
 	// IsCorrect 答案是否正确
 	IsCorrect         bool                 `json:"is_correct"`
 	SelectedOptionIds []openapi_types.UUID `json:"selected_option_ids"`
@@ -389,100 +620,8 @@ type MySubmission struct {
 	TimeSpent int `json:"time_spent"`
 }
 
-// Question defines model for Question.
-type Question struct {
-	// AnswerCount 总答题人数
-	AnswerCount *int `json:"answer_count,omitempty"`
-
-	// Category 题目分类
-	Category QuestionCategory `json:"category"`
-
-	// CorrectCount 总答对人数
-	CorrectCount *int               `json:"correct_count,omitempty"`
-	CreatedAt    time.Time          `json:"created_at"`
-	CreatedBy    openapi_types.UUID `json:"created_by"`
-
-	// Difficulty 难度等级
-	Difficulty  QuestionDifficulty `json:"difficulty"`
-	Explanation *string            `json:"explanation,omitempty"`
-	Id          openapi_types.UUID `json:"id"`
-
-	// Languages 支持的多语言列表
-	Languages []string `json:"languages"`
-
-	// LikeStatus 点赞状态，1=已点赞，-1=已点踩，0=未操作
-	LikeStatus *QuestionLikeStatus `json:"likeStatus,omitempty"`
-
-	// Likes 点赞数
-	Likes   *int             `json:"likes,omitempty"`
-	Options []QuestionOption `json:"options"`
-
-	// Public 是否公开可见
-	Public       bool   `json:"public"`
-	QuestionText string `json:"question_text"`
-
-	// QuestionType 题目类型
-	QuestionType QuestionType `json:"question_type"`
-
-	// Solved 是否已经通过了
-	Solved *bool `json:"solved,omitempty"`
-}
-
-// QuestionLikeStatus 点赞状态，1=已点赞，-1=已点踩，0=未操作
-type QuestionLikeStatus int
-
-// QuestionCategory 题目分类
-type QuestionCategory string
-
-// QuestionDifficulty 难度等级
-type QuestionDifficulty string
-
-// QuestionOption defines model for QuestionOption.
-type QuestionOption struct {
-	// Count 选中次数
-	Count *int                `json:"count,omitempty"`
-	Id    *openapi_types.UUID `json:"id,omitempty"`
-
-	// Image 选项图片URL
-	Image *string `json:"image,omitempty"`
-
-	// IsAnswer 是否为正确答案
-	IsAnswer *bool `json:"is_answer,omitempty"`
-
-	// Text 选项文本
-	Text *map[string]string `json:"text,omitempty"`
-
-	// Type 选项类型
-	Type QuestionOptionType `json:"type"`
-}
-
-// QuestionOptionType 选项类型
-type QuestionOptionType string
-
 // QuestionType 题目类型
 type QuestionType string
-
-// QuestionWithAnswer defines model for QuestionWithAnswer.
-type QuestionWithAnswer struct {
-	// Category 题目分类
-	Category QuestionCategory `json:"category"`
-
-	// Difficulty 难度等级
-	Difficulty QuestionDifficulty `json:"difficulty"`
-
-	// Explanation 多语言解释
-	Explanation *map[string]string `json:"explanation,omitempty"`
-
-	// Options 问题的选项
-	Options []QuestionOption `json:"options"`
-	Public  bool             `json:"public"`
-
-	// QuestionText 多语言题干
-	QuestionText map[string]string `json:"question_text"`
-
-	// QuestionType 题目类型
-	QuestionType QuestionType `json:"question_type"`
-}
 
 // RecentSubmission defines model for RecentSubmission.
 type RecentSubmission struct {
@@ -493,142 +632,142 @@ type RecentSubmission struct {
 	SubmittedAt time.Time `json:"submitted_at"`
 
 	// TimeSpent 答题用时（秒）
+	TimeSpent int                `json:"time_spent"`
+	UserId    openapi_types.UUID `json:"user_id"`
+	UserName  string             `json:"user_name"`
+}
+
+// SubmissionBase defines model for SubmissionBase.
+type SubmissionBase struct {
+	// IsCorrect 答案是否正确
+	IsCorrect bool `json:"is_correct"`
+
+	// SubmittedAt 提交时间
+	SubmittedAt time.Time `json:"submitted_at"`
+
+	// TimeSpent 答题用时（秒）
 	TimeSpent int `json:"time_spent"`
-
-	// UserName 提交用户昵称
-	UserName string `json:"user_name"`
 }
 
-// User defines model for User.
-type User struct {
-	AvatarUrl      string    `json:"avatar_url"`
-	CorrectAnswers int       `json:"correct_answers"`
-	Country        string    `json:"country"`
-	Ip             string    `json:"ip"`
-	Language       *string   `json:"language,omitempty"`
-	LastLoginAt    time.Time `json:"last_login_at"`
-	LastLoginIp    *string   `json:"last_login_ip,omitempty"`
-
-	// LikesReceived 该用户创建的所有题目获得的点赞总数，用于创作达人榜按点赞率排序
-	LikesReceived    *int               `json:"likes_received,omitempty"`
-	Nickname         string             `json:"nickname"`
-	QuestionsCreated int                `json:"questions_created"`
-	RegisteredAt     time.Time          `json:"registered_at"`
-	RegisteredIp     *string            `json:"registered_ip,omitempty"`
-	TotalAnswers     int                `json:"total_answers"`
-	Uuid             openapi_types.UUID `json:"uuid"`
-	Votes            int                `json:"votes"`
+// UserAdmin defines model for UserAdmin.
+type UserAdmin struct {
+	AvatarUrl          string              `json:"avatar_url"`
+	Bio                string              `json:"bio"`
+	Birthday           *openapi_types.Date `json:"birthday,omitempty"`
+	BirthdayVisibility Visibility          `json:"birthday_visibility"`
+	CorrectAnswers     int                 `json:"correct_answers"`
+	Country            *string             `json:"country,omitempty"`
+	CountryVisibility  Visibility          `json:"country_visibility"`
+	Email              openapi_types.Email `json:"email"`
+	EmailVerified      bool                `json:"email_verified"`
+	EmailVisibility    Visibility          `json:"email_visibility"`
+	Gender             *Gender             `json:"gender,omitempty"`
+	GenderVisibility   Visibility          `json:"gender_visibility"`
+	IsDeleted          bool                `json:"is_deleted"`
+	Language           string              `json:"language"`
+	LastLoginAt        time.Time           `json:"last_login_at"`
+	LastLoginIp        *string             `json:"last_login_ip,omitempty"`
+	LikesReceived      int                 `json:"likes_received"`
+	Nickname           string              `json:"nickname"`
+	PollsCreated       int                 `json:"polls_created"`
+	QuestionsCreated   int                 `json:"questions_created"`
+	RegisteredAt       time.Time           `json:"registered_at"`
+	RegisteredIp       string              `json:"registered_ip"`
+	TotalAnswers       int                 `json:"total_answers"`
+	Uuid               openapi_types.UUID  `json:"uuid"`
 }
 
-// Vote defines model for Vote.
-type Vote struct {
-	// Category 题目分类
-	Category  QuestionCategory   `json:"category"`
-	CreatedAt time.Time          `json:"created_at"`
-	CreatedBy openapi_types.UUID `json:"created_by"`
-
-	// Description 多语言描述
-	Description *map[string]string `json:"description,omitempty"`
-	ExpireAt    *time.Time         `json:"expire_at,omitempty"`
-
-	// Expired 投票是否已过期
-	Expired bool               `json:"expired"`
-	Id      openapi_types.UUID `json:"id"`
-
-	// LikeStatus 点赞状态：-1踩, 0未操作, 1赞
-	LikeStatus *VoteLikeStatus `json:"likeStatus,omitempty"`
-	Likes      *int            `json:"likes,omitempty"`
-	Options    []VoteOption    `json:"options"`
-
-	// Participants 参与投票的用户数
-	Participants *int      `json:"participants,omitempty"`
-	Public       bool      `json:"public"`
-	StartAt      time.Time `json:"start_at"`
-	Tags         *[]string `json:"tags,omitempty"`
-
-	// Title 多语言标题
-	Title map[string]string `json:"title"`
-
-	// TotalVotes 总投票数
-	TotalVotes *int `json:"total_votes,omitempty"`
-
-	// Voted 当前用户是否已参与投票
-	Voted bool `json:"voted"`
-
-	// VotedOptions 当前用户已投票的选项及票数
-	VotedOptions []VoteSubmissionOption `json:"voted_options"`
-
-	// VotesPerOption 每个选项的最大可投票数，0表示无限制
-	VotesPerOption int `json:"votes_per_option"`
-
-	// VotesPerUser 每个用户最多可投票数
-	VotesPerUser int `json:"votes_per_user"`
+// UserBase defines model for UserBase.
+type UserBase struct {
+	AvatarUrl    string             `json:"avatar_url"`
+	Bio          string             `json:"bio"`
+	Nickname     string             `json:"nickname"`
+	RegisteredAt time.Time          `json:"registered_at"`
+	Uuid         openapi_types.UUID `json:"uuid"`
 }
 
-// VoteLikeStatus 点赞状态：-1踩, 0未操作, 1赞
-type VoteLikeStatus int
-
-// VoteOption defines model for VoteOption.
-type VoteOption struct {
-	// Description 选项描述
-	Description *string             `json:"description,omitempty"`
-	Id          *openapi_types.UUID `json:"id,omitempty"`
-
-	// ImageUrl 选项图片URL
-	ImageUrl *string `json:"image_url,omitempty"`
-
-	// MusicUrl 选项音乐URL
-	MusicUrl *string `json:"music_url,omitempty"`
-
-	// Text 选项文本
-	Text *map[string]string `json:"text,omitempty"`
-
-	// Type 选项类型（文本、图片、音乐）
-	Type VoteOptionType `json:"type"`
-
-	// Votes 获得的累计票数
-	Votes *int `json:"votes,omitempty"`
+// UserPrivacy defines model for UserPrivacy.
+type UserPrivacy struct {
+	BirthdayVisibility Visibility `json:"birthday_visibility"`
+	CountryVisibility  Visibility `json:"country_visibility"`
+	EmailVisibility    Visibility `json:"email_visibility"`
+	GenderVisibility   Visibility `json:"gender_visibility"`
 }
 
-// VoteOptionType 选项类型（文本、图片、音乐）
-type VoteOptionType string
-
-// VoteSubmissionOption 投票时单个选项的投票信息
-type VoteSubmissionOption struct {
-	// OptionId 选项ID
-	OptionId openapi_types.UUID `json:"option_id"`
-
-	// Votes 给该选项投的票数
-	Votes int `json:"votes"`
+// UserPrivate defines model for UserPrivate.
+type UserPrivate struct {
+	AvatarUrl          string              `json:"avatar_url"`
+	Bio                string              `json:"bio"`
+	Birthday           *openapi_types.Date `json:"birthday,omitempty"`
+	BirthdayVisibility Visibility          `json:"birthday_visibility"`
+	CorrectAnswers     int                 `json:"correct_answers"`
+	Country            *string             `json:"country,omitempty"`
+	CountryVisibility  Visibility          `json:"country_visibility"`
+	Email              openapi_types.Email `json:"email"`
+	EmailVerified      bool                `json:"email_verified"`
+	EmailVisibility    Visibility          `json:"email_visibility"`
+	Gender             *Gender             `json:"gender,omitempty"`
+	GenderVisibility   Visibility          `json:"gender_visibility"`
+	Language           string              `json:"language"`
+	LastLoginAt        time.Time           `json:"last_login_at"`
+	LastLoginIp        *string             `json:"last_login_ip,omitempty"`
+	LikesReceived      int                 `json:"likes_received"`
+	Nickname           string              `json:"nickname"`
+	PollsCreated       int                 `json:"polls_created"`
+	QuestionsCreated   int                 `json:"questions_created"`
+	RegisteredAt       time.Time           `json:"registered_at"`
+	RegisteredIp       string              `json:"registered_ip"`
+	TotalAnswers       int                 `json:"total_answers"`
+	Uuid               openapi_types.UUID  `json:"uuid"`
 }
 
-// VoteWithOption defines model for VoteWithOption.
-type VoteWithOption struct {
-	// Category 题目分类
-	Category QuestionCategory `json:"category"`
-
-	// Description 多语言描述
-	Description *map[string]string `json:"description,omitempty"`
-	ExpireAt    *time.Time         `json:"expire_at,omitempty"`
-	Options     []VoteOption       `json:"options"`
-
-	// Password 投票密码
-	Password *string `json:"password,omitempty"`
-
-	// Public 是否公开可见(需要密码才能参与投票)
-	Public  bool      `json:"public"`
-	StartAt time.Time `json:"start_at"`
-	Tags    *[]string `json:"tags,omitempty"`
-
-	// Title 多语言标题
-	Title map[string]string `json:"title"`
-
-	// VotesPerOption 每个选项的最大可投票数，0表示无限制
-	VotesPerOption *int `json:"votes_per_option,omitempty"`
-
-	// VotesPerUser 每个用户最多可投票数
-	VotesPerUser int `json:"votes_per_user"`
+// UserProfile defines model for UserProfile.
+type UserProfile struct {
+	Birthday *openapi_types.Date  `json:"birthday,omitempty"`
+	Country  *string              `json:"country,omitempty"`
+	Email    *openapi_types.Email `json:"email,omitempty"`
+	Gender   *Gender              `json:"gender,omitempty"`
+	Language string               `json:"language"`
 }
+
+// UserPublic defines model for UserPublic.
+type UserPublic struct {
+	AvatarUrl        string               `json:"avatar_url"`
+	Bio              string               `json:"bio"`
+	Birthday         *openapi_types.Date  `json:"birthday,omitempty"`
+	CorrectAnswers   int                  `json:"correct_answers"`
+	Country          *string              `json:"country,omitempty"`
+	Email            *openapi_types.Email `json:"email,omitempty"`
+	Gender           *Gender              `json:"gender,omitempty"`
+	Language         string               `json:"language"`
+	LikesReceived    int                  `json:"likes_received"`
+	Nickname         string               `json:"nickname"`
+	PollsCreated     int                  `json:"polls_created"`
+	QuestionsCreated int                  `json:"questions_created"`
+	RegisteredAt     time.Time            `json:"registered_at"`
+	TotalAnswers     int                  `json:"total_answers"`
+	Uuid             openapi_types.UUID   `json:"uuid"`
+}
+
+// UserSecurity defines model for UserSecurity.
+type UserSecurity struct {
+	EmailVerified bool      `json:"email_verified"`
+	LastLoginAt   time.Time `json:"last_login_at"`
+	LastLoginIp   *string   `json:"last_login_ip,omitempty"`
+	RegisteredIp  string    `json:"registered_ip"`
+}
+
+// UserStats defines model for UserStats.
+type UserStats struct {
+	CorrectAnswers   int `json:"correct_answers"`
+	LikesReceived    int `json:"likes_received"`
+	PollsCreated     int `json:"polls_created"`
+	QuestionsCreated int `json:"questions_created"`
+	TotalAnswers     int `json:"total_answers"`
+}
+
+// Visibility defines model for Visibility.
+type Visibility string
 
 // BadRequest defines model for BadRequest.
 type BadRequest = CommonError
@@ -641,6 +780,12 @@ type NotFound = CommonError
 
 // Unauthorized defines model for Unauthorized.
 type Unauthorized = CommonError
+
+// PostChangePasswordJSONBody defines parameters for PostChangePassword.
+type PostChangePasswordJSONBody struct {
+	NewPassword string `json:"new_password"`
+	OldPassword string `json:"old_password"`
+}
 
 // PostForgotPasswordJSONBody defines parameters for PostForgotPassword.
 type PostForgotPasswordJSONBody struct {
@@ -662,13 +807,29 @@ type PostRegisterUserJSONBody struct {
 	Password string  `json:"password"`
 }
 
+// PostResetPasswordJSONBody defines parameters for PostResetPassword.
+type PostResetPasswordJSONBody struct {
+	Password string `json:"password"`
+	Token    string `json:"token"`
+}
+
+// PostSendVerificationEmailJSONBody defines parameters for PostSendVerificationEmail.
+type PostSendVerificationEmailJSONBody struct {
+	Email openapi_types.Email `json:"email"`
+}
+
+// PostVerifyEmailJSONBody defines parameters for PostVerifyEmail.
+type PostVerifyEmailJSONBody struct {
+	Token string `json:"token"`
+}
+
 // GetExamsParams defines parameters for GetExams.
 type GetExamsParams struct {
-	Page       *int                `form:"page,omitempty" json:"page,omitempty"`
-	Limit      *int                `form:"limit,omitempty" json:"limit,omitempty"`
-	Category   *QuestionCategory   `form:"category,omitempty" json:"category,omitempty"`
-	Difficulty *QuestionDifficulty `form:"difficulty,omitempty" json:"difficulty,omitempty"`
-	Query      *string             `form:"query,omitempty" json:"query,omitempty"`
+	Page       *int        `form:"page,omitempty" json:"page,omitempty"`
+	Limit      *int        `form:"limit,omitempty" json:"limit,omitempty"`
+	Category   *Category   `form:"category,omitempty" json:"category,omitempty"`
+	Difficulty *Difficulty `form:"difficulty,omitempty" json:"difficulty,omitempty"`
+	Query      *string     `form:"query,omitempty" json:"query,omitempty"`
 
 	// CreatedBy 只返回指定用户创建的测验
 	CreatedBy *openapi_types.UUID `form:"created_by,omitempty" json:"created_by,omitempty"`
@@ -678,26 +839,55 @@ type GetExamsParams struct {
 
 // PostLikeExamJSONBody defines parameters for PostLikeExam.
 type PostLikeExamJSONBody struct {
-	// Like 点赞状态：1=点赞，0=取消操作，-1=点踩
-	Like PostLikeExamJSONBodyLike `json:"like"`
+	// Like 点赞状态：-1踩, 0未操作, 1赞
+	Like LikeStatus `json:"like"`
 }
-
-// PostLikeExamJSONBodyLike defines parameters for PostLikeExam.
-type PostLikeExamJSONBodyLike int
 
 // GetHomeParams defines parameters for GetHome.
 type GetHomeParams struct {
 	Language *string `form:"language,omitempty" json:"language,omitempty"`
 }
 
+// GetPollsParams defines parameters for GetPolls.
+type GetPollsParams struct {
+	Page     *int                `form:"page,omitempty" json:"page,omitempty"`
+	Limit    *int                `form:"limit,omitempty" json:"limit,omitempty"`
+	Type     *GetPollsParamsType `form:"type,omitempty" json:"type,omitempty"`
+	Query    *string             `form:"query,omitempty" json:"query,omitempty"`
+	Language *[]string           `form:"language,omitempty" json:"language,omitempty"`
+
+	// CreatedBy 只返回指定用户创建的投票
+	CreatedBy *openapi_types.UUID `form:"created_by,omitempty" json:"created_by,omitempty"`
+	SortBy    *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+	SortDesc  *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
+}
+
+// GetPollsParamsType defines parameters for GetPolls.
+type GetPollsParamsType string
+
+// PostLikePollJSONBody defines parameters for PostLikePoll.
+type PostLikePollJSONBody struct {
+	// Like 点赞状态：-1踩, 0未操作, 1赞
+	Like LikeStatus `json:"like"`
+}
+
+// PostVotePollJSONBody defines parameters for PostVotePoll.
+type PostVotePollJSONBody struct {
+	// Anonymous 是否匿名投票
+	Anonymous *bool `json:"anonymous,omitempty"`
+
+	// Options 投票选项列表，每个选项可以投不同数量的票
+	Options []PollVote `json:"options"`
+}
+
 // GetQuestionsParams defines parameters for GetQuestions.
 type GetQuestionsParams struct {
-	Page       *int                  `form:"page,omitempty" json:"page,omitempty"`
-	Limit      *int                  `form:"limit,omitempty" json:"limit,omitempty"`
-	Category   *QuestionCategory     `form:"category,omitempty" json:"category,omitempty"`
-	Difficulty *[]QuestionDifficulty `form:"difficulty,omitempty" json:"difficulty,omitempty"`
-	Query      *string               `form:"query,omitempty" json:"query,omitempty"`
-	Language   *[]string             `form:"language,omitempty" json:"language,omitempty"`
+	Page       *int          `form:"page,omitempty" json:"page,omitempty"`
+	Limit      *int          `form:"limit,omitempty" json:"limit,omitempty"`
+	Category   *Category     `form:"category,omitempty" json:"category,omitempty"`
+	Difficulty *[]Difficulty `form:"difficulty,omitempty" json:"difficulty,omitempty"`
+	Query      *string       `form:"query,omitempty" json:"query,omitempty"`
+	Language   *[]string     `form:"language,omitempty" json:"language,omitempty"`
 
 	// CreatedBy 只返回指定用户创建的题目
 	CreatedBy *openapi_types.UUID `form:"created_by,omitempty" json:"created_by,omitempty"`
@@ -707,12 +897,9 @@ type GetQuestionsParams struct {
 
 // PostLikeQuestionJSONBody defines parameters for PostLikeQuestion.
 type PostLikeQuestionJSONBody struct {
-	// Like 点赞状态：1=点赞，0=取消操作，-1=点踩
-	Like PostLikeQuestionJSONBodyLike `json:"like"`
+	// Like 点赞状态：-1踩, 0未操作, 1赞
+	Like LikeStatus `json:"like"`
 }
-
-// PostLikeQuestionJSONBodyLike defines parameters for PostLikeQuestion.
-type PostLikeQuestionJSONBodyLike int
 
 // PostSubmitAnswerJSONBody defines parameters for PostSubmitAnswer.
 type PostSubmitAnswerJSONBody struct {
@@ -735,40 +922,20 @@ type GetUsersParams struct {
 // GetUsersParamsSortBy defines parameters for GetUsers.
 type GetUsersParamsSortBy string
 
-// GetVotesParams defines parameters for GetVotes.
-type GetVotesParams struct {
-	Page     *int                `form:"page,omitempty" json:"page,omitempty"`
-	Limit    *int                `form:"limit,omitempty" json:"limit,omitempty"`
-	Type     *GetVotesParamsType `form:"type,omitempty" json:"type,omitempty"`
-	Query    *string             `form:"query,omitempty" json:"query,omitempty"`
-	Language *[]string           `form:"language,omitempty" json:"language,omitempty"`
-
-	// CreatedBy 只返回指定用户创建的投票
-	CreatedBy *openapi_types.UUID `form:"created_by,omitempty" json:"created_by,omitempty"`
-	SortBy    *string             `form:"sortBy,omitempty" json:"sortBy,omitempty"`
-	SortDesc  *bool               `form:"sortDesc,omitempty" json:"sortDesc,omitempty"`
+// GetUserPollsParams defines parameters for GetUserPolls.
+type GetUserPollsParams struct {
+	Page  *int `form:"page,omitempty" json:"page,omitempty"`
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
-// GetVotesParamsType defines parameters for GetVotes.
-type GetVotesParamsType string
-
-// PostLikeVoteJSONBody defines parameters for PostLikeVote.
-type PostLikeVoteJSONBody struct {
-	// Like 点赞状态：1=点赞，0=取消操作，-1=点踩
-	Like PostLikeVoteJSONBodyLike `json:"like"`
+// GetUserQuestionsParams defines parameters for GetUserQuestions.
+type GetUserQuestionsParams struct {
+	Page  *int `form:"page,omitempty" json:"page,omitempty"`
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
-// PostLikeVoteJSONBodyLike defines parameters for PostLikeVote.
-type PostLikeVoteJSONBodyLike int
-
-// PostVoteJSONBody defines parameters for PostVote.
-type PostVoteJSONBody struct {
-	// Anonymous 是否匿名投票
-	Anonymous *bool `json:"anonymous,omitempty"`
-
-	// Options 投票选项列表，每个选项可以投不同数量的票
-	Options []VoteSubmissionOption `json:"options"`
-}
+// PostChangePasswordJSONRequestBody defines body for PostChangePassword for application/json ContentType.
+type PostChangePasswordJSONRequestBody PostChangePasswordJSONBody
 
 // PostForgotPasswordJSONRequestBody defines body for PostForgotPassword for application/json ContentType.
 type PostForgotPasswordJSONRequestBody PostForgotPasswordJSONBody
@@ -776,8 +943,20 @@ type PostForgotPasswordJSONRequestBody PostForgotPasswordJSONBody
 // PostLoginUserJSONRequestBody defines body for PostLoginUser for application/json ContentType.
 type PostLoginUserJSONRequestBody PostLoginUserJSONBody
 
+// UpdateUserJSONRequestBody defines body for UpdateUser for application/json ContentType.
+type UpdateUserJSONRequestBody = UserPrivate
+
 // PostRegisterUserJSONRequestBody defines body for PostRegisterUser for application/json ContentType.
 type PostRegisterUserJSONRequestBody PostRegisterUserJSONBody
+
+// PostResetPasswordJSONRequestBody defines body for PostResetPassword for application/json ContentType.
+type PostResetPasswordJSONRequestBody PostResetPasswordJSONBody
+
+// PostSendVerificationEmailJSONRequestBody defines body for PostSendVerificationEmail for application/json ContentType.
+type PostSendVerificationEmailJSONRequestBody PostSendVerificationEmailJSONBody
+
+// PostVerifyEmailJSONRequestBody defines body for PostVerifyEmail for application/json ContentType.
+type PostVerifyEmailJSONRequestBody PostVerifyEmailJSONBody
 
 // PostCreateExamJSONRequestBody defines body for PostCreateExam for application/json ContentType.
 type PostCreateExamJSONRequestBody = Exam
@@ -788,29 +967,26 @@ type UpdateExamJSONRequestBody = Exam
 // PostLikeExamJSONRequestBody defines body for PostLikeExam for application/json ContentType.
 type PostLikeExamJSONRequestBody PostLikeExamJSONBody
 
+// PostCreatePollJSONRequestBody defines body for PostCreatePoll for application/json ContentType.
+type PostCreatePollJSONRequestBody = CreatePollRequest
+
+// PostLikePollJSONRequestBody defines body for PostLikePoll for application/json ContentType.
+type PostLikePollJSONRequestBody PostLikePollJSONBody
+
+// PostVotePollJSONRequestBody defines body for PostVotePoll for application/json ContentType.
+type PostVotePollJSONRequestBody PostVotePollJSONBody
+
 // PostCreateQuestionJSONRequestBody defines body for PostCreateQuestion for application/json ContentType.
-type PostCreateQuestionJSONRequestBody = QuestionWithAnswer
+type PostCreateQuestionJSONRequestBody = CreateQuestionRequest
 
 // UpdateQuestionJSONRequestBody defines body for UpdateQuestion for application/json ContentType.
-type UpdateQuestionJSONRequestBody = QuestionWithAnswer
+type UpdateQuestionJSONRequestBody = CreateQuestionRequest
 
 // PostLikeQuestionJSONRequestBody defines body for PostLikeQuestion for application/json ContentType.
 type PostLikeQuestionJSONRequestBody PostLikeQuestionJSONBody
 
 // PostSubmitAnswerJSONRequestBody defines body for PostSubmitAnswer for application/json ContentType.
 type PostSubmitAnswerJSONRequestBody PostSubmitAnswerJSONBody
-
-// UpdateUserJSONRequestBody defines body for UpdateUser for application/json ContentType.
-type UpdateUserJSONRequestBody = User
-
-// PostCreateVoteJSONRequestBody defines body for PostCreateVote for application/json ContentType.
-type PostCreateVoteJSONRequestBody = VoteWithOption
-
-// PostLikeVoteJSONRequestBody defines body for PostLikeVote for application/json ContentType.
-type PostLikeVoteJSONRequestBody PostLikeVoteJSONBody
-
-// PostVoteJSONRequestBody defines body for PostVote for application/json ContentType.
-type PostVoteJSONRequestBody PostVoteJSONBody
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -885,6 +1061,11 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// PostChangePasswordWithBody request with any body
+	PostChangePasswordWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostChangePassword(ctx context.Context, body PostChangePasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// PostForgotPasswordWithBody request with any body
 	PostForgotPasswordWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -895,13 +1076,36 @@ type ClientInterface interface {
 
 	PostLoginUser(ctx context.Context, body PostLoginUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// DeleteUser request
+	DeleteUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetCurrentUser request
 	GetCurrentUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateUserWithBody request with any body
+	UpdateUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateUser(ctx context.Context, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostRegisterUserWithBody request with any body
 	PostRegisterUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	PostRegisterUser(ctx context.Context, body PostRegisterUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostResetPasswordWithBody request with any body
+	PostResetPasswordWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostResetPassword(ctx context.Context, body PostResetPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostSendVerificationEmailWithBody request with any body
+	PostSendVerificationEmailWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostSendVerificationEmail(ctx context.Context, body PostSendVerificationEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostVerifyEmailWithBody request with any body
+	PostVerifyEmailWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostVerifyEmail(ctx context.Context, body PostVerifyEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetExams request
 	GetExams(ctx context.Context, params *GetExamsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -929,6 +1133,27 @@ type ClientInterface interface {
 
 	// GetHome request
 	GetHome(ctx context.Context, params *GetHomeParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetPolls request
+	GetPolls(ctx context.Context, params *GetPollsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostCreatePollWithBody request with any body
+	PostCreatePollWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostCreatePoll(ctx context.Context, body PostCreatePollJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetPoll request
+	GetPoll(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostLikePollWithBody request with any body
+	PostLikePollWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostLikePoll(ctx context.Context, id openapi_types.UUID, body PostLikePollJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostVotePollWithBody request with any body
+	PostVotePollWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostVotePoll(ctx context.Context, id openapi_types.UUID, body PostVotePollJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetQuestions request
 	GetQuestions(ctx context.Context, params *GetQuestionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -968,37 +1193,38 @@ type ClientInterface interface {
 	// GetUsers request
 	GetUsers(ctx context.Context, params *GetUsersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteUser request
-	DeleteUser(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// GetUser request
 	GetUser(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// UpdateUserWithBody request with any body
-	UpdateUserWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetUserPolls request
+	GetUserPolls(ctx context.Context, id openapi_types.UUID, params *GetUserPollsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateUser(ctx context.Context, id openapi_types.UUID, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetUserQuestions request
+	GetUserQuestions(ctx context.Context, id openapi_types.UUID, params *GetUserQuestionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
 
-	// GetVotes request
-	GetVotes(ctx context.Context, params *GetVotesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+func (c *Client) PostChangePasswordWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostChangePasswordRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
 
-	// PostCreateVoteWithBody request with any body
-	PostCreateVoteWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PostCreateVote(ctx context.Context, body PostCreateVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetVote request
-	GetVote(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PostLikeVoteWithBody request with any body
-	PostLikeVoteWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PostLikeVote(ctx context.Context, id openapi_types.UUID, body PostLikeVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PostVoteWithBody request with any body
-	PostVoteWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PostVote(ctx context.Context, id openapi_types.UUID, body PostVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+func (c *Client) PostChangePassword(ctx context.Context, body PostChangePasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostChangePasswordRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) PostForgotPasswordWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -1049,8 +1275,44 @@ func (c *Client) PostLoginUser(ctx context.Context, body PostLoginUserJSONReques
 	return c.Client.Do(req)
 }
 
+func (c *Client) DeleteUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteUserRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) GetCurrentUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetCurrentUserRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateUserRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateUser(ctx context.Context, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateUserRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1075,6 +1337,78 @@ func (c *Client) PostRegisterUserWithBody(ctx context.Context, contentType strin
 
 func (c *Client) PostRegisterUser(ctx context.Context, body PostRegisterUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostRegisterUserRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostResetPasswordWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostResetPasswordRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostResetPassword(ctx context.Context, body PostResetPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostResetPasswordRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSendVerificationEmailWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSendVerificationEmailRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSendVerificationEmail(ctx context.Context, body PostSendVerificationEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSendVerificationEmailRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostVerifyEmailWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostVerifyEmailRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostVerifyEmail(ctx context.Context, body PostVerifyEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostVerifyEmailRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1195,6 +1529,102 @@ func (c *Client) PostLikeExam(ctx context.Context, id openapi_types.UUID, body P
 
 func (c *Client) GetHome(ctx context.Context, params *GetHomeParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetHomeRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetPolls(ctx context.Context, params *GetPollsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetPollsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostCreatePollWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCreatePollRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostCreatePoll(ctx context.Context, body PostCreatePollJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCreatePollRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetPoll(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetPollRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostLikePollWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostLikePollRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostLikePoll(ctx context.Context, id openapi_types.UUID, body PostLikePollJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostLikePollRequest(c.Server, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostVotePollWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostVotePollRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostVotePoll(ctx context.Context, id openapi_types.UUID, body PostVotePollJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostVotePollRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1373,18 +1803,6 @@ func (c *Client) GetUsers(ctx context.Context, params *GetUsersParams, reqEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteUser(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteUserRequest(c.Server, id)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) GetUser(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetUserRequest(c.Server, id)
 	if err != nil {
@@ -1397,8 +1815,8 @@ func (c *Client) GetUser(ctx context.Context, id openapi_types.UUID, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateUserWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateUserRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) GetUserPolls(ctx context.Context, id openapi_types.UUID, params *GetUserPollsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetUserPollsRequest(c.Server, id, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1409,8 +1827,8 @@ func (c *Client) UpdateUserWithBody(ctx context.Context, id openapi_types.UUID, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateUser(ctx context.Context, id openapi_types.UUID, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateUserRequest(c.Server, id, body)
+func (c *Client) GetUserQuestions(ctx context.Context, id openapi_types.UUID, params *GetUserQuestionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetUserQuestionsRequest(c.Server, id, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1421,100 +1839,44 @@ func (c *Client) UpdateUser(ctx context.Context, id openapi_types.UUID, body Upd
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetVotes(ctx context.Context, params *GetVotesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetVotesRequest(c.Server, params)
+// NewPostChangePasswordRequest calls the generic PostChangePassword builder with application/json body
+func NewPostChangePasswordRequest(server string, body PostChangePasswordJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
+	bodyReader = bytes.NewReader(buf)
+	return NewPostChangePasswordRequestWithBody(server, "application/json", bodyReader)
 }
 
-func (c *Client) PostCreateVoteWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostCreateVoteRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
+// NewPostChangePasswordRequestWithBody generates requests for PostChangePassword with any type of body
+func NewPostChangePasswordRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
 
-func (c *Client) PostCreateVote(ctx context.Context, body PostCreateVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostCreateVoteRequest(c.Server, body)
+	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
 
-func (c *Client) GetVote(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetVoteRequest(c.Server, id)
-	if err != nil {
-		return nil, err
+	operationPath := fmt.Sprintf("/auth/change-password")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
 	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
 
-func (c *Client) PostLikeVoteWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostLikeVoteRequestWithBody(c.Server, id, contentType, body)
+	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
 
-func (c *Client) PostLikeVote(ctx context.Context, id openapi_types.UUID, body PostLikeVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostLikeVoteRequest(c.Server, id, body)
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
 
-func (c *Client) PostVoteWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostVoteRequestWithBody(c.Server, id, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
+	req.Header.Add("Content-Type", contentType)
 
-func (c *Client) PostVote(ctx context.Context, id openapi_types.UUID, body PostVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostVoteRequest(c.Server, id, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
+	return req, nil
 }
 
 // NewPostForgotPasswordRequest calls the generic PostForgotPassword builder with application/json body
@@ -1597,6 +1959,33 @@ func NewPostLoginUserRequestWithBody(server string, contentType string, body io.
 	return req, nil
 }
 
+// NewDeleteUserRequest generates requests for DeleteUser
+func NewDeleteUserRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/me")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewGetCurrentUserRequest generates requests for GetCurrentUser
 func NewGetCurrentUserRequest(server string) (*http.Request, error) {
 	var err error
@@ -1624,6 +2013,46 @@ func NewGetCurrentUserRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
+// NewUpdateUserRequest calls the generic UpdateUser builder with application/json body
+func NewUpdateUserRequest(server string, body UpdateUserJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateUserRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewUpdateUserRequestWithBody generates requests for UpdateUser with any type of body
+func NewUpdateUserRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/me")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPut, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewPostRegisterUserRequest calls the generic PostRegisterUser builder with application/json body
 func NewPostRegisterUserRequest(server string, body PostRegisterUserJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -1645,6 +2074,126 @@ func NewPostRegisterUserRequestWithBody(server string, contentType string, body 
 	}
 
 	operationPath := fmt.Sprintf("/auth/register")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostResetPasswordRequest calls the generic PostResetPassword builder with application/json body
+func NewPostResetPasswordRequest(server string, body PostResetPasswordJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostResetPasswordRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostResetPasswordRequestWithBody generates requests for PostResetPassword with any type of body
+func NewPostResetPasswordRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/reset-password")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostSendVerificationEmailRequest calls the generic PostSendVerificationEmail builder with application/json body
+func NewPostSendVerificationEmailRequest(server string, body PostSendVerificationEmailJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostSendVerificationEmailRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostSendVerificationEmailRequestWithBody generates requests for PostSendVerificationEmail with any type of body
+func NewPostSendVerificationEmailRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/send-verification-email")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostVerifyEmailRequest calls the generic PostVerifyEmail builder with application/json body
+func NewPostVerifyEmailRequest(server string, body PostVerifyEmailJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostVerifyEmailRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostVerifyEmailRequestWithBody generates requests for PostVerifyEmail with any type of body
+func NewPostVerifyEmailRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/verify-email")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2054,6 +2603,312 @@ func NewGetHomeRequest(server string, params *GetHomeParams) (*http.Request, err
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewGetPollsRequest generates requests for GetPolls
+func NewGetPollsRequest(server string, params *GetPollsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/polls")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Type != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "type", *params.Type, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Query != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "query", *params.Query, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Language != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "array", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.CreatedBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "created_by", *params.CreatedBy, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "uuid"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "sortBy", *params.SortBy, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.SortDesc != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "sortDesc", *params.SortDesc, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostCreatePollRequest calls the generic PostCreatePoll builder with application/json body
+func NewPostCreatePollRequest(server string, body PostCreatePollJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostCreatePollRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostCreatePollRequestWithBody generates requests for PostCreatePoll with any type of body
+func NewPostCreatePollRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/polls")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetPollRequest generates requests for GetPoll
+func NewGetPollRequest(server string, id openapi_types.UUID) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "id", id, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/polls/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostLikePollRequest calls the generic PostLikePoll builder with application/json body
+func NewPostLikePollRequest(server string, id openapi_types.UUID, body PostLikePollJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostLikePollRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewPostLikePollRequestWithBody generates requests for PostLikePoll with any type of body
+func NewPostLikePollRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "id", id, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/polls/%s/like", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostVotePollRequest calls the generic PostVotePoll builder with application/json body
+func NewPostVotePollRequest(server string, id openapi_types.UUID, body PostVotePollJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostVotePollRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewPostVotePollRequestWithBody generates requests for PostVotePoll with any type of body
+func NewPostVotePollRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "id", id, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/polls/%s/vote", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -2627,40 +3482,6 @@ func NewGetUsersRequest(server string, params *GetUsersParams) (*http.Request, e
 	return req, nil
 }
 
-// NewDeleteUserRequest generates requests for DeleteUser
-func NewDeleteUserRequest(server string, id openapi_types.UUID) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "id", id, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/users/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
 // NewGetUserRequest generates requests for GetUser
 func NewGetUserRequest(server string, id openapi_types.UUID) (*http.Request, error) {
 	var err error
@@ -2695,19 +3516,8 @@ func NewGetUserRequest(server string, id openapi_types.UUID) (*http.Request, err
 	return req, nil
 }
 
-// NewUpdateUserRequest calls the generic UpdateUser builder with application/json body
-func NewUpdateUserRequest(server string, id openapi_types.UUID, body UpdateUserJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewUpdateUserRequestWithBody(server, id, "application/json", bodyReader)
-}
-
-// NewUpdateUserRequestWithBody generates requests for UpdateUser with any type of body
-func NewUpdateUserRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+// NewGetUserPollsRequest generates requests for GetUserPolls
+func NewGetUserPollsRequest(server string, id openapi_types.UUID, params *GetUserPollsParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -2722,36 +3532,7 @@ func NewUpdateUserRequestWithBody(server string, id openapi_types.UUID, contentT
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/users/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPut, queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewGetVotesRequest generates requests for GetVotes
-func NewGetVotesRequest(server string, params *GetVotesParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/votes")
+	operationPath := fmt.Sprintf("/users/%s/polls", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2794,9 +3575,58 @@ func NewGetVotesRequest(server string, params *GetVotesParams) (*http.Request, e
 
 		}
 
-		if params.Type != nil {
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
 
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "type", *params.Type, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetUserQuestionsRequest generates requests for GetUserQuestions
+func NewGetUserQuestionsRequest(server string, id openapi_types.UUID, params *GetUserQuestionsParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "id", id, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/users/%s/questions", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
 				return nil, err
 			} else {
 				for _, qp := range strings.Split(queryFrag, "&") {
@@ -2806,57 +3636,9 @@ func NewGetVotesRequest(server string, params *GetVotesParams) (*http.Request, e
 
 		}
 
-		if params.Query != nil {
+		if params.Limit != nil {
 
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "query", *params.Query, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else {
-				for _, qp := range strings.Split(queryFrag, "&") {
-					rawQueryFragments = append(rawQueryFragments, qp)
-				}
-			}
-
-		}
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "array", Format: ""}); err != nil {
-				return nil, err
-			} else {
-				for _, qp := range strings.Split(queryFrag, "&") {
-					rawQueryFragments = append(rawQueryFragments, qp)
-				}
-			}
-
-		}
-
-		if params.CreatedBy != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "created_by", *params.CreatedBy, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "uuid"}); err != nil {
-				return nil, err
-			} else {
-				for _, qp := range strings.Split(queryFrag, "&") {
-					rawQueryFragments = append(rawQueryFragments, qp)
-				}
-			}
-
-		}
-
-		if params.SortBy != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "sortBy", *params.SortBy, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else {
-				for _, qp := range strings.Split(queryFrag, "&") {
-					rawQueryFragments = append(rawQueryFragments, qp)
-				}
-			}
-
-		}
-
-		if params.SortDesc != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "sortDesc", *params.SortDesc, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
 				return nil, err
 			} else {
 				for _, qp := range strings.Split(queryFrag, "&") {
@@ -2876,174 +3658,6 @@ func NewGetVotesRequest(server string, params *GetVotesParams) (*http.Request, e
 	if err != nil {
 		return nil, err
 	}
-
-	return req, nil
-}
-
-// NewPostCreateVoteRequest calls the generic PostCreateVote builder with application/json body
-func NewPostCreateVoteRequest(server string, body PostCreateVoteJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPostCreateVoteRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewPostCreateVoteRequestWithBody generates requests for PostCreateVote with any type of body
-func NewPostCreateVoteRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/votes")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewGetVoteRequest generates requests for GetVote
-func NewGetVoteRequest(server string, id openapi_types.UUID) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "id", id, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/votes/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewPostLikeVoteRequest calls the generic PostLikeVote builder with application/json body
-func NewPostLikeVoteRequest(server string, id openapi_types.UUID, body PostLikeVoteJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPostLikeVoteRequestWithBody(server, id, "application/json", bodyReader)
-}
-
-// NewPostLikeVoteRequestWithBody generates requests for PostLikeVote with any type of body
-func NewPostLikeVoteRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "id", id, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/votes/%s/like", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewPostVoteRequest calls the generic PostVote builder with application/json body
-func NewPostVoteRequest(server string, id openapi_types.UUID, body PostVoteJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPostVoteRequestWithBody(server, id, "application/json", bodyReader)
-}
-
-// NewPostVoteRequestWithBody generates requests for PostVote with any type of body
-func NewPostVoteRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "id", id, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/votes/%s/vote", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -3091,6 +3705,11 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// PostChangePasswordWithBodyWithResponse request with any body
+	PostChangePasswordWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostChangePasswordResponse, error)
+
+	PostChangePasswordWithResponse(ctx context.Context, body PostChangePasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*PostChangePasswordResponse, error)
+
 	// PostForgotPasswordWithBodyWithResponse request with any body
 	PostForgotPasswordWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostForgotPasswordResponse, error)
 
@@ -3101,13 +3720,36 @@ type ClientWithResponsesInterface interface {
 
 	PostLoginUserWithResponse(ctx context.Context, body PostLoginUserJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLoginUserResponse, error)
 
+	// DeleteUserWithResponse request
+	DeleteUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DeleteUserResponse, error)
+
 	// GetCurrentUserWithResponse request
 	GetCurrentUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCurrentUserResponse, error)
+
+	// UpdateUserWithBodyWithResponse request with any body
+	UpdateUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error)
+
+	UpdateUserWithResponse(ctx context.Context, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error)
 
 	// PostRegisterUserWithBodyWithResponse request with any body
 	PostRegisterUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostRegisterUserResponse, error)
 
 	PostRegisterUserWithResponse(ctx context.Context, body PostRegisterUserJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRegisterUserResponse, error)
+
+	// PostResetPasswordWithBodyWithResponse request with any body
+	PostResetPasswordWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostResetPasswordResponse, error)
+
+	PostResetPasswordWithResponse(ctx context.Context, body PostResetPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*PostResetPasswordResponse, error)
+
+	// PostSendVerificationEmailWithBodyWithResponse request with any body
+	PostSendVerificationEmailWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSendVerificationEmailResponse, error)
+
+	PostSendVerificationEmailWithResponse(ctx context.Context, body PostSendVerificationEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSendVerificationEmailResponse, error)
+
+	// PostVerifyEmailWithBodyWithResponse request with any body
+	PostVerifyEmailWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostVerifyEmailResponse, error)
+
+	PostVerifyEmailWithResponse(ctx context.Context, body PostVerifyEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*PostVerifyEmailResponse, error)
 
 	// GetExamsWithResponse request
 	GetExamsWithResponse(ctx context.Context, params *GetExamsParams, reqEditors ...RequestEditorFn) (*GetExamsResponse, error)
@@ -3135,6 +3777,27 @@ type ClientWithResponsesInterface interface {
 
 	// GetHomeWithResponse request
 	GetHomeWithResponse(ctx context.Context, params *GetHomeParams, reqEditors ...RequestEditorFn) (*GetHomeResponse, error)
+
+	// GetPollsWithResponse request
+	GetPollsWithResponse(ctx context.Context, params *GetPollsParams, reqEditors ...RequestEditorFn) (*GetPollsResponse, error)
+
+	// PostCreatePollWithBodyWithResponse request with any body
+	PostCreatePollWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreatePollResponse, error)
+
+	PostCreatePollWithResponse(ctx context.Context, body PostCreatePollJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreatePollResponse, error)
+
+	// GetPollWithResponse request
+	GetPollWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetPollResponse, error)
+
+	// PostLikePollWithBodyWithResponse request with any body
+	PostLikePollWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostLikePollResponse, error)
+
+	PostLikePollWithResponse(ctx context.Context, id openapi_types.UUID, body PostLikePollJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLikePollResponse, error)
+
+	// PostVotePollWithBodyWithResponse request with any body
+	PostVotePollWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostVotePollResponse, error)
+
+	PostVotePollWithResponse(ctx context.Context, id openapi_types.UUID, body PostVotePollJSONRequestBody, reqEditors ...RequestEditorFn) (*PostVotePollResponse, error)
 
 	// GetQuestionsWithResponse request
 	GetQuestionsWithResponse(ctx context.Context, params *GetQuestionsParams, reqEditors ...RequestEditorFn) (*GetQuestionsResponse, error)
@@ -3174,37 +3837,45 @@ type ClientWithResponsesInterface interface {
 	// GetUsersWithResponse request
 	GetUsersWithResponse(ctx context.Context, params *GetUsersParams, reqEditors ...RequestEditorFn) (*GetUsersResponse, error)
 
-	// DeleteUserWithResponse request
-	DeleteUserWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteUserResponse, error)
-
 	// GetUserWithResponse request
 	GetUserWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetUserResponse, error)
 
-	// UpdateUserWithBodyWithResponse request with any body
-	UpdateUserWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error)
+	// GetUserPollsWithResponse request
+	GetUserPollsWithResponse(ctx context.Context, id openapi_types.UUID, params *GetUserPollsParams, reqEditors ...RequestEditorFn) (*GetUserPollsResponse, error)
 
-	UpdateUserWithResponse(ctx context.Context, id openapi_types.UUID, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error)
+	// GetUserQuestionsWithResponse request
+	GetUserQuestionsWithResponse(ctx context.Context, id openapi_types.UUID, params *GetUserQuestionsParams, reqEditors ...RequestEditorFn) (*GetUserQuestionsResponse, error)
+}
 
-	// GetVotesWithResponse request
-	GetVotesWithResponse(ctx context.Context, params *GetVotesParams, reqEditors ...RequestEditorFn) (*GetVotesResponse, error)
+type PostChangePasswordResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON500      *InternalServerError
+}
 
-	// PostCreateVoteWithBodyWithResponse request with any body
-	PostCreateVoteWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreateVoteResponse, error)
+// Status returns HTTPResponse.Status
+func (r PostChangePasswordResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
 
-	PostCreateVoteWithResponse(ctx context.Context, body PostCreateVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreateVoteResponse, error)
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostChangePasswordResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
 
-	// GetVoteWithResponse request
-	GetVoteWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetVoteResponse, error)
-
-	// PostLikeVoteWithBodyWithResponse request with any body
-	PostLikeVoteWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostLikeVoteResponse, error)
-
-	PostLikeVoteWithResponse(ctx context.Context, id openapi_types.UUID, body PostLikeVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLikeVoteResponse, error)
-
-	// PostVoteWithBodyWithResponse request with any body
-	PostVoteWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostVoteResponse, error)
-
-	PostVoteWithResponse(ctx context.Context, id openapi_types.UUID, body PostVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostVoteResponse, error)
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PostChangePasswordResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
 }
 
 type PostForgotPasswordResponse struct {
@@ -3270,10 +3941,41 @@ func (r PostLoginUserResponse) ContentType() string {
 	return ""
 }
 
+type DeleteUserResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON401      *Unauthorized
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteUserResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteUserResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r DeleteUserResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 type GetCurrentUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *User
+	JSON200      *UserPrivate
 	JSON400      *BadRequest
 	JSON401      *Unauthorized
 	JSON500      *InternalServerError
@@ -3297,6 +3999,39 @@ func (r GetCurrentUserResponse) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r GetCurrentUserResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type UpdateUserResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *UserPrivate
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateUserResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateUserResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r UpdateUserResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -3329,6 +4064,99 @@ func (r PostRegisterUserResponse) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r PostRegisterUserResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type PostResetPasswordResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostResetPasswordResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostResetPasswordResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PostResetPasswordResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type PostSendVerificationEmailResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostSendVerificationEmailResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostSendVerificationEmailResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PostSendVerificationEmailResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type PostVerifyEmailResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostVerifyEmailResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostVerifyEmailResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PostVerifyEmailResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -3567,6 +4395,172 @@ func (r GetHomeResponse) ContentType() string {
 	return ""
 }
 
+type GetPollsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Polls []Poll `json:"polls"`
+		Total int    `json:"total"`
+	}
+	JSON500 *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetPollsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetPollsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetPollsResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type PostCreatePollResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *Poll
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostCreatePollResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostCreatePollResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PostCreatePollResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type GetPollResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Poll
+	JSON400      *BadRequest
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetPollResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetPollResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetPollResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type PostLikePollResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostLikePollResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostLikePollResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PostLikePollResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type PostVotePollResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *BadRequest
+	JSON401      *Unauthorized
+	JSON404      *NotFound
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostVotePollResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostVotePollResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r PostVotePollResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 type GetQuestionsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -3605,7 +4599,7 @@ func (r GetQuestionsResponse) ContentType() string {
 type PostCreateQuestionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *QuestionWithAnswer
+	JSON201      *CreateQuestionRequest
 	JSON400      *BadRequest
 	JSON401      *Unauthorized
 	JSON500      *InternalServerError
@@ -3704,7 +4698,7 @@ func (r GetQuestionResponse) ContentType() string {
 type UpdateQuestionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *QuestionWithAnswer
+	JSON200      *CreateQuestionRequest
 	JSON400      *BadRequest
 	JSON401      *Unauthorized
 	JSON404      *NotFound
@@ -3771,7 +4765,7 @@ func (r PostLikeQuestionResponse) ContentType() string {
 type GetQuestionMySubmissionsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *[]MySubmission
+	JSON200      *[]QuestionSubmission
 	JSON400      *BadRequest
 	JSON401      *Unauthorized
 	JSON404      *NotFound
@@ -3876,8 +4870,8 @@ type GetUsersResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Total int    `json:"total"`
-		Users []User `json:"users"`
+		Total int          `json:"total"`
+		Users []UserPublic `json:"users"`
 	}
 	JSON400 *BadRequest
 	JSON401 *Unauthorized
@@ -3908,43 +4902,10 @@ func (r GetUsersResponse) ContentType() string {
 	return ""
 }
 
-type DeleteUserResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON400      *BadRequest
-	JSON401      *Unauthorized
-	JSON404      *NotFound
-	JSON500      *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r DeleteUserResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r DeleteUserResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r DeleteUserResponse) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
 type GetUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *User
+	JSON200      *UserPublic
 	JSON404      *NotFound
 	JSON500      *InternalServerError
 }
@@ -3973,52 +4934,19 @@ func (r GetUserResponse) ContentType() string {
 	return ""
 }
 
-type UpdateUserResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *User
-	JSON400      *BadRequest
-	JSON401      *Unauthorized
-	JSON404      *NotFound
-	JSON500      *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r UpdateUserResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r UpdateUserResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r UpdateUserResponse) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
-type GetVotesResponse struct {
+type GetUserPollsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
+		Polls []Poll `json:"polls"`
 		Total int    `json:"total"`
-		Votes []Vote `json:"votes"`
 	}
+	JSON404 *NotFound
 	JSON500 *InternalServerError
 }
 
 // Status returns HTTPResponse.Status
-func (r GetVotesResponse) Status() string {
+func (r GetUserPollsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -4026,7 +4954,7 @@ func (r GetVotesResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetVotesResponse) StatusCode() int {
+func (r GetUserPollsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4034,24 +4962,26 @@ func (r GetVotesResponse) StatusCode() int {
 }
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r GetVotesResponse) ContentType() string {
+func (r GetUserPollsResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
 	return ""
 }
 
-type PostCreateVoteResponse struct {
+type GetUserQuestionsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *Vote
-	JSON400      *BadRequest
-	JSON401      *Unauthorized
-	JSON500      *InternalServerError
+	JSON200      *struct {
+		Questions []Question `json:"questions"`
+		Total     int        `json:"total"`
+	}
+	JSON404 *NotFound
+	JSON500 *InternalServerError
 }
 
 // Status returns HTTPResponse.Status
-func (r PostCreateVoteResponse) Status() string {
+func (r GetUserQuestionsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -4059,7 +4989,7 @@ func (r PostCreateVoteResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostCreateVoteResponse) StatusCode() int {
+func (r GetUserQuestionsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4067,110 +4997,28 @@ func (r PostCreateVoteResponse) StatusCode() int {
 }
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r PostCreateVoteResponse) ContentType() string {
+func (r GetUserQuestionsResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
 	return ""
 }
 
-type GetVoteResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *Vote
-	JSON400      *BadRequest
-	JSON404      *NotFound
-	JSON500      *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetVoteResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
+// PostChangePasswordWithBodyWithResponse request with arbitrary body returning *PostChangePasswordResponse
+func (c *ClientWithResponses) PostChangePasswordWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostChangePasswordResponse, error) {
+	rsp, err := c.PostChangePasswordWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
 	}
-	return http.StatusText(0)
+	return ParsePostChangePasswordResponse(rsp)
 }
 
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetVoteResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
+func (c *ClientWithResponses) PostChangePasswordWithResponse(ctx context.Context, body PostChangePasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*PostChangePasswordResponse, error) {
+	rsp, err := c.PostChangePassword(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
 	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r GetVoteResponse) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
-type PostLikeVoteResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON400      *BadRequest
-	JSON401      *Unauthorized
-	JSON404      *NotFound
-	JSON500      *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r PostLikeVoteResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r PostLikeVoteResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r PostLikeVoteResponse) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
-}
-
-type PostVoteResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON400      *BadRequest
-	JSON401      *Unauthorized
-	JSON404      *NotFound
-	JSON500      *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r PostVoteResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r PostVoteResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
-func (r PostVoteResponse) ContentType() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Header.Get("Content-Type")
-	}
-	return ""
+	return ParsePostChangePasswordResponse(rsp)
 }
 
 // PostForgotPasswordWithBodyWithResponse request with arbitrary body returning *PostForgotPasswordResponse
@@ -4207,6 +5055,15 @@ func (c *ClientWithResponses) PostLoginUserWithResponse(ctx context.Context, bod
 	return ParsePostLoginUserResponse(rsp)
 }
 
+// DeleteUserWithResponse request returning *DeleteUserResponse
+func (c *ClientWithResponses) DeleteUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DeleteUserResponse, error) {
+	rsp, err := c.DeleteUser(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteUserResponse(rsp)
+}
+
 // GetCurrentUserWithResponse request returning *GetCurrentUserResponse
 func (c *ClientWithResponses) GetCurrentUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCurrentUserResponse, error) {
 	rsp, err := c.GetCurrentUser(ctx, reqEditors...)
@@ -4214,6 +5071,23 @@ func (c *ClientWithResponses) GetCurrentUserWithResponse(ctx context.Context, re
 		return nil, err
 	}
 	return ParseGetCurrentUserResponse(rsp)
+}
+
+// UpdateUserWithBodyWithResponse request with arbitrary body returning *UpdateUserResponse
+func (c *ClientWithResponses) UpdateUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error) {
+	rsp, err := c.UpdateUserWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateUserResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateUserWithResponse(ctx context.Context, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error) {
+	rsp, err := c.UpdateUser(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateUserResponse(rsp)
 }
 
 // PostRegisterUserWithBodyWithResponse request with arbitrary body returning *PostRegisterUserResponse
@@ -4231,6 +5105,57 @@ func (c *ClientWithResponses) PostRegisterUserWithResponse(ctx context.Context, 
 		return nil, err
 	}
 	return ParsePostRegisterUserResponse(rsp)
+}
+
+// PostResetPasswordWithBodyWithResponse request with arbitrary body returning *PostResetPasswordResponse
+func (c *ClientWithResponses) PostResetPasswordWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostResetPasswordResponse, error) {
+	rsp, err := c.PostResetPasswordWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostResetPasswordResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostResetPasswordWithResponse(ctx context.Context, body PostResetPasswordJSONRequestBody, reqEditors ...RequestEditorFn) (*PostResetPasswordResponse, error) {
+	rsp, err := c.PostResetPassword(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostResetPasswordResponse(rsp)
+}
+
+// PostSendVerificationEmailWithBodyWithResponse request with arbitrary body returning *PostSendVerificationEmailResponse
+func (c *ClientWithResponses) PostSendVerificationEmailWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSendVerificationEmailResponse, error) {
+	rsp, err := c.PostSendVerificationEmailWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSendVerificationEmailResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostSendVerificationEmailWithResponse(ctx context.Context, body PostSendVerificationEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSendVerificationEmailResponse, error) {
+	rsp, err := c.PostSendVerificationEmail(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSendVerificationEmailResponse(rsp)
+}
+
+// PostVerifyEmailWithBodyWithResponse request with arbitrary body returning *PostVerifyEmailResponse
+func (c *ClientWithResponses) PostVerifyEmailWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostVerifyEmailResponse, error) {
+	rsp, err := c.PostVerifyEmailWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostVerifyEmailResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostVerifyEmailWithResponse(ctx context.Context, body PostVerifyEmailJSONRequestBody, reqEditors ...RequestEditorFn) (*PostVerifyEmailResponse, error) {
+	rsp, err := c.PostVerifyEmail(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostVerifyEmailResponse(rsp)
 }
 
 // GetExamsWithResponse request returning *GetExamsResponse
@@ -4318,6 +5243,75 @@ func (c *ClientWithResponses) GetHomeWithResponse(ctx context.Context, params *G
 		return nil, err
 	}
 	return ParseGetHomeResponse(rsp)
+}
+
+// GetPollsWithResponse request returning *GetPollsResponse
+func (c *ClientWithResponses) GetPollsWithResponse(ctx context.Context, params *GetPollsParams, reqEditors ...RequestEditorFn) (*GetPollsResponse, error) {
+	rsp, err := c.GetPolls(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetPollsResponse(rsp)
+}
+
+// PostCreatePollWithBodyWithResponse request with arbitrary body returning *PostCreatePollResponse
+func (c *ClientWithResponses) PostCreatePollWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreatePollResponse, error) {
+	rsp, err := c.PostCreatePollWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostCreatePollResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostCreatePollWithResponse(ctx context.Context, body PostCreatePollJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreatePollResponse, error) {
+	rsp, err := c.PostCreatePoll(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostCreatePollResponse(rsp)
+}
+
+// GetPollWithResponse request returning *GetPollResponse
+func (c *ClientWithResponses) GetPollWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetPollResponse, error) {
+	rsp, err := c.GetPoll(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetPollResponse(rsp)
+}
+
+// PostLikePollWithBodyWithResponse request with arbitrary body returning *PostLikePollResponse
+func (c *ClientWithResponses) PostLikePollWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostLikePollResponse, error) {
+	rsp, err := c.PostLikePollWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostLikePollResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostLikePollWithResponse(ctx context.Context, id openapi_types.UUID, body PostLikePollJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLikePollResponse, error) {
+	rsp, err := c.PostLikePoll(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostLikePollResponse(rsp)
+}
+
+// PostVotePollWithBodyWithResponse request with arbitrary body returning *PostVotePollResponse
+func (c *ClientWithResponses) PostVotePollWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostVotePollResponse, error) {
+	rsp, err := c.PostVotePollWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostVotePollResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostVotePollWithResponse(ctx context.Context, id openapi_types.UUID, body PostVotePollJSONRequestBody, reqEditors ...RequestEditorFn) (*PostVotePollResponse, error) {
+	rsp, err := c.PostVotePoll(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostVotePollResponse(rsp)
 }
 
 // GetQuestionsWithResponse request returning *GetQuestionsResponse
@@ -4442,15 +5436,6 @@ func (c *ClientWithResponses) GetUsersWithResponse(ctx context.Context, params *
 	return ParseGetUsersResponse(rsp)
 }
 
-// DeleteUserWithResponse request returning *DeleteUserResponse
-func (c *ClientWithResponses) DeleteUserWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteUserResponse, error) {
-	rsp, err := c.DeleteUser(ctx, id, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteUserResponse(rsp)
-}
-
 // GetUserWithResponse request returning *GetUserResponse
 func (c *ClientWithResponses) GetUserWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetUserResponse, error) {
 	rsp, err := c.GetUser(ctx, id, reqEditors...)
@@ -4460,90 +5445,55 @@ func (c *ClientWithResponses) GetUserWithResponse(ctx context.Context, id openap
 	return ParseGetUserResponse(rsp)
 }
 
-// UpdateUserWithBodyWithResponse request with arbitrary body returning *UpdateUserResponse
-func (c *ClientWithResponses) UpdateUserWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error) {
-	rsp, err := c.UpdateUserWithBody(ctx, id, contentType, body, reqEditors...)
+// GetUserPollsWithResponse request returning *GetUserPollsResponse
+func (c *ClientWithResponses) GetUserPollsWithResponse(ctx context.Context, id openapi_types.UUID, params *GetUserPollsParams, reqEditors ...RequestEditorFn) (*GetUserPollsResponse, error) {
+	rsp, err := c.GetUserPolls(ctx, id, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseUpdateUserResponse(rsp)
+	return ParseGetUserPollsResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateUserWithResponse(ctx context.Context, id openapi_types.UUID, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error) {
-	rsp, err := c.UpdateUser(ctx, id, body, reqEditors...)
+// GetUserQuestionsWithResponse request returning *GetUserQuestionsResponse
+func (c *ClientWithResponses) GetUserQuestionsWithResponse(ctx context.Context, id openapi_types.UUID, params *GetUserQuestionsParams, reqEditors ...RequestEditorFn) (*GetUserQuestionsResponse, error) {
+	rsp, err := c.GetUserQuestions(ctx, id, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseUpdateUserResponse(rsp)
+	return ParseGetUserQuestionsResponse(rsp)
 }
 
-// GetVotesWithResponse request returning *GetVotesResponse
-func (c *ClientWithResponses) GetVotesWithResponse(ctx context.Context, params *GetVotesParams, reqEditors ...RequestEditorFn) (*GetVotesResponse, error) {
-	rsp, err := c.GetVotes(ctx, params, reqEditors...)
+// ParsePostChangePasswordResponse parses an HTTP response from a PostChangePasswordWithResponse call
+func ParsePostChangePasswordResponse(rsp *http.Response) (*PostChangePasswordResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetVotesResponse(rsp)
-}
 
-// PostCreateVoteWithBodyWithResponse request with arbitrary body returning *PostCreateVoteResponse
-func (c *ClientWithResponses) PostCreateVoteWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreateVoteResponse, error) {
-	rsp, err := c.PostCreateVoteWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
+	response := &PostChangePasswordResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
 	}
-	return ParsePostCreateVoteResponse(rsp)
-}
 
-func (c *ClientWithResponses) PostCreateVoteWithResponse(ctx context.Context, body PostCreateVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreateVoteResponse, error) {
-	rsp, err := c.PostCreateVote(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostCreateVoteResponse(rsp)
-}
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
 
-// GetVoteWithResponse request returning *GetVoteResponse
-func (c *ClientWithResponses) GetVoteWithResponse(ctx context.Context, id openapi_types.UUID, reqEditors ...RequestEditorFn) (*GetVoteResponse, error) {
-	rsp, err := c.GetVote(ctx, id, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetVoteResponse(rsp)
-}
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
 
-// PostLikeVoteWithBodyWithResponse request with arbitrary body returning *PostLikeVoteResponse
-func (c *ClientWithResponses) PostLikeVoteWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostLikeVoteResponse, error) {
-	rsp, err := c.PostLikeVoteWithBody(ctx, id, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
 	}
-	return ParsePostLikeVoteResponse(rsp)
-}
 
-func (c *ClientWithResponses) PostLikeVoteWithResponse(ctx context.Context, id openapi_types.UUID, body PostLikeVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostLikeVoteResponse, error) {
-	rsp, err := c.PostLikeVote(ctx, id, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostLikeVoteResponse(rsp)
-}
-
-// PostVoteWithBodyWithResponse request with arbitrary body returning *PostVoteResponse
-func (c *ClientWithResponses) PostVoteWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostVoteResponse, error) {
-	rsp, err := c.PostVoteWithBody(ctx, id, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostVoteResponse(rsp)
-}
-
-func (c *ClientWithResponses) PostVoteWithResponse(ctx context.Context, id openapi_types.UUID, body PostVoteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostVoteResponse, error) {
-	rsp, err := c.PostVote(ctx, id, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostVoteResponse(rsp)
+	return response, nil
 }
 
 // ParsePostForgotPasswordResponse parses an HTTP response from a PostForgotPasswordWithResponse call
@@ -4619,6 +5569,39 @@ func ParsePostLoginUserResponse(rsp *http.Response) (*PostLoginUserResponse, err
 	return response, nil
 }
 
+// ParseDeleteUserResponse parses an HTTP response from a DeleteUserWithResponse call
+func ParseDeleteUserResponse(rsp *http.Response) (*DeleteUserResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteUserResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetCurrentUserResponse parses an HTTP response from a GetCurrentUserWithResponse call
 func ParseGetCurrentUserResponse(rsp *http.Response) (*GetCurrentUserResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -4634,7 +5617,54 @@ func ParseGetCurrentUserResponse(rsp *http.Response) (*GetCurrentUserResponse, e
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest User
+		var dest UserPrivate
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateUserResponse parses an HTTP response from a UpdateUserWithResponse call
+func ParseUpdateUserResponse(rsp *http.Response) (*UpdateUserResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateUserResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest UserPrivate
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -4687,6 +5717,105 @@ func ParsePostRegisterUserResponse(rsp *http.Response) (*PostRegisterUserRespons
 		}
 		response.JSON201 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostResetPasswordResponse parses an HTTP response from a PostResetPasswordWithResponse call
+func ParsePostResetPasswordResponse(rsp *http.Response) (*PostResetPasswordResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostResetPasswordResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostSendVerificationEmailResponse parses an HTTP response from a PostSendVerificationEmailWithResponse call
+func ParsePostSendVerificationEmailResponse(rsp *http.Response) (*PostSendVerificationEmailResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostSendVerificationEmailResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostVerifyEmailResponse parses an HTTP response from a PostVerifyEmailWithResponse call
+func ParsePostVerifyEmailResponse(rsp *http.Response) (*PostVerifyEmailResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostVerifyEmailResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest BadRequest
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -5024,6 +6153,230 @@ func ParseGetHomeResponse(rsp *http.Response) (*GetHomeResponse, error) {
 	return response, nil
 }
 
+// ParseGetPollsResponse parses an HTTP response from a GetPollsWithResponse call
+func ParseGetPollsResponse(rsp *http.Response) (*GetPollsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetPollsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Polls []Poll `json:"polls"`
+			Total int    `json:"total"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostCreatePollResponse parses an HTTP response from a PostCreatePollWithResponse call
+func ParsePostCreatePollResponse(rsp *http.Response) (*PostCreatePollResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostCreatePollResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest Poll
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetPollResponse parses an HTTP response from a GetPollWithResponse call
+func ParseGetPollResponse(rsp *http.Response) (*GetPollResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetPollResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Poll
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostLikePollResponse parses an HTTP response from a PostLikePollWithResponse call
+func ParsePostLikePollResponse(rsp *http.Response) (*PostLikePollResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostLikePollResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostVotePollResponse parses an HTTP response from a PostVotePollWithResponse call
+func ParsePostVotePollResponse(rsp *http.Response) (*PostVotePollResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostVotePollResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequest
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetQuestionsResponse parses an HTTP response from a GetQuestionsWithResponse call
 func ParseGetQuestionsResponse(rsp *http.Response) (*GetQuestionsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -5082,7 +6435,7 @@ func ParsePostCreateQuestionResponse(rsp *http.Response) (*PostCreateQuestionRes
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest QuestionWithAnswer
+		var dest CreateQuestionRequest
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -5223,7 +6576,7 @@ func ParseUpdateQuestionResponse(rsp *http.Response) (*UpdateQuestionResponse, e
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest QuestionWithAnswer
+		var dest CreateQuestionRequest
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -5324,7 +6677,7 @@ func ParseGetQuestionMySubmissionsResponse(rsp *http.Response) (*GetQuestionMySu
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []MySubmission
+		var dest []QuestionSubmission
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -5489,8 +6842,8 @@ func ParseGetUsersResponse(rsp *http.Response) (*GetUsersResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Total int    `json:"total"`
-			Users []User `json:"users"`
+			Total int          `json:"total"`
+			Users []UserPublic `json:"users"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -5510,53 +6863,6 @@ func ParseGetUsersResponse(rsp *http.Response) (*GetUsersResponse, error) {
 			return nil, err
 		}
 		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseDeleteUserResponse parses an HTTP response from a DeleteUserWithResponse call
-func ParseDeleteUserResponse(rsp *http.Response) (*DeleteUserResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &DeleteUserResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequest
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Unauthorized
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest NotFound
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest InternalServerError
@@ -5585,7 +6891,7 @@ func ParseGetUserResponse(rsp *http.Response) (*GetUserResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest User
+		var dest UserPublic
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -5610,69 +6916,15 @@ func ParseGetUserResponse(rsp *http.Response) (*GetUserResponse, error) {
 	return response, nil
 }
 
-// ParseUpdateUserResponse parses an HTTP response from a UpdateUserWithResponse call
-func ParseUpdateUserResponse(rsp *http.Response) (*UpdateUserResponse, error) {
+// ParseGetUserPollsResponse parses an HTTP response from a GetUserPollsWithResponse call
+func ParseGetUserPollsResponse(rsp *http.Response) (*GetUserPollsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &UpdateUserResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest User
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequest
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Unauthorized
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest NotFound
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetVotesResponse parses an HTTP response from a GetVotesWithResponse call
-func ParseGetVotesResponse(rsp *http.Response) (*GetVotesResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetVotesResponse{
+	response := &GetUserPollsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -5680,60 +6932,20 @@ func ParseGetVotesResponse(rsp *http.Response) (*GetVotesResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
+			Polls []Poll `json:"polls"`
 			Total int    `json:"total"`
-			Votes []Vote `json:"votes"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest InternalServerError
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParsePostCreateVoteResponse parses an HTTP response from a PostCreateVoteWithResponse call
-func ParsePostCreateVoteResponse(rsp *http.Response) (*PostCreateVoteResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &PostCreateVoteResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest Vote
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON201 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequest
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Unauthorized
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
+		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest InternalServerError
@@ -5747,127 +6959,29 @@ func ParsePostCreateVoteResponse(rsp *http.Response) (*PostCreateVoteResponse, e
 	return response, nil
 }
 
-// ParseGetVoteResponse parses an HTTP response from a GetVoteWithResponse call
-func ParseGetVoteResponse(rsp *http.Response) (*GetVoteResponse, error) {
+// ParseGetUserQuestionsResponse parses an HTTP response from a GetUserQuestionsWithResponse call
+func ParseGetUserQuestionsResponse(rsp *http.Response) (*GetUserQuestionsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetVoteResponse{
+	response := &GetUserQuestionsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Vote
+		var dest struct {
+			Questions []Question `json:"questions"`
+			Total     int        `json:"total"`
+		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequest
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest NotFound
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParsePostLikeVoteResponse parses an HTTP response from a PostLikeVoteWithResponse call
-func ParsePostLikeVoteResponse(rsp *http.Response) (*PostLikeVoteResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &PostLikeVoteResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequest
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Unauthorized
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest NotFound
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParsePostVoteResponse parses an HTTP response from a PostVoteWithResponse call
-func ParsePostVoteResponse(rsp *http.Response) (*PostVoteResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &PostVoteResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequest
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Unauthorized
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest NotFound
@@ -5890,18 +7004,36 @@ func ParsePostVoteResponse(rsp *http.Response) (*PostVoteResponse, error) {
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Change password
+	// (POST /auth/change-password)
+	PostChangePassword(w http.ResponseWriter, r *http.Request)
 	// Request password reset
 	// (POST /auth/forgot-password)
 	PostForgotPassword(w http.ResponseWriter, r *http.Request)
 	// Login user
 	// (POST /auth/login)
 	PostLoginUser(w http.ResponseWriter, r *http.Request)
+	// Delete current user
+	// (DELETE /auth/me)
+	DeleteUser(w http.ResponseWriter, r *http.Request)
 	// 获取当前用户信息
 	// (GET /auth/me)
 	GetCurrentUser(w http.ResponseWriter, r *http.Request)
+	// Update current user
+	// (PUT /auth/me)
+	UpdateUser(w http.ResponseWriter, r *http.Request)
 	// Register a new user
 	// (POST /auth/register)
 	PostRegisterUser(w http.ResponseWriter, r *http.Request)
+	// Reset password
+	// (POST /auth/reset-password)
+	PostResetPassword(w http.ResponseWriter, r *http.Request)
+	// Send verification email
+	// (POST /auth/send-verification-email)
+	PostSendVerificationEmail(w http.ResponseWriter, r *http.Request)
+	// Verify email address
+	// (POST /auth/verify-email)
+	PostVerifyEmail(w http.ResponseWriter, r *http.Request)
 	// Get all exams
 	// (GET /exams)
 	GetExams(w http.ResponseWriter, r *http.Request, params GetExamsParams)
@@ -5923,6 +7055,21 @@ type ServerInterface interface {
 	// Get homepage data
 	// (GET /home)
 	GetHome(w http.ResponseWriter, r *http.Request, params GetHomeParams)
+	// Get all polls
+	// (GET /polls)
+	GetPolls(w http.ResponseWriter, r *http.Request, params GetPollsParams)
+	// Create new poll
+	// (POST /polls)
+	PostCreatePoll(w http.ResponseWriter, r *http.Request)
+	// 获取投票详情（含当前结果）
+	// (GET /polls/{id})
+	GetPoll(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// 点赞投票
+	// (POST /polls/{id}/like)
+	PostLikePoll(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// 投票
+	// (POST /polls/{id}/vote)
+	PostVotePoll(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Get all questions
 	// (GET /questions)
 	GetQuestions(w http.ResponseWriter, r *http.Request, params GetQuestionsParams)
@@ -5953,35 +7100,26 @@ type ServerInterface interface {
 	// Get all users
 	// (GET /users)
 	GetUsers(w http.ResponseWriter, r *http.Request, params GetUsersParams)
-	// Delete user
-	// (DELETE /users/{id})
-	DeleteUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Get user by ID
 	// (GET /users/{id})
 	GetUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
-	// Update user
-	// (PUT /users/{id})
-	UpdateUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
-	// Get all votes
-	// (GET /votes)
-	GetVotes(w http.ResponseWriter, r *http.Request, params GetVotesParams)
-	// Create new vote
-	// (POST /votes)
-	PostCreateVote(w http.ResponseWriter, r *http.Request)
-	// 获取投票详情（含当前结果）
-	// (GET /votes/{id})
-	GetVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
-	// 点赞投票
-	// (POST /votes/{id}/like)
-	PostLikeVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
-	// 投票
-	// (POST /votes/{id}/vote)
-	PostVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Get user's created polls
+	// (GET /users/{id}/polls)
+	GetUserPolls(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserPollsParams)
+	// Get user's created question
+	// (GET /users/{id}/questions)
+	GetUserQuestions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserQuestionsParams)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// Change password
+// (POST /auth/change-password)
+func (_ Unimplemented) PostChangePassword(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // Request password reset
 // (POST /auth/forgot-password)
@@ -5995,15 +7133,45 @@ func (_ Unimplemented) PostLoginUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// Delete current user
+// (DELETE /auth/me)
+func (_ Unimplemented) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // 获取当前用户信息
 // (GET /auth/me)
 func (_ Unimplemented) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// Update current user
+// (PUT /auth/me)
+func (_ Unimplemented) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // Register a new user
 // (POST /auth/register)
 func (_ Unimplemented) PostRegisterUser(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Reset password
+// (POST /auth/reset-password)
+func (_ Unimplemented) PostResetPassword(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Send verification email
+// (POST /auth/send-verification-email)
+func (_ Unimplemented) PostSendVerificationEmail(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Verify email address
+// (POST /auth/verify-email)
+func (_ Unimplemented) PostVerifyEmail(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -6046,6 +7214,36 @@ func (_ Unimplemented) PostLikeExam(w http.ResponseWriter, r *http.Request, id o
 // Get homepage data
 // (GET /home)
 func (_ Unimplemented) GetHome(w http.ResponseWriter, r *http.Request, params GetHomeParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get all polls
+// (GET /polls)
+func (_ Unimplemented) GetPolls(w http.ResponseWriter, r *http.Request, params GetPollsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Create new poll
+// (POST /polls)
+func (_ Unimplemented) PostCreatePoll(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// 获取投票详情（含当前结果）
+// (GET /polls/{id})
+func (_ Unimplemented) GetPoll(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// 点赞投票
+// (POST /polls/{id}/like)
+func (_ Unimplemented) PostLikePoll(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// 投票
+// (POST /polls/{id}/vote)
+func (_ Unimplemented) PostVotePoll(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -6109,51 +7307,21 @@ func (_ Unimplemented) GetUsers(w http.ResponseWriter, r *http.Request, params G
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Delete user
-// (DELETE /users/{id})
-func (_ Unimplemented) DeleteUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
 // Get user by ID
 // (GET /users/{id})
 func (_ Unimplemented) GetUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Update user
-// (PUT /users/{id})
-func (_ Unimplemented) UpdateUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+// Get user's created polls
+// (GET /users/{id}/polls)
+func (_ Unimplemented) GetUserPolls(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserPollsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Get all votes
-// (GET /votes)
-func (_ Unimplemented) GetVotes(w http.ResponseWriter, r *http.Request, params GetVotesParams) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// Create new vote
-// (POST /votes)
-func (_ Unimplemented) PostCreateVote(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// 获取投票详情（含当前结果）
-// (GET /votes/{id})
-func (_ Unimplemented) GetVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// 点赞投票
-// (POST /votes/{id}/like)
-func (_ Unimplemented) PostLikeVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// 投票
-// (POST /votes/{id}/vote)
-func (_ Unimplemented) PostVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+// Get user's created question
+// (GET /users/{id}/questions)
+func (_ Unimplemented) GetUserQuestions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserQuestionsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -6165,6 +7333,20 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// PostChangePassword operation middleware
+func (siw *ServerInterfaceWrapper) PostChangePassword(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostChangePassword(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // PostForgotPassword operation middleware
 func (siw *ServerInterfaceWrapper) PostForgotPassword(w http.ResponseWriter, r *http.Request) {
@@ -6194,6 +7376,20 @@ func (siw *ServerInterfaceWrapper) PostLoginUser(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r)
 }
 
+// DeleteUser operation middleware
+func (siw *ServerInterfaceWrapper) DeleteUser(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteUser(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // GetCurrentUser operation middleware
 func (siw *ServerInterfaceWrapper) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 
@@ -6208,11 +7404,67 @@ func (siw *ServerInterfaceWrapper) GetCurrentUser(w http.ResponseWriter, r *http
 	handler.ServeHTTP(w, r)
 }
 
+// UpdateUser operation middleware
+func (siw *ServerInterfaceWrapper) UpdateUser(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateUser(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // PostRegisterUser operation middleware
 func (siw *ServerInterfaceWrapper) PostRegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PostRegisterUser(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostResetPassword operation middleware
+func (siw *ServerInterfaceWrapper) PostResetPassword(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostResetPassword(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostSendVerificationEmail operation middleware
+func (siw *ServerInterfaceWrapper) PostSendVerificationEmail(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostSendVerificationEmail(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostVerifyEmail operation middleware
+func (siw *ServerInterfaceWrapper) PostVerifyEmail(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostVerifyEmail(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -6488,6 +7740,222 @@ func (siw *ServerInterfaceWrapper) GetHome(w http.ResponseWriter, r *http.Reques
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetHome(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetPolls operation middleware
+func (siw *ServerInterfaceWrapper) GetPolls(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetPollsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", r.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "limit"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "type" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "type", r.URL.Query(), &params.Type, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "type"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "type", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "query" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "query", r.URL.Query(), &params.Query, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "query"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "query", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "language" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "language", r.URL.Query(), &params.Language, runtime.BindQueryParameterOptions{Type: "array", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "language"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "language", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "created_by" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "created_by", r.URL.Query(), &params.CreatedBy, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "created_by"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "created_by", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "sortBy" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "sortBy", r.URL.Query(), &params.SortBy, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "sortBy"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sortBy", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "sortDesc" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "sortDesc", r.URL.Query(), &params.SortDesc, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "sortDesc"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sortDesc", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetPolls(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostCreatePoll operation middleware
+func (siw *ServerInterfaceWrapper) PostCreatePoll(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostCreatePoll(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetPoll operation middleware
+func (siw *ServerInterfaceWrapper) GetPoll(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetPoll(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostLikePoll operation middleware
+func (siw *ServerInterfaceWrapper) PostLikePoll(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostLikePoll(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostVotePoll operation middleware
+func (siw *ServerInterfaceWrapper) PostVotePoll(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostVotePoll(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -6915,32 +8383,6 @@ func (siw *ServerInterfaceWrapper) GetUsers(w http.ResponseWriter, r *http.Reque
 	handler.ServeHTTP(w, r)
 }
 
-// DeleteUser operation middleware
-func (siw *ServerInterfaceWrapper) DeleteUser(w http.ResponseWriter, r *http.Request) {
-
-	var err error
-	_ = err
-
-	// ------------- Path parameter "id" -------------
-	var id openapi_types.UUID
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteUser(w, r, id)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
 // GetUser operation middleware
 func (siw *ServerInterfaceWrapper) GetUser(w http.ResponseWriter, r *http.Request) {
 
@@ -6967,8 +8409,8 @@ func (siw *ServerInterfaceWrapper) GetUser(w http.ResponseWriter, r *http.Reques
 	handler.ServeHTTP(w, r)
 }
 
-// UpdateUser operation middleware
-func (siw *ServerInterfaceWrapper) UpdateUser(w http.ResponseWriter, r *http.Request) {
+// GetUserPolls operation middleware
+func (siw *ServerInterfaceWrapper) GetUserPolls(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 	_ = err
@@ -6982,25 +8424,8 @@ func (siw *ServerInterfaceWrapper) UpdateUser(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.UpdateUser(w, r, id)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// GetVotes operation middleware
-func (siw *ServerInterfaceWrapper) GetVotes(w http.ResponseWriter, r *http.Request) {
-
-	var err error
-	_ = err
-
 	// Parameter object where we will unmarshal all parameters from the context
-	var params GetVotesParams
+	var params GetUserPollsParams
 
 	// ------------- Optional query parameter "page" -------------
 
@@ -7028,86 +8453,8 @@ func (siw *ServerInterfaceWrapper) GetVotes(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// ------------- Optional query parameter "type" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "type", r.URL.Query(), &params.Type, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
-	if err != nil {
-		var requiredError *runtime.RequiredParameterError
-		if errors.As(err, &requiredError) {
-			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "type"})
-		} else {
-			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "type", Err: err})
-		}
-		return
-	}
-
-	// ------------- Optional query parameter "query" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "query", r.URL.Query(), &params.Query, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
-	if err != nil {
-		var requiredError *runtime.RequiredParameterError
-		if errors.As(err, &requiredError) {
-			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "query"})
-		} else {
-			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "query", Err: err})
-		}
-		return
-	}
-
-	// ------------- Optional query parameter "language" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "language", r.URL.Query(), &params.Language, runtime.BindQueryParameterOptions{Type: "array", Format: ""})
-	if err != nil {
-		var requiredError *runtime.RequiredParameterError
-		if errors.As(err, &requiredError) {
-			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "language"})
-		} else {
-			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "language", Err: err})
-		}
-		return
-	}
-
-	// ------------- Optional query parameter "created_by" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "created_by", r.URL.Query(), &params.CreatedBy, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
-	if err != nil {
-		var requiredError *runtime.RequiredParameterError
-		if errors.As(err, &requiredError) {
-			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "created_by"})
-		} else {
-			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "created_by", Err: err})
-		}
-		return
-	}
-
-	// ------------- Optional query parameter "sortBy" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "sortBy", r.URL.Query(), &params.SortBy, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
-	if err != nil {
-		var requiredError *runtime.RequiredParameterError
-		if errors.As(err, &requiredError) {
-			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "sortBy"})
-		} else {
-			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sortBy", Err: err})
-		}
-		return
-	}
-
-	// ------------- Optional query parameter "sortDesc" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "sortDesc", r.URL.Query(), &params.SortDesc, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
-	if err != nil {
-		var requiredError *runtime.RequiredParameterError
-		if errors.As(err, &requiredError) {
-			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "sortDesc"})
-		} else {
-			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sortDesc", Err: err})
-		}
-		return
-	}
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetVotes(w, r, params)
+		siw.Handler.GetUserPolls(w, r, id, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -7117,22 +8464,8 @@ func (siw *ServerInterfaceWrapper) GetVotes(w http.ResponseWriter, r *http.Reque
 	handler.ServeHTTP(w, r)
 }
 
-// PostCreateVote operation middleware
-func (siw *ServerInterfaceWrapper) PostCreateVote(w http.ResponseWriter, r *http.Request) {
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PostCreateVote(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// GetVote operation middleware
-func (siw *ServerInterfaceWrapper) GetVote(w http.ResponseWriter, r *http.Request) {
+// GetUserQuestions operation middleware
+func (siw *ServerInterfaceWrapper) GetUserQuestions(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 	_ = err
@@ -7146,60 +8479,37 @@ func (siw *ServerInterfaceWrapper) GetVote(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetVote(w, r, id)
-	}))
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetUserQuestionsParams
 
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
 	}
 
-	handler.ServeHTTP(w, r)
-}
+	// ------------- Optional query parameter "limit" -------------
 
-// PostLikeVote operation middleware
-func (siw *ServerInterfaceWrapper) PostLikeVote(w http.ResponseWriter, r *http.Request) {
-
-	var err error
-	_ = err
-
-	// ------------- Path parameter "id" -------------
-	var id openapi_types.UUID
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", r.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
 	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "limit"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		}
 		return
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PostLikeVote(w, r, id)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// PostVote operation middleware
-func (siw *ServerInterfaceWrapper) PostVote(w http.ResponseWriter, r *http.Request) {
-
-	var err error
-	_ = err
-
-	// ------------- Path parameter "id" -------------
-	var id openapi_types.UUID
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PostVote(w, r, id)
+		siw.Handler.GetUserQuestions(w, r, id, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -7323,16 +8633,34 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/auth/change-password", wrapper.PostChangePassword)
+	})
+	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/auth/forgot-password", wrapper.PostForgotPassword)
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/auth/login", wrapper.PostLoginUser)
 	})
 	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/auth/me", wrapper.DeleteUser)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/auth/me", wrapper.GetCurrentUser)
 	})
 	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/auth/me", wrapper.UpdateUser)
+	})
+	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/auth/register", wrapper.PostRegisterUser)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/auth/reset-password", wrapper.PostResetPassword)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/auth/send-verification-email", wrapper.PostSendVerificationEmail)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/auth/verify-email", wrapper.PostVerifyEmail)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/exams", wrapper.GetExams)
@@ -7354,6 +8682,21 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/home", wrapper.GetHome)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/polls", wrapper.GetPolls)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/polls", wrapper.PostCreatePoll)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/polls/{id}", wrapper.GetPoll)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/polls/{id}/like", wrapper.PostLikePoll)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/polls/{id}/vote", wrapper.PostVotePoll)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/questions", wrapper.GetQuestions)
@@ -7386,28 +8729,13 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Get(options.BaseURL+"/users", wrapper.GetUsers)
 	})
 	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/users/{id}", wrapper.DeleteUser)
-	})
-	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/users/{id}", wrapper.GetUser)
 	})
 	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/users/{id}", wrapper.UpdateUser)
+		r.Get(options.BaseURL+"/users/{id}/polls", wrapper.GetUserPolls)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/votes", wrapper.GetVotes)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/votes", wrapper.PostCreateVote)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/votes/{id}", wrapper.GetVote)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/votes/{id}/like", wrapper.PostLikeVote)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/votes/{id}/vote", wrapper.PostVote)
+		r.Get(options.BaseURL+"/users/{id}/questions", wrapper.GetUserQuestions)
 	})
 
 	return r
@@ -7420,6 +8748,52 @@ type InternalServerErrorJSONResponse CommonError
 type NotFoundJSONResponse CommonError
 
 type UnauthorizedJSONResponse CommonError
+
+type PostChangePasswordRequestObject struct {
+	Body *PostChangePasswordJSONRequestBody
+}
+
+type PostChangePasswordResponseObject interface {
+	VisitPostChangePasswordResponse(w http.ResponseWriter) error
+}
+
+type PostChangePassword200Response struct {
+}
+
+func (response PostChangePassword200Response) VisitPostChangePasswordResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type PostChangePassword400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostChangePassword400JSONResponse) VisitPostChangePasswordResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostChangePassword500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostChangePassword500JSONResponse) VisitPostChangePasswordResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
 
 type PostForgotPasswordRequestObject struct {
 	Body *PostForgotPasswordJSONRequestBody
@@ -7527,6 +8901,51 @@ func (response PostLoginUser500JSONResponse) VisitPostLoginUserResponse(w http.R
 	return err
 }
 
+type DeleteUserRequestObject struct {
+}
+
+type DeleteUserResponseObject interface {
+	VisitDeleteUserResponse(w http.ResponseWriter) error
+}
+
+type DeleteUser204Response struct {
+}
+
+func (response DeleteUser204Response) VisitDeleteUserResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteUser401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response DeleteUser401JSONResponse) VisitDeleteUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteUser500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response DeleteUser500JSONResponse) VisitDeleteUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetCurrentUserRequestObject struct {
 }
 
@@ -7534,7 +8953,7 @@ type GetCurrentUserResponseObject interface {
 	VisitGetCurrentUserResponse(w http.ResponseWriter) error
 }
 
-type GetCurrentUser200JSONResponse User
+type GetCurrentUser200JSONResponse UserPrivate
 
 func (response GetCurrentUser200JSONResponse) VisitGetCurrentUserResponse(w http.ResponseWriter) error {
 
@@ -7592,6 +9011,72 @@ func (response GetCurrentUser500JSONResponse) VisitGetCurrentUserResponse(w http
 	return err
 }
 
+type UpdateUserRequestObject struct {
+	Body *UpdateUserJSONRequestBody
+}
+
+type UpdateUserResponseObject interface {
+	VisitUpdateUserResponse(w http.ResponseWriter) error
+}
+
+type UpdateUser200JSONResponse UserPrivate
+
+func (response UpdateUser200JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateUser400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response UpdateUser400JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateUser401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response UpdateUser401JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateUser500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response UpdateUser500JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type PostRegisterUserRequestObject struct {
 	Body *PostRegisterUserJSONRequestBody
 }
@@ -7633,6 +9118,144 @@ type PostRegisterUser500JSONResponse struct {
 }
 
 func (response PostRegisterUser500JSONResponse) VisitPostRegisterUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostResetPasswordRequestObject struct {
+	Body *PostResetPasswordJSONRequestBody
+}
+
+type PostResetPasswordResponseObject interface {
+	VisitPostResetPasswordResponse(w http.ResponseWriter) error
+}
+
+type PostResetPassword200Response struct {
+}
+
+func (response PostResetPassword200Response) VisitPostResetPasswordResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type PostResetPassword400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostResetPassword400JSONResponse) VisitPostResetPasswordResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostResetPassword500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostResetPassword500JSONResponse) VisitPostResetPasswordResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostSendVerificationEmailRequestObject struct {
+	Body *PostSendVerificationEmailJSONRequestBody
+}
+
+type PostSendVerificationEmailResponseObject interface {
+	VisitPostSendVerificationEmailResponse(w http.ResponseWriter) error
+}
+
+type PostSendVerificationEmail200Response struct {
+}
+
+func (response PostSendVerificationEmail200Response) VisitPostSendVerificationEmailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type PostSendVerificationEmail400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostSendVerificationEmail400JSONResponse) VisitPostSendVerificationEmailResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostSendVerificationEmail500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostSendVerificationEmail500JSONResponse) VisitPostSendVerificationEmailResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostVerifyEmailRequestObject struct {
+	Body *PostVerifyEmailJSONRequestBody
+}
+
+type PostVerifyEmailResponseObject interface {
+	VisitPostVerifyEmailResponse(w http.ResponseWriter) error
+}
+
+type PostVerifyEmail200Response struct {
+}
+
+func (response PostVerifyEmail200Response) VisitPostVerifyEmailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type PostVerifyEmail400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostVerifyEmail400JSONResponse) VisitPostVerifyEmailResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostVerifyEmail500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostVerifyEmail500JSONResponse) VisitPostVerifyEmailResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -8099,6 +9722,329 @@ func (response GetHome500JSONResponse) VisitGetHomeResponse(w http.ResponseWrite
 	return err
 }
 
+type GetPollsRequestObject struct {
+	Params GetPollsParams
+}
+
+type GetPollsResponseObject interface {
+	VisitGetPollsResponse(w http.ResponseWriter) error
+}
+
+type GetPolls200JSONResponse struct {
+	Polls []Poll `json:"polls"`
+	Total int    `json:"total"`
+}
+
+func (response GetPolls200JSONResponse) VisitGetPollsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPolls500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetPolls500JSONResponse) VisitGetPollsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostCreatePollRequestObject struct {
+	Body *PostCreatePollJSONRequestBody
+}
+
+type PostCreatePollResponseObject interface {
+	VisitPostCreatePollResponse(w http.ResponseWriter) error
+}
+
+type PostCreatePoll201JSONResponse Poll
+
+func (response PostCreatePoll201JSONResponse) VisitPostCreatePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostCreatePoll400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostCreatePoll400JSONResponse) VisitPostCreatePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostCreatePoll401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response PostCreatePoll401JSONResponse) VisitPostCreatePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostCreatePoll500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostCreatePoll500JSONResponse) VisitPostCreatePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPollRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type GetPollResponseObject interface {
+	VisitGetPollResponse(w http.ResponseWriter) error
+}
+
+type GetPoll200JSONResponse Poll
+
+func (response GetPoll200JSONResponse) VisitGetPollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPoll400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response GetPoll400JSONResponse) VisitGetPollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPoll404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response GetPoll404JSONResponse) VisitGetPollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPoll500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetPoll500JSONResponse) VisitGetPollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostLikePollRequestObject struct {
+	Id   openapi_types.UUID `json:"id"`
+	Body *PostLikePollJSONRequestBody
+}
+
+type PostLikePollResponseObject interface {
+	VisitPostLikePollResponse(w http.ResponseWriter) error
+}
+
+type PostLikePoll201Response struct {
+}
+
+func (response PostLikePoll201Response) VisitPostLikePollResponse(w http.ResponseWriter) error {
+	w.WriteHeader(201)
+	return nil
+}
+
+type PostLikePoll400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostLikePoll400JSONResponse) VisitPostLikePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostLikePoll401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response PostLikePoll401JSONResponse) VisitPostLikePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostLikePoll404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response PostLikePoll404JSONResponse) VisitPostLikePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostLikePoll500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostLikePoll500JSONResponse) VisitPostLikePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostVotePollRequestObject struct {
+	Id   openapi_types.UUID `json:"id"`
+	Body *PostVotePollJSONRequestBody
+}
+
+type PostVotePollResponseObject interface {
+	VisitPostVotePollResponse(w http.ResponseWriter) error
+}
+
+type PostVotePoll200Response struct {
+}
+
+func (response PostVotePoll200Response) VisitPostVotePollResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type PostVotePoll400JSONResponse struct{ BadRequestJSONResponse }
+
+func (response PostVotePoll400JSONResponse) VisitPostVotePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostVotePoll401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response PostVotePoll401JSONResponse) VisitPostVotePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostVotePoll404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response PostVotePoll404JSONResponse) VisitPostVotePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostVotePoll500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PostVotePoll500JSONResponse) VisitPostVotePollResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetQuestionsRequestObject struct {
 	Params GetQuestionsParams
 }
@@ -8162,7 +10108,7 @@ type PostCreateQuestionResponseObject interface {
 	VisitPostCreateQuestionResponse(w http.ResponseWriter) error
 }
 
-type PostCreateQuestion201JSONResponse QuestionWithAnswer
+type PostCreateQuestion201JSONResponse CreateQuestionRequest
 
 func (response PostCreateQuestion201JSONResponse) VisitPostCreateQuestionResponse(w http.ResponseWriter) error {
 
@@ -8369,7 +10315,7 @@ type UpdateQuestionResponseObject interface {
 	VisitUpdateQuestionResponse(w http.ResponseWriter) error
 }
 
-type UpdateQuestion200JSONResponse QuestionWithAnswer
+type UpdateQuestion200JSONResponse CreateQuestionRequest
 
 func (response UpdateQuestion200JSONResponse) VisitUpdateQuestionResponse(w http.ResponseWriter) error {
 
@@ -8524,7 +10470,7 @@ type GetQuestionMySubmissionsResponseObject interface {
 	VisitGetQuestionMySubmissionsResponse(w http.ResponseWriter) error
 }
 
-type GetQuestionMySubmissions200JSONResponse []MySubmission
+type GetQuestionMySubmissions200JSONResponse []QuestionSubmission
 
 func (response GetQuestionMySubmissions200JSONResponse) VisitGetQuestionMySubmissionsResponse(w http.ResponseWriter) error {
 
@@ -8768,8 +10714,8 @@ type GetUsersResponseObject interface {
 }
 
 type GetUsers200JSONResponse struct {
-	Total int    `json:"total"`
-	Users []User `json:"users"`
+	Total int          `json:"total"`
+	Users []UserPublic `json:"users"`
 }
 
 func (response GetUsers200JSONResponse) VisitGetUsersResponse(w http.ResponseWriter) error {
@@ -8828,80 +10774,6 @@ func (response GetUsers500JSONResponse) VisitGetUsersResponse(w http.ResponseWri
 	return err
 }
 
-type DeleteUserRequestObject struct {
-	Id openapi_types.UUID `json:"id"`
-}
-
-type DeleteUserResponseObject interface {
-	VisitDeleteUserResponse(w http.ResponseWriter) error
-}
-
-type DeleteUser204Response struct {
-}
-
-func (response DeleteUser204Response) VisitDeleteUserResponse(w http.ResponseWriter) error {
-	w.WriteHeader(204)
-	return nil
-}
-
-type DeleteUser400JSONResponse struct{ BadRequestJSONResponse }
-
-func (response DeleteUser400JSONResponse) VisitDeleteUserResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type DeleteUser401JSONResponse struct{ UnauthorizedJSONResponse }
-
-func (response DeleteUser401JSONResponse) VisitDeleteUserResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type DeleteUser404JSONResponse struct{ NotFoundJSONResponse }
-
-func (response DeleteUser404JSONResponse) VisitDeleteUserResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type DeleteUser500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response DeleteUser500JSONResponse) VisitDeleteUserResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
 type GetUserRequestObject struct {
 	Id openapi_types.UUID `json:"id"`
 }
@@ -8910,7 +10782,7 @@ type GetUserResponseObject interface {
 	VisitGetUserResponse(w http.ResponseWriter) error
 }
 
-type GetUser200JSONResponse User
+type GetUser200JSONResponse UserPublic
 
 func (response GetUser200JSONResponse) VisitGetUserResponse(w http.ResponseWriter) error {
 
@@ -8954,101 +10826,21 @@ func (response GetUser500JSONResponse) VisitGetUserResponse(w http.ResponseWrite
 	return err
 }
 
-type UpdateUserRequestObject struct {
-	Id   openapi_types.UUID `json:"id"`
-	Body *UpdateUserJSONRequestBody
+type GetUserPollsRequestObject struct {
+	Id     openapi_types.UUID `json:"id"`
+	Params GetUserPollsParams
 }
 
-type UpdateUserResponseObject interface {
-	VisitUpdateUserResponse(w http.ResponseWriter) error
+type GetUserPollsResponseObject interface {
+	VisitGetUserPollsResponse(w http.ResponseWriter) error
 }
 
-type UpdateUser200JSONResponse User
-
-func (response UpdateUser200JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type UpdateUser400JSONResponse struct{ BadRequestJSONResponse }
-
-func (response UpdateUser400JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type UpdateUser401JSONResponse struct{ UnauthorizedJSONResponse }
-
-func (response UpdateUser401JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type UpdateUser404JSONResponse struct{ NotFoundJSONResponse }
-
-func (response UpdateUser404JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type UpdateUser500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response UpdateUser500JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetVotesRequestObject struct {
-	Params GetVotesParams
-}
-
-type GetVotesResponseObject interface {
-	VisitGetVotesResponse(w http.ResponseWriter) error
-}
-
-type GetVotes200JSONResponse struct {
+type GetUserPolls200JSONResponse struct {
+	Polls []Poll `json:"polls"`
 	Total int    `json:"total"`
-	Votes []Vote `json:"votes"`
 }
 
-func (response GetVotes200JSONResponse) VisitGetVotesResponse(w http.ResponseWriter) error {
+func (response GetUserPolls200JSONResponse) VisitGetUserPollsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -9060,11 +10852,25 @@ func (response GetVotes200JSONResponse) VisitGetVotesResponse(w http.ResponseWri
 	return err
 }
 
-type GetVotes500JSONResponse struct {
+type GetUserPolls404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response GetUserPolls404JSONResponse) VisitGetUserPollsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetUserPolls500JSONResponse struct {
 	InternalServerErrorJSONResponse
 }
 
-func (response GetVotes500JSONResponse) VisitGetVotesResponse(w http.ResponseWriter) error {
+func (response GetUserPolls500JSONResponse) VisitGetUserPollsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -9076,83 +10882,21 @@ func (response GetVotes500JSONResponse) VisitGetVotesResponse(w http.ResponseWri
 	return err
 }
 
-type PostCreateVoteRequestObject struct {
-	Body *PostCreateVoteJSONRequestBody
+type GetUserQuestionsRequestObject struct {
+	Id     openapi_types.UUID `json:"id"`
+	Params GetUserQuestionsParams
 }
 
-type PostCreateVoteResponseObject interface {
-	VisitPostCreateVoteResponse(w http.ResponseWriter) error
+type GetUserQuestionsResponseObject interface {
+	VisitGetUserQuestionsResponse(w http.ResponseWriter) error
 }
 
-type PostCreateVote201JSONResponse Vote
-
-func (response PostCreateVote201JSONResponse) VisitPostCreateVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
-	_, err := buf.WriteTo(w)
-	return err
+type GetUserQuestions200JSONResponse struct {
+	Questions []Question `json:"questions"`
+	Total     int        `json:"total"`
 }
 
-type PostCreateVote400JSONResponse struct{ BadRequestJSONResponse }
-
-func (response PostCreateVote400JSONResponse) VisitPostCreateVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type PostCreateVote401JSONResponse struct{ UnauthorizedJSONResponse }
-
-func (response PostCreateVote401JSONResponse) VisitPostCreateVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type PostCreateVote500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response PostCreateVote500JSONResponse) VisitPostCreateVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetVoteRequestObject struct {
-	Id openapi_types.UUID `json:"id"`
-}
-
-type GetVoteResponseObject interface {
-	VisitGetVoteResponse(w http.ResponseWriter) error
-}
-
-type GetVote200JSONResponse Vote
-
-func (response GetVote200JSONResponse) VisitGetVoteResponse(w http.ResponseWriter) error {
+func (response GetUserQuestions200JSONResponse) VisitGetUserQuestionsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -9164,23 +10908,9 @@ func (response GetVote200JSONResponse) VisitGetVoteResponse(w http.ResponseWrite
 	return err
 }
 
-type GetVote400JSONResponse struct{ BadRequestJSONResponse }
+type GetUserQuestions404JSONResponse struct{ NotFoundJSONResponse }
 
-func (response GetVote400JSONResponse) VisitGetVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetVote404JSONResponse struct{ NotFoundJSONResponse }
-
-func (response GetVote404JSONResponse) VisitGetVoteResponse(w http.ResponseWriter) error {
+func (response GetUserQuestions404JSONResponse) VisitGetUserQuestionsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -9192,161 +10922,11 @@ func (response GetVote404JSONResponse) VisitGetVoteResponse(w http.ResponseWrite
 	return err
 }
 
-type GetVote500JSONResponse struct {
+type GetUserQuestions500JSONResponse struct {
 	InternalServerErrorJSONResponse
 }
 
-func (response GetVote500JSONResponse) VisitGetVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type PostLikeVoteRequestObject struct {
-	Id   openapi_types.UUID `json:"id"`
-	Body *PostLikeVoteJSONRequestBody
-}
-
-type PostLikeVoteResponseObject interface {
-	VisitPostLikeVoteResponse(w http.ResponseWriter) error
-}
-
-type PostLikeVote201Response struct {
-}
-
-func (response PostLikeVote201Response) VisitPostLikeVoteResponse(w http.ResponseWriter) error {
-	w.WriteHeader(201)
-	return nil
-}
-
-type PostLikeVote400JSONResponse struct{ BadRequestJSONResponse }
-
-func (response PostLikeVote400JSONResponse) VisitPostLikeVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type PostLikeVote401JSONResponse struct{ UnauthorizedJSONResponse }
-
-func (response PostLikeVote401JSONResponse) VisitPostLikeVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type PostLikeVote404JSONResponse struct{ NotFoundJSONResponse }
-
-func (response PostLikeVote404JSONResponse) VisitPostLikeVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type PostLikeVote500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response PostLikeVote500JSONResponse) VisitPostLikeVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type PostVoteRequestObject struct {
-	Id   openapi_types.UUID `json:"id"`
-	Body *PostVoteJSONRequestBody
-}
-
-type PostVoteResponseObject interface {
-	VisitPostVoteResponse(w http.ResponseWriter) error
-}
-
-type PostVote200Response struct {
-}
-
-func (response PostVote200Response) VisitPostVoteResponse(w http.ResponseWriter) error {
-	w.WriteHeader(200)
-	return nil
-}
-
-type PostVote400JSONResponse struct{ BadRequestJSONResponse }
-
-func (response PostVote400JSONResponse) VisitPostVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type PostVote401JSONResponse struct{ UnauthorizedJSONResponse }
-
-func (response PostVote401JSONResponse) VisitPostVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type PostVote404JSONResponse struct{ NotFoundJSONResponse }
-
-func (response PostVote404JSONResponse) VisitPostVoteResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type PostVote500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response PostVote500JSONResponse) VisitPostVoteResponse(w http.ResponseWriter) error {
+func (response GetUserQuestions500JSONResponse) VisitGetUserQuestionsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -9360,18 +10940,36 @@ func (response PostVote500JSONResponse) VisitPostVoteResponse(w http.ResponseWri
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// Change password
+	// (POST /auth/change-password)
+	PostChangePassword(ctx context.Context, request PostChangePasswordRequestObject) (PostChangePasswordResponseObject, error)
 	// Request password reset
 	// (POST /auth/forgot-password)
 	PostForgotPassword(ctx context.Context, request PostForgotPasswordRequestObject) (PostForgotPasswordResponseObject, error)
 	// Login user
 	// (POST /auth/login)
 	PostLoginUser(ctx context.Context, request PostLoginUserRequestObject) (PostLoginUserResponseObject, error)
+	// Delete current user
+	// (DELETE /auth/me)
+	DeleteUser(ctx context.Context, request DeleteUserRequestObject) (DeleteUserResponseObject, error)
 	// 获取当前用户信息
 	// (GET /auth/me)
 	GetCurrentUser(ctx context.Context, request GetCurrentUserRequestObject) (GetCurrentUserResponseObject, error)
+	// Update current user
+	// (PUT /auth/me)
+	UpdateUser(ctx context.Context, request UpdateUserRequestObject) (UpdateUserResponseObject, error)
 	// Register a new user
 	// (POST /auth/register)
 	PostRegisterUser(ctx context.Context, request PostRegisterUserRequestObject) (PostRegisterUserResponseObject, error)
+	// Reset password
+	// (POST /auth/reset-password)
+	PostResetPassword(ctx context.Context, request PostResetPasswordRequestObject) (PostResetPasswordResponseObject, error)
+	// Send verification email
+	// (POST /auth/send-verification-email)
+	PostSendVerificationEmail(ctx context.Context, request PostSendVerificationEmailRequestObject) (PostSendVerificationEmailResponseObject, error)
+	// Verify email address
+	// (POST /auth/verify-email)
+	PostVerifyEmail(ctx context.Context, request PostVerifyEmailRequestObject) (PostVerifyEmailResponseObject, error)
 	// Get all exams
 	// (GET /exams)
 	GetExams(ctx context.Context, request GetExamsRequestObject) (GetExamsResponseObject, error)
@@ -9393,6 +10991,21 @@ type StrictServerInterface interface {
 	// Get homepage data
 	// (GET /home)
 	GetHome(ctx context.Context, request GetHomeRequestObject) (GetHomeResponseObject, error)
+	// Get all polls
+	// (GET /polls)
+	GetPolls(ctx context.Context, request GetPollsRequestObject) (GetPollsResponseObject, error)
+	// Create new poll
+	// (POST /polls)
+	PostCreatePoll(ctx context.Context, request PostCreatePollRequestObject) (PostCreatePollResponseObject, error)
+	// 获取投票详情（含当前结果）
+	// (GET /polls/{id})
+	GetPoll(ctx context.Context, request GetPollRequestObject) (GetPollResponseObject, error)
+	// 点赞投票
+	// (POST /polls/{id}/like)
+	PostLikePoll(ctx context.Context, request PostLikePollRequestObject) (PostLikePollResponseObject, error)
+	// 投票
+	// (POST /polls/{id}/vote)
+	PostVotePoll(ctx context.Context, request PostVotePollRequestObject) (PostVotePollResponseObject, error)
 	// Get all questions
 	// (GET /questions)
 	GetQuestions(ctx context.Context, request GetQuestionsRequestObject) (GetQuestionsResponseObject, error)
@@ -9423,30 +11036,15 @@ type StrictServerInterface interface {
 	// Get all users
 	// (GET /users)
 	GetUsers(ctx context.Context, request GetUsersRequestObject) (GetUsersResponseObject, error)
-	// Delete user
-	// (DELETE /users/{id})
-	DeleteUser(ctx context.Context, request DeleteUserRequestObject) (DeleteUserResponseObject, error)
 	// Get user by ID
 	// (GET /users/{id})
 	GetUser(ctx context.Context, request GetUserRequestObject) (GetUserResponseObject, error)
-	// Update user
-	// (PUT /users/{id})
-	UpdateUser(ctx context.Context, request UpdateUserRequestObject) (UpdateUserResponseObject, error)
-	// Get all votes
-	// (GET /votes)
-	GetVotes(ctx context.Context, request GetVotesRequestObject) (GetVotesResponseObject, error)
-	// Create new vote
-	// (POST /votes)
-	PostCreateVote(ctx context.Context, request PostCreateVoteRequestObject) (PostCreateVoteResponseObject, error)
-	// 获取投票详情（含当前结果）
-	// (GET /votes/{id})
-	GetVote(ctx context.Context, request GetVoteRequestObject) (GetVoteResponseObject, error)
-	// 点赞投票
-	// (POST /votes/{id}/like)
-	PostLikeVote(ctx context.Context, request PostLikeVoteRequestObject) (PostLikeVoteResponseObject, error)
-	// 投票
-	// (POST /votes/{id}/vote)
-	PostVote(ctx context.Context, request PostVoteRequestObject) (PostVoteResponseObject, error)
+	// Get user's created polls
+	// (GET /users/{id}/polls)
+	GetUserPolls(ctx context.Context, request GetUserPollsRequestObject) (GetUserPollsResponseObject, error)
+	// Get user's created question
+	// (GET /users/{id}/questions)
+	GetUserQuestions(ctx context.Context, request GetUserQuestionsRequestObject) (GetUserQuestionsResponseObject, error)
 }
 
 type StrictHandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error)
@@ -9476,6 +11074,37 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// PostChangePassword operation middleware
+func (sh *strictHandler) PostChangePassword(w http.ResponseWriter, r *http.Request) {
+	var request PostChangePasswordRequestObject
+
+	var body PostChangePasswordJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostChangePassword(ctx, request.(PostChangePasswordRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostChangePassword")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostChangePasswordResponseObject); ok {
+		if err := validResponse.VisitPostChangePasswordResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // PostForgotPassword operation middleware
@@ -9540,6 +11169,30 @@ func (sh *strictHandler) PostLoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteUser operation middleware
+func (sh *strictHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	var request DeleteUserRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteUser(ctx, request.(DeleteUserRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteUser")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteUserResponseObject); ok {
+		if err := validResponse.VisitDeleteUserResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // GetCurrentUser operation middleware
 func (sh *strictHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	var request GetCurrentUserRequestObject
@@ -9557,6 +11210,37 @@ func (sh *strictHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) 
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetCurrentUserResponseObject); ok {
 		if err := validResponse.VisitGetCurrentUserResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateUser operation middleware
+func (sh *strictHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	var request UpdateUserRequestObject
+
+	var body UpdateUserJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateUser(ctx, request.(UpdateUserRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateUser")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateUserResponseObject); ok {
+		if err := validResponse.VisitUpdateUserResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -9588,6 +11272,99 @@ func (sh *strictHandler) PostRegisterUser(w http.ResponseWriter, r *http.Request
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(PostRegisterUserResponseObject); ok {
 		if err := validResponse.VisitPostRegisterUserResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostResetPassword operation middleware
+func (sh *strictHandler) PostResetPassword(w http.ResponseWriter, r *http.Request) {
+	var request PostResetPasswordRequestObject
+
+	var body PostResetPasswordJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostResetPassword(ctx, request.(PostResetPasswordRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostResetPassword")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostResetPasswordResponseObject); ok {
+		if err := validResponse.VisitPostResetPasswordResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostSendVerificationEmail operation middleware
+func (sh *strictHandler) PostSendVerificationEmail(w http.ResponseWriter, r *http.Request) {
+	var request PostSendVerificationEmailRequestObject
+
+	var body PostSendVerificationEmailJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostSendVerificationEmail(ctx, request.(PostSendVerificationEmailRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostSendVerificationEmail")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostSendVerificationEmailResponseObject); ok {
+		if err := validResponse.VisitPostSendVerificationEmailResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostVerifyEmail operation middleware
+func (sh *strictHandler) PostVerifyEmail(w http.ResponseWriter, r *http.Request) {
+	var request PostVerifyEmailRequestObject
+
+	var body PostVerifyEmailJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostVerifyEmail(ctx, request.(PostVerifyEmailRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostVerifyEmail")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostVerifyEmailResponseObject); ok {
+		if err := validResponse.VisitPostVerifyEmailResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -9789,6 +11566,155 @@ func (sh *strictHandler) GetHome(w http.ResponseWriter, r *http.Request, params 
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetHomeResponseObject); ok {
 		if err := validResponse.VisitGetHomeResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetPolls operation middleware
+func (sh *strictHandler) GetPolls(w http.ResponseWriter, r *http.Request, params GetPollsParams) {
+	var request GetPollsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetPolls(ctx, request.(GetPollsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetPolls")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetPollsResponseObject); ok {
+		if err := validResponse.VisitGetPollsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostCreatePoll operation middleware
+func (sh *strictHandler) PostCreatePoll(w http.ResponseWriter, r *http.Request) {
+	var request PostCreatePollRequestObject
+
+	var body PostCreatePollJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostCreatePoll(ctx, request.(PostCreatePollRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostCreatePoll")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostCreatePollResponseObject); ok {
+		if err := validResponse.VisitPostCreatePollResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetPoll operation middleware
+func (sh *strictHandler) GetPoll(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request GetPollRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetPoll(ctx, request.(GetPollRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetPoll")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetPollResponseObject); ok {
+		if err := validResponse.VisitGetPollResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostLikePoll operation middleware
+func (sh *strictHandler) PostLikePoll(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request PostLikePollRequestObject
+
+	request.Id = id
+
+	var body PostLikePollJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostLikePoll(ctx, request.(PostLikePollRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostLikePoll")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostLikePollResponseObject); ok {
+		if err := validResponse.VisitPostLikePollResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostVotePoll operation middleware
+func (sh *strictHandler) PostVotePoll(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request PostVotePollRequestObject
+
+	request.Id = id
+
+	var body PostVotePollJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostVotePoll(ctx, request.(PostVotePollRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostVotePoll")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostVotePollResponseObject); ok {
+		if err := validResponse.VisitPostVotePollResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -10082,32 +12008,6 @@ func (sh *strictHandler) GetUsers(w http.ResponseWriter, r *http.Request, params
 	}
 }
 
-// DeleteUser operation middleware
-func (sh *strictHandler) DeleteUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
-	var request DeleteUserRequestObject
-
-	request.Id = id
-
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.DeleteUser(ctx, request.(DeleteUserRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "DeleteUser")
-	}
-
-	response, err := handler(r.Context(), w, r, request)
-
-	if err != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(DeleteUserResponseObject); ok {
-		if err := validResponse.VisitDeleteUserResponse(w); err != nil {
-			sh.options.ResponseErrorHandlerFunc(w, r, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
 // GetUser operation middleware
 func (sh *strictHandler) GetUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	var request GetUserRequestObject
@@ -10134,58 +12034,26 @@ func (sh *strictHandler) GetUser(w http.ResponseWriter, r *http.Request, id open
 	}
 }
 
-// UpdateUser operation middleware
-func (sh *strictHandler) UpdateUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
-	var request UpdateUserRequestObject
+// GetUserPolls operation middleware
+func (sh *strictHandler) GetUserPolls(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserPollsParams) {
+	var request GetUserPollsRequestObject
 
 	request.Id = id
-
-	var body UpdateUserJSONRequestBody
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.UpdateUser(ctx, request.(UpdateUserRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "UpdateUser")
-	}
-
-	response, err := handler(r.Context(), w, r, request)
-
-	if err != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(UpdateUserResponseObject); ok {
-		if err := validResponse.VisitUpdateUserResponse(w); err != nil {
-			sh.options.ResponseErrorHandlerFunc(w, r, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// GetVotes operation middleware
-func (sh *strictHandler) GetVotes(w http.ResponseWriter, r *http.Request, params GetVotesParams) {
-	var request GetVotesRequestObject
-
 	request.Params = params
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.GetVotes(ctx, request.(GetVotesRequestObject))
+		return sh.ssi.GetUserPolls(ctx, request.(GetUserPollsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetVotes")
+		handler = middleware(handler, "GetUserPolls")
 	}
 
 	response, err := handler(r.Context(), w, r, request)
 
 	if err != nil {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(GetVotesResponseObject); ok {
-		if err := validResponse.VisitGetVotesResponse(w); err != nil {
+	} else if validResponse, ok := response.(GetUserPollsResponseObject); ok {
+		if err := validResponse.VisitGetUserPollsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -10193,122 +12061,26 @@ func (sh *strictHandler) GetVotes(w http.ResponseWriter, r *http.Request, params
 	}
 }
 
-// PostCreateVote operation middleware
-func (sh *strictHandler) PostCreateVote(w http.ResponseWriter, r *http.Request) {
-	var request PostCreateVoteRequestObject
-
-	var body PostCreateVoteJSONRequestBody
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.PostCreateVote(ctx, request.(PostCreateVoteRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "PostCreateVote")
-	}
-
-	response, err := handler(r.Context(), w, r, request)
-
-	if err != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(PostCreateVoteResponseObject); ok {
-		if err := validResponse.VisitPostCreateVoteResponse(w); err != nil {
-			sh.options.ResponseErrorHandlerFunc(w, r, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// GetVote operation middleware
-func (sh *strictHandler) GetVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
-	var request GetVoteRequestObject
+// GetUserQuestions operation middleware
+func (sh *strictHandler) GetUserQuestions(w http.ResponseWriter, r *http.Request, id openapi_types.UUID, params GetUserQuestionsParams) {
+	var request GetUserQuestionsRequestObject
 
 	request.Id = id
+	request.Params = params
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.GetVote(ctx, request.(GetVoteRequestObject))
+		return sh.ssi.GetUserQuestions(ctx, request.(GetUserQuestionsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetVote")
+		handler = middleware(handler, "GetUserQuestions")
 	}
 
 	response, err := handler(r.Context(), w, r, request)
 
 	if err != nil {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(GetVoteResponseObject); ok {
-		if err := validResponse.VisitGetVoteResponse(w); err != nil {
-			sh.options.ResponseErrorHandlerFunc(w, r, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// PostLikeVote operation middleware
-func (sh *strictHandler) PostLikeVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
-	var request PostLikeVoteRequestObject
-
-	request.Id = id
-
-	var body PostLikeVoteJSONRequestBody
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.PostLikeVote(ctx, request.(PostLikeVoteRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "PostLikeVote")
-	}
-
-	response, err := handler(r.Context(), w, r, request)
-
-	if err != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(PostLikeVoteResponseObject); ok {
-		if err := validResponse.VisitPostLikeVoteResponse(w); err != nil {
-			sh.options.ResponseErrorHandlerFunc(w, r, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// PostVote operation middleware
-func (sh *strictHandler) PostVote(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
-	var request PostVoteRequestObject
-
-	request.Id = id
-
-	var body PostVoteJSONRequestBody
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.PostVote(ctx, request.(PostVoteRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "PostVote")
-	}
-
-	response, err := handler(r.Context(), w, r, request)
-
-	if err != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(PostVoteResponseObject); ok {
-		if err := validResponse.VisitPostVoteResponse(w); err != nil {
+	} else if validResponse, ok := response.(GetUserQuestionsResponseObject); ok {
+		if err := validResponse.VisitGetUserQuestionsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

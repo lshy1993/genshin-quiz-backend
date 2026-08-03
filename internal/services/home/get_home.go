@@ -6,10 +6,8 @@ import (
 	"genshin-quiz/config"
 	"genshin-quiz/generated/oapi"
 	"genshin-quiz/internal/dao"
-	"genshin-quiz/internal/dao/transformer"
+	poll_repo "genshin-quiz/internal/repository/poll"
 	question_repo "genshin-quiz/internal/repository/question"
-	vote_repo "genshin-quiz/internal/repository/vote"
-	"genshin-quiz/internal/webserver/middleware"
 )
 
 func GetHome(
@@ -23,11 +21,38 @@ func GetHome(
 		language = &lang
 	}
 
+	// 获取
+	latestQuestions, err := getLatestQuestions(ctx, app, language)
+	if err != nil {
+		return nil, err
+	}
+	latestPolls, err := getLatestPolls(ctx, app, language)
+	if err != nil {
+		return nil, err
+	}
+	popularPolls, err := getPopularPolls(ctx, app, language)
+	if err != nil {
+		return nil, err
+	}
+
+	return &oapi.GetHome200JSONResponse{
+		PopularExams:    []oapi.Exam{},
+		LatestQuestions: latestQuestions,
+		LatestPolls:     latestPolls,
+		PopularPolls:    popularPolls,
+	}, nil
+}
+
+func getLatestQuestions(
+	ctx context.Context,
+	app *config.App,
+	language *[]string,
+) ([]oapi.Question, error) {
 	questionSortBy := "PublishDate"
-	questionResult, err := question_repo.GetQuestions(ctx, app.DB, dao.QuestionListParams{
+	result, err := question_repo.GetQuestions(ctx, app.DB, dao.QuestionListParams{
 		Page:       1,
 		NumPerPage: 5,
-		SortBy:     &questionSortBy,
+		SortBy:     questionSortBy,
 		SortDesc:   true,
 		Language:   language,
 	})
@@ -35,65 +60,61 @@ func GetHome(
 		return nil, err
 	}
 
-	latestQuestions := make([]oapi.Question, 0, len(questionResult.Questions))
-	for _, q := range questionResult.Questions {
-		latestQuestions = append(latestQuestions, transformer.ConvertSimpleToQuestion(q, false, 0))
+	dtos, err := question_repo.BuildQuestionsWithTransaction(ctx, app.DB, result)
+	if err != nil {
+		return nil, err
 	}
 
-	voteSortBy := "created_at"
-	voteResult, err := vote_repo.GetVotes(ctx, app.DB, dao.VoteListParams{
-		Page:     1,
-		Limit:    5,
-		Type:     "all",
-		SortBy:   voteSortBy,
-		SortDesc: true,
-		Language: language,
+	return dtos, nil
+}
+
+func getPopularPolls(
+	ctx context.Context,
+	app *config.App,
+	language *[]string,
+) ([]oapi.Poll, error) {
+	sortBy := "created_at"
+	result, err := poll_repo.GetPolls(ctx, app.DB, dao.PollListParams{
+		Page:       1,
+		NumPerPage: 5,
+		Type:       "all",
+		SortBy:     sortBy,
+		SortDesc:   true,
+		Language:   language,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	var userClaims *middleware.UserClaims
-	if claims, ok := middleware.GetUserFromContextOnly(ctx); ok {
-		userClaims = claims
+	dtos, err := poll_repo.BuildPollsWithLike(ctx, app.DB, result)
+	if err != nil {
+		return nil, err
 	}
 
-	latestVotes := make([]oapi.Vote, 0, len(voteResult.Votes))
-	popularVotes := make([]oapi.Vote, 0, len(voteResult.Votes))
-	for _, vote := range voteResult.Votes {
-		voted := false
-		likeStatus := int16(0)
-		if userClaims != nil {
-			userVotes, err := vote_repo.GetUserVotedOptions(
-				ctx,
-				app.DB,
-				userClaims.UserID,
-				vote.Vote.ID,
-			)
-			if err == nil && userVotes != nil && len(*userVotes) > 0 {
-				voted = true
-			}
+	return dtos, nil
+}
 
-			userLikeStatus, err := vote_repo.GetVoteLikeStatus(
-				ctx,
-				app.DB,
-				userClaims.UserID,
-				vote.Vote.ID,
-			)
-			if err == nil && userLikeStatus != nil {
-				likeStatus = *userLikeStatus
-			}
-		}
-
-		dto := transformer.ConvertSimpleVoteToDTO(vote, voted, likeStatus)
-		latestVotes = append(latestVotes, dto)
-		popularVotes = append(popularVotes, dto)
+func getLatestPolls(
+	ctx context.Context,
+	app *config.App,
+	language *[]string,
+) ([]oapi.Poll, error) {
+	sortBy := "created_at"
+	result, err := poll_repo.GetPolls(ctx, app.DB, dao.PollListParams{
+		Page:       1,
+		NumPerPage: 5,
+		Type:       "all",
+		SortBy:     sortBy,
+		SortDesc:   true,
+		Language:   language,
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	return &oapi.GetHome200JSONResponse{
-		PopularExams:    []oapi.Exam{},
-		LatestQuestions: latestQuestions,
-		LatestVotes:     latestVotes,
-		PopularVotes:    popularVotes,
-	}, nil
+	dtos, err := poll_repo.BuildPollsWithLike(ctx, app.DB, result)
+	if err != nil {
+		return nil, err
+	}
+	return dtos, nil
 }

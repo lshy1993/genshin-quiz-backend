@@ -3,28 +3,34 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 
 	"genshin-quiz/config"
+	"genshin-quiz/internal/enum"
 	"genshin-quiz/internal/webserver"
+	"genshin-quiz/logger"
 )
 
 func main() {
 	// Load environment variables based on environment
-	env := os.Getenv("ENVIRONMENT")
-	if env == "" {
-		env = "development" // 默认为开发环境
+	envStr := os.Getenv("ENVIRONMENT")
+	if envStr == "" {
+		envStr = string(enum.DEV) // 默认为开发环境
 	}
+
+	env := enum.Environment(envStr)
 
 	var envFile string
 	switch env {
-	case "development":
+	case enum.DEV:
 		envFile = ".env.dev"
-	case "testing":
+	case enum.TEST:
 		envFile = ".env.test"
-	case "production":
+	case enum.PROD:
 		envFile = ".env.prod"
 	default:
 		envFile = ".env.dev"
@@ -36,6 +42,11 @@ func main() {
 
 	// Initialize configuration
 	app := config.NewApp()
+
+	defer sentry.Flush(2 * time.Second)
+
+	// Set up defer immediately after logger is created
+	defer logger.Sync()
 
 	// Initialize server
 	server := webserver.NewServer(app)

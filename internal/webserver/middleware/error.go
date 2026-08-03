@@ -11,6 +11,7 @@ import (
 	stdErrors "errors"
 	"genshin-quiz/config"
 	"genshin-quiz/internal/common"
+	"genshin-quiz/internal/enum"
 )
 
 type ErrorResponse struct {
@@ -25,20 +26,17 @@ func Handler(app *config.App) func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
 				if err := recover(); err != nil {
-					// 手动捕获错误到Sentry (只在生产环境)
-					if app.Config.Environment == "production" {
-						sentry.WithScope(func(scope *sentry.Scope) {
-							scope.SetRequest(r)
-							scope.SetLevel(sentry.LevelError)
-							scope.SetTag("error_type", "panic")
-							scope.SetContext("request", map[string]interface{}{
-								"method":  r.Method,
-								"url":     r.URL.String(),
-								"headers": r.Header,
-							})
-							sentry.CaptureException(fmt.Errorf("panic recovered: %v", err))
+					sentry.WithScope(func(scope *sentry.Scope) {
+						scope.SetRequest(r)
+						scope.SetLevel(sentry.LevelError)
+						scope.SetTag("error_type", "panic")
+						scope.SetContext("request", map[string]interface{}{
+							"method":  r.Method,
+							"url":     r.URL.String(),
+							"headers": r.Header,
 						})
-					}
+						sentry.CaptureException(fmt.Errorf("panic recovered: %v", err))
+					})
 
 					app.Logger.Error("Panic recovered",
 						zap.String("method", r.Method),
@@ -50,8 +48,8 @@ func Handler(app *config.App) func(next http.Handler) http.Handler {
 					writeErrorResponse(
 						w,
 						http.StatusInternalServerError,
-						"Internal server error",
-						"",
+						"Internal server error (PANIC)",
+						"INTERNAL_ERROR",
 						"",
 						false,
 					)
@@ -120,8 +118,73 @@ func HandleResponseErrorWithLog(
 		// 检查是否是我们定义的 API 错误
 		var apiErr *common.APIError
 		if stdErrors.As(err, &apiErr) {
-			handleAPIError(app, w, apiErr)
-			return
+			// 处理自定义的 APIError 根据状态码返回相应的响应
+			switch apiErr.Code {
+			case 400:
+				writeErrorResponse(
+					w,
+					apiErr.Code,
+					apiErr.Message,
+					"BAD_REQUEST",
+					apiErr.Detail,
+					false,
+				)
+				return
+			case 401:
+				// Debug: 打印错误详情供调试
+				app.Logger.Info("Unauthorized API error",
+					zap.Int("code", apiErr.Code),
+					zap.String("message", apiErr.Message),
+					zap.String("detail", apiErr.Detail),
+				)
+				// 401 错误通常不返回响应体，只返回状态码
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			case 403:
+				writeErrorResponse(
+					w,
+					apiErr.Code,
+					apiErr.Message,
+					"FORBIDDEN",
+					apiErr.Detail,
+					false,
+				)
+				return
+			case 404:
+				writeErrorResponse(
+					w,
+					apiErr.Code,
+					apiErr.Message,
+					"NOT_FOUND",
+					apiErr.Detail,
+					false,
+				)
+				return
+			case 409:
+				writeErrorResponse(w, apiErr.Code, apiErr.Message, "CONFLICT", apiErr.Detail, false)
+				return
+			case 422:
+				writeErrorResponse(
+					w,
+					apiErr.Code,
+					apiErr.Message,
+					"UNPROCESSABLE_ENTITY",
+					apiErr.Detail,
+					false,
+				)
+				return
+			case 429:
+				writeErrorResponse(
+					w,
+					apiErr.Code,
+					apiErr.Message,
+					"TOO_MANY_REQUESTS",
+					apiErr.Detail,
+					false,
+				)
+				return
+			}
+			// code 不在已知分类里，落到下面统一兜底
 		}
 
 		// 记录未处理的错误
@@ -131,74 +194,25 @@ func HandleResponseErrorWithLog(
 			zap.Error(err),
 			zap.String("request_id", r.Header.Get("X-Request-ID")),
 		)
-
-		// 上报 Sentry (只在生产环境)
-		if app.Config.Environment == "production" {
+		// 上报 Sentry
+		sentry.WithScope(func(scope *sentry.Scope) {
+			scope.SetRequest(r)
+			scope.SetLevel(sentry.LevelError)
+			scope.SetTag("error_type", "internal")
 			sentry.CaptureException(err)
+		})
+
+		// 返回 500 错误给客户端
+		details := ""
+		if app.Config.Environment != enum.PROD {
+			details = err.Error()
 		}
-
-		// 返回通用的 500 错误
 		writeErrorResponse(
 			w,
 			http.StatusInternalServerError,
 			"Internal server error",
 			"INTERNAL_ERROR",
-			err.Error(),
-			false,
-		)
-	}
-}
-
-func handleAPIError(
-	app *config.App,
-	w http.ResponseWriter,
-	apiErr *common.APIError,
-) {
-	// 处理自定义的 APIError 根据状态码返回相应的响应
-	switch apiErr.Code {
-	case 400:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "BAD_REQUEST", apiErr.Detail, false)
-	case 401:
-		// Debug: 打印错误详情供调试
-		app.Logger.Info("Unauthorized API error",
-			zap.Int("code", apiErr.Code),
-			zap.String("message", apiErr.Message),
-			zap.String("detail", apiErr.Detail),
-		)
-		// 401 错误通常不返回响应体，只返回状态码
-		w.WriteHeader(http.StatusUnauthorized)
-	case 403:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "FORBIDDEN", apiErr.Detail, false)
-	case 404:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "NOT_FOUND", apiErr.Detail, false)
-	case 409:
-		writeErrorResponse(w, apiErr.Code, apiErr.Message, "CONFLICT", apiErr.Detail, false)
-	case 422:
-		writeErrorResponse(
-			w,
-			apiErr.Code,
-			apiErr.Message,
-			"UNPROCESSABLE_ENTITY",
-			apiErr.Detail,
-			false,
-		)
-	case 429:
-		writeErrorResponse(
-			w,
-			apiErr.Code,
-			apiErr.Message,
-			"TOO_MANY_REQUESTS",
-			apiErr.Detail,
-			false,
-		)
-	default:
-		// 500 及其他未知错误
-		writeErrorResponse(
-			w,
-			http.StatusInternalServerError,
-			"Internal server error",
-			"INTERNAL_ERROR",
-			"",
+			details, // 非生产返回所有细节
 			false,
 		)
 	}

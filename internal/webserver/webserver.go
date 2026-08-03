@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/getsentry/sentry-go"
-	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -29,22 +27,12 @@ func NewServer(app *config.App) *Server {
 	// Setup router
 	r := chi.NewRouter()
 
-	// Sentry 中间件 - 只在生产环境启用
-	if app.Config.Environment == "production" && app.Config.SentryDSN != "" {
-		sentryHandler := sentryhttp.New(sentryhttp.Options{
-			Repanic: true,
-		})
-		r.Use(sentryHandler.Handle)
-	}
-
 	// Basic middleware
 	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
+	r.Use(mw.SecureRealIP)
 	r.Use(mw.Logger(app.Logger))
-
 	// 使用自定义的错误处理中间件，替代 chi 的 Recoverer
 	r.Use(mw.Handler(app))
-
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	// CORS configuration
@@ -77,6 +65,7 @@ func NewServer(app *config.App) *Server {
 
 	// Setup API routes - 使用条件认证中间件，根据路径决定是否需要认证
 	r.Group(func(r chi.Router) {
+		// JWT 认证中间件
 		r.Use(mw.ConditionalJWTAuth(app.Config.JWTSecret, app.DB))
 
 		baseURL := ""
@@ -91,8 +80,6 @@ func NewServer(app *config.App) *Server {
 		)
 		oapi.HandlerFromMuxWithBaseURL(strictHandler, r, baseURL)
 	})
-
-	defer sentry.Flush(2 * time.Second)
 
 	return &Server{
 		router:     r,

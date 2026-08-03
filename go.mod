@@ -38,6 +38,7 @@ require (
 	github.com/lestrrat-go/jwx/v3 v3.1.1 // indirect
 	github.com/lestrrat-go/option/v2 v2.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/resend/resend-go/v3 v3.11.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/valyala/fastjson v1.6.10 // indirect

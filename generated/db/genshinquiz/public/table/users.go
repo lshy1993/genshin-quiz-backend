@@ -17,22 +17,20 @@ type usersTable struct {
 	postgres.Table
 
 	// Columns
-	ID                 postgres.ColumnInteger
-	UserUUID           postgres.ColumnString
-	Email              postgres.ColumnString
-	DisplayName        postgres.ColumnString
-	AvatarURL          postgres.ColumnString
-	Location           postgres.ColumnString
-	Timezone           postgres.ColumnString
-	Language           postgres.ColumnString
-	ShowEmail          postgres.ColumnBool
-	CreatedAt          postgres.ColumnTimestampz
-	UpdatedAt          postgres.ColumnTimestampz
-	TotalSubmissions   postgres.ColumnInteger
-	CorrectSubmissions postgres.ColumnInteger
-	QuestionsCreated   postgres.ColumnInteger
-	TotalVotes         postgres.ColumnInteger
-	UserRole           postgres.ColumnInteger // User role: 0=regular user, 1=admin, 2=moderator
+	ID            postgres.ColumnInteger
+	UserUUID      postgres.ColumnString
+	Email         postgres.ColumnString
+	Nickname      postgres.ColumnString
+	AvatarURL     postgres.ColumnString
+	Biography     postgres.ColumnString
+	Language      postgres.ColumnString  // IETF BCP 47 language tag
+	UserRole      postgres.ColumnInteger // 0=regular user, 1=admin, 2=moderator
+	EmailVerified postgres.ColumnBool
+	Status        postgres.ColumnInteger // 0=active, 1=suspended, 2=deleted
+	DeletedAt     postgres.ColumnTimestampz
+	CreatedIP     postgres.ColumnString
+	CreatedAt     postgres.ColumnTimestampz
+	UpdatedAt     postgres.ColumnTimestampz
 
 	AllColumns     postgres.ColumnList
 	MutableColumns postgres.ColumnList
@@ -74,47 +72,43 @@ func newUsersTable(schemaName, tableName, alias string) *UsersTable {
 
 func newUsersTableImpl(schemaName, tableName, alias string) usersTable {
 	var (
-		IDColumn                 = postgres.IntegerColumn("id")
-		UserUUIDColumn           = postgres.StringColumn("user_uuid")
-		EmailColumn              = postgres.StringColumn("email")
-		DisplayNameColumn        = postgres.StringColumn("display_name")
-		AvatarURLColumn          = postgres.StringColumn("avatar_url")
-		LocationColumn           = postgres.StringColumn("location")
-		TimezoneColumn           = postgres.StringColumn("timezone")
-		LanguageColumn           = postgres.StringColumn("language")
-		ShowEmailColumn          = postgres.BoolColumn("show_email")
-		CreatedAtColumn          = postgres.TimestampzColumn("created_at")
-		UpdatedAtColumn          = postgres.TimestampzColumn("updated_at")
-		TotalSubmissionsColumn   = postgres.IntegerColumn("total_submissions")
-		CorrectSubmissionsColumn = postgres.IntegerColumn("correct_submissions")
-		QuestionsCreatedColumn   = postgres.IntegerColumn("questions_created")
-		TotalVotesColumn         = postgres.IntegerColumn("total_votes")
-		UserRoleColumn           = postgres.IntegerColumn("user_role")
-		allColumns               = postgres.ColumnList{IDColumn, UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, LocationColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn, UserRoleColumn}
-		mutableColumns           = postgres.ColumnList{UserUUIDColumn, EmailColumn, DisplayNameColumn, AvatarURLColumn, LocationColumn, TimezoneColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn, UserRoleColumn}
-		defaultColumns           = postgres.ColumnList{IDColumn, UserUUIDColumn, LanguageColumn, ShowEmailColumn, CreatedAtColumn, UpdatedAtColumn, TotalSubmissionsColumn, CorrectSubmissionsColumn, QuestionsCreatedColumn, TotalVotesColumn, UserRoleColumn}
+		IDColumn            = postgres.IntegerColumn("id")
+		UserUUIDColumn      = postgres.StringColumn("user_uuid")
+		EmailColumn         = postgres.StringColumn("email")
+		NicknameColumn      = postgres.StringColumn("nickname")
+		AvatarURLColumn     = postgres.StringColumn("avatar_url")
+		BiographyColumn     = postgres.StringColumn("biography")
+		LanguageColumn      = postgres.StringColumn("language")
+		UserRoleColumn      = postgres.IntegerColumn("user_role")
+		EmailVerifiedColumn = postgres.BoolColumn("email_verified")
+		StatusColumn        = postgres.IntegerColumn("status")
+		DeletedAtColumn     = postgres.TimestampzColumn("deleted_at")
+		CreatedIPColumn     = postgres.StringColumn("created_ip")
+		CreatedAtColumn     = postgres.TimestampzColumn("created_at")
+		UpdatedAtColumn     = postgres.TimestampzColumn("updated_at")
+		allColumns          = postgres.ColumnList{IDColumn, UserUUIDColumn, EmailColumn, NicknameColumn, AvatarURLColumn, BiographyColumn, LanguageColumn, UserRoleColumn, EmailVerifiedColumn, StatusColumn, DeletedAtColumn, CreatedIPColumn, CreatedAtColumn, UpdatedAtColumn}
+		mutableColumns      = postgres.ColumnList{UserUUIDColumn, EmailColumn, NicknameColumn, AvatarURLColumn, BiographyColumn, LanguageColumn, UserRoleColumn, EmailVerifiedColumn, StatusColumn, DeletedAtColumn, CreatedIPColumn, CreatedAtColumn, UpdatedAtColumn}
+		defaultColumns      = postgres.ColumnList{IDColumn, UserUUIDColumn, LanguageColumn, UserRoleColumn, EmailVerifiedColumn, StatusColumn, CreatedAtColumn, UpdatedAtColumn}
 	)
 
 	return usersTable{
 		Table: postgres.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:                 IDColumn,
-		UserUUID:           UserUUIDColumn,
-		Email:              EmailColumn,
-		DisplayName:        DisplayNameColumn,
-		AvatarURL:          AvatarURLColumn,
-		Location:           LocationColumn,
-		Timezone:           TimezoneColumn,
-		Language:           LanguageColumn,
-		ShowEmail:          ShowEmailColumn,
-		CreatedAt:          CreatedAtColumn,
-		UpdatedAt:          UpdatedAtColumn,
-		TotalSubmissions:   TotalSubmissionsColumn,
-		CorrectSubmissions: CorrectSubmissionsColumn,
-		QuestionsCreated:   QuestionsCreatedColumn,
-		TotalVotes:         TotalVotesColumn,
-		UserRole:           UserRoleColumn,
+		ID:            IDColumn,
+		UserUUID:      UserUUIDColumn,
+		Email:         EmailColumn,
+		Nickname:      NicknameColumn,
+		AvatarURL:     AvatarURLColumn,
+		Biography:     BiographyColumn,
+		Language:      LanguageColumn,
+		UserRole:      UserRoleColumn,
+		EmailVerified: EmailVerifiedColumn,
+		Status:        StatusColumn,
+		DeletedAt:     DeletedAtColumn,
+		CreatedIP:     CreatedIPColumn,
+		CreatedAt:     CreatedAtColumn,
+		UpdatedAt:     UpdatedAtColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.25.0-alpine AS builder
+FROM golang:1.26.0-alpine AS builder
 
 # Set working directory
 WORKDIR /app
@@ -17,7 +17,21 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=bind,source=.,target=. \
     go build -o /bin/console ./cmd/console
 
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go build -o /bin/goose github.com/pressly/goose/v3/cmd/goose@latest
+
 FROM alpine:3.22 AS server
-COPY --from=build-server /bin/server /bin/
-COPY --from=build-server /bin/console /bin/
-ENTRYPOINT [ "/bin/server" ]
+RUN apk add --no-cache ca-certificates
+
+WORKDIR /app
+
+# 拷贝生成的三个二进制文件
+COPY --from=build-server /bin/server ./
+COPY --from=build-server /bin/console ./
+COPY --from=build-server /bin/goose ./
+
+# 拷贝迁移 SQL 脚本（确保 ./migrations 文件夹在 Dockerfile 同级目录下）
+COPY ./migrations ./migrations 
+
+EXPOSE 8080
+ENTRYPOINT [ "./server" ]
