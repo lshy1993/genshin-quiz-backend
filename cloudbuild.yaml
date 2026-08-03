@@ -22,7 +22,7 @@ steps:
       ]
 
   # 2. 执行数据库迁移
-  - name: "ghcr.io/pressly/goose/v3:latest"
+  - name: "docker.io/pressly/goose:latest"
     id: "Run Database Migrations"
     entrypoint: "goose"
     args: ["-dir", "./migrations", "postgres", "$$DATABASE_URL", "up"]
