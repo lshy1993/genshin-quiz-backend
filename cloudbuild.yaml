@@ -1,5 +1,5 @@
 steps:
-  # 第一步：构建后端镜像 (使用您刚才写的那个优秀的多阶段 Dockerfile)
+  # 1. 构建后端镜像
   - name: "gcr.io/cloud-builders/docker"
     id: "Build Backend Image"
     args:
@@ -10,22 +10,23 @@ steps:
         "./repos/backend",
       ]
 
-  # 第二步：执行数据库迁移
+  # 1.5 推送镜像到 Artifact Registry（确保下一步可顺利拉取或调用）
+  - name: "gcr.io/cloud-builders/docker"
+    id: "Push Backend Image"
+    args:
+      [
+        "push",
+        "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:$COMMIT_SHA",
+      ]
+
+  # 2. 执行数据库迁移
   - name: "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:$COMMIT_SHA"
     id: "Run Database Migrations"
-    # 注意：我们直接运行镜像里的 goose
     entrypoint: "./goose"
-    args: [
-        "-dir",
-        "./migrations",
-        "postgres",
-        "$$DATABASE_URL", # 注意这里的双美金符号，用于转义
-        "up",
-      ]
-    env:
-      - "DATABASE_URL=$_DATABASE_URL"
+    args: ["-dir", "./migrations", "postgres", "$$DATABASE_URL", "up"]
+    secretEnv: ["DATABASE_URL"] # 推荐结合 Secret Manager 使用，比普通环境变量更安全
 
-  # 第三步：部署到 Cloud Run
+  # 3. 部署到 Cloud Run
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "Deploy to Cloud Run"
     entrypoint: gcloud
@@ -42,11 +43,12 @@ steps:
         "managed",
         "--allow-unauthenticated",
         "--add-cloudsql-instances=$_CLOUD_SQL_CONNECTION_NAME",
+        "--port",
+        "8080",
       ]
 
-# 将镜像推送到 Artifact Registry
 images:
   - "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:$COMMIT_SHA"
 
 options:
-  logging: CLOUD_LOGGING
+  logging: LEGACY
