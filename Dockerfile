@@ -4,17 +4,22 @@ FROM golang:1.26-alpine AS builder
 # Set working directory
 WORKDIR /app
 
+ENV GOCACHE=/root/.cache/go-build
+
+COPY go.mod go.sum ./
+
 RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=bind,source=go.sum,target=go.sum \
-    --mount=type=bind,source=go.mod,target=go.mod \
     go mod download -x
 
 FROM builder AS build-server
+COPY . .
+
 RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=bind,source=.,target=. \
+    --mount=type=cache,target=/root/.cache/go-build \
     go build -o /bin/server ./cmd/server
 
 RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
     GOBIN=/bin go install github.com/pressly/goose/v3/cmd/goose@latest
 
 FROM alpine:3.22 AS server

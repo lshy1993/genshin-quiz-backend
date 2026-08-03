@@ -1,28 +1,43 @@
 steps:
-  # 1. 构建后端镜像
+  # 0. 尝试拉取最新的镜像作为缓存源（如果不存在则忽略错误继续）
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      [
+        "-c",
+        "docker pull asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:latest || exit 0",
+      ]
+  # 1. 构建后端镜像（开启 BuildKit 与镜像层缓存）
   - name: "gcr.io/cloud-builders/docker"
     id: "Build Backend Image"
     env:
-      - "DOCKER_BUILDKIT=1" # 👈 启用 BuildKit 引擎
+      - "DOCKER_BUILDKIT=1"
     args:
       [
         "build",
+        "--build-arg",
+        "BUILDKIT_INLINE_CACHE=1",
+        "--cache-from",
+        "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:latest",
         "-t",
         "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:$COMMIT_SHA",
+        "-t",
+        "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:latest",
         ".",
       ]
 
   # 1.5 推送镜像到 Artifact Registry（确保下一步可顺利拉取或调用）
   - name: "gcr.io/cloud-builders/docker"
     id: "Push Backend Image"
+    entrypoint: "bash"
     args:
       [
-        "push",
-        "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:$COMMIT_SHA",
+        "-c",
+        "docker push asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:$COMMIT_SHA && docker push asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:latest",
       ]
 
   # 2. 执行数据库迁移
-  - name: "docker.io/pressly/goose:latest"
+  - name: "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:$COMMIT_SHA"
     id: "Run Database Migrations"
     entrypoint: "goose"
     args: ["-dir", "./migrations", "postgres", "$$DATABASE_URL", "up"]
@@ -55,6 +70,7 @@ steps:
 
 images:
   - "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:$COMMIT_SHA"
+  - "asia-northeast1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/genshinquiz-backend:latest"
 
 options:
   logging: CLOUD_LOGGING_ONLY
