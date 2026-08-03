@@ -28,11 +28,11 @@ RUN apk add --no-cache ca-certificates
 WORKDIR /app
 
 # 拷贝生成的二进制文件
-COPY --from=build-server /bin/server ./
-COPY --from=build-server /bin/goose ./
+COPY --from=build-server /bin/server ./server
+COPY --from=build-server /bin/goose ./goose
 
 # 拷贝迁移 SQL 脚本（确保 ./migrations 文件夹在 Dockerfile 同级目录下）
 COPY ./migrations ./migrations 
 
 EXPOSE 8080
-ENTRYPOINT [ "./server" ]
+ENTRYPOINT [ "server" ]
