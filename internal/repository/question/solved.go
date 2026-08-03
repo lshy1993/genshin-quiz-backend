@@ -54,7 +54,7 @@ func CheckMultipleQuestionsSolved(
 
 	submissionTbl := table.QuestionSubmissions
 
-	// 构建 ID 列表
+	// 构建 ID exp
 	idList := make([]pg.Expression, 0, len(questionIDs))
 	for _, id := range questionIDs {
 		idList = append(idList, pg.Int64(id))
@@ -72,21 +72,15 @@ func CheckMultipleQuestionsSolved(
 	).GROUP_BY(submissionTbl.QuestionID)
 
 	var results []struct {
-		QuestionID int64 `alias:"questions.id"`
+		QuestionID int64 `alias:"question_submissions.question_id"`
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get multi question solved failed", 0)
 	}
 
 	// 构建结果 map
-	solvedMap := make(map[int64]bool)
-
-	// 初始化所有题目为未解答
-	for _, id := range questionIDs {
-		solvedMap[id] = false
-	}
-
+	solvedMap := make(map[int64]bool, len(results))
 	// 标记已解答的题目
 	for _, result := range results {
 		solvedMap[result.QuestionID] = true

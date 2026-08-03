@@ -493,27 +493,20 @@ func BuildQuestionsWithTransaction(
 	db qrm.DB,
 	result *dao.QuestionListResult,
 ) ([]oapi.Question, error) {
-	idList := make([]int64, 0)
+	questionIDs := make([]int64, 0)
 	for _, q := range result.Questions {
-		idList = append(idList, q.Question.ID)
+		questionIDs = append(questionIDs, q.Question.ID)
 	}
-
-	var solvedMap map[int64]bool
-	var likedMap map[int64]int16
-
 	// 获取翻译
-	trans, err := GetQuestionTransByIDs(ctx, db, idList)
+	trans, err := GetQuestionTransByIDs(ctx, db, questionIDs)
 	if err != nil {
 		return nil, err
 	}
 
+	var solvedMap map[int64]bool
+	var likedMap map[int64]int16
 	// 检查用户是否已解答这些题目（如果用户已登录）
 	if userClaims, ok := middleware.GetUserFromContextOnly(ctx); ok {
-		questionIDs := make([]int64, 0, len(result.Questions))
-		for _, q := range result.Questions {
-			questionIDs = append(questionIDs, q.Question.ID)
-		}
-
 		solvedMap, err = CheckMultipleQuestionsSolved(
 			ctx,
 			db,
@@ -534,7 +527,7 @@ func BuildQuestionsWithTransaction(
 			return nil, err
 		}
 
-		// log.Println("Solved Map:", solvedMap)
+		// logger.L.Debug("Solved Map:", zap.Any("solvedMap", solvedMap))
 	}
 
 	dtos := make([]oapi.Question, 0, len(result.Questions))

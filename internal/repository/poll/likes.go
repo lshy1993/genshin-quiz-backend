@@ -155,22 +155,16 @@ func GetMultiplePollsLikesCount(
 		GROUP_BY(likesTbl.PollID)
 
 	var results []struct {
-		PollID int64 `alias:"poll_id"`
+		PollID int64 `alias:"poll_likes.poll_id"`
 		Count  int64 `alias:"count"`
 	}
 	err := stmt.QueryContext(ctx, db, &results)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get multi poll likes count failed", 0)
 	}
 
 	// 构建结果map
-	likesCountMap := make(map[int64]int64)
-
-	// 初始化所有投票为0
-	for _, id := range pollIDs {
-		likesCountMap[id] = 0
-	}
-
+	likesCountMap := make(map[int64]int64, len(pollIDs))
 	// 设置有点赞的投票
 	for _, result := range results {
 		likesCountMap[result.PollID] = result.Count

@@ -324,20 +324,14 @@ func GetPollsVoteStatusByUser(
 	)
 
 	var rows []struct {
-		PollID int64 `alias:"poll_votes.poll_id"`
+		PollID int64 `alias:"user_votes.poll_id"`
 	}
 
 	if err := stmt.QueryContext(ctx, db, &rows); err != nil {
-		return nil, err
+		return nil, errors.WrapPrefix(err, "get polls voted by user failed", 0)
 	}
 
 	result := make(map[int64]bool, len(pollIDs))
-
-	// 默认全部 false
-	for _, id := range pollIDs {
-		result[id] = false
-	}
-
 	// 查到的标记为 true
 	for _, row := range rows {
 		result[row.PollID] = true
@@ -358,10 +352,10 @@ func BuildPollsWithLike(
 	}
 
 	// 批量获取所有投票的点赞数
-	likesCountMap, err := GetMultiplePollsLikesCount(ctx, db, pollIDs)
-	if err != nil {
-		return nil, err
-	}
+	// likesCountMap, err := GetMultiplePollsLikesCount(ctx, db, pollIDs)
+	// if err != nil {
+	// 	return nil, err
+	// }
 	// 获取翻译
 	trans, err := GetPollTransByIDs(ctx, db, pollIDs)
 	if err != nil {
@@ -376,7 +370,8 @@ func BuildPollsWithLike(
 		userVoted, err = GetPollsVoteStatusByUser(ctx,
 			db,
 			userClaims.UserID,
-			pollIDs)
+			pollIDs,
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -397,7 +392,7 @@ func BuildPollsWithLike(
 	for _, poll := range result.Polls {
 		// 覆盖投票的点赞数为实时计算的值
 		id := poll.Poll.ID
-		poll.Poll.LikesCount = likesCountMap[id]
+		// poll.Poll.LikesCount = likesCountMap[id]
 
 		voted := userVoted[id]
 		likeStatus := userLikeStatus[id]

@@ -67,7 +67,7 @@ func GetMultipleQuestionsLikeStatus(
 	}
 
 	stmt := pg.SELECT(
-		questionTbl.QuestionUUID,
+		questionTbl.ID,
 		likesTbl.Value,
 	).FROM(
 		likesTbl.INNER_JOIN(questionTbl, questionTbl.ID.EQ(likesTbl.QuestionID)),

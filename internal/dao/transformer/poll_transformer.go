@@ -32,6 +32,18 @@ func ConvertSimplePollToDTO(
 	expireAt := poll.Poll.ExpiresAt
 
 	likeStatusValue := oapi.LikeStatus(likeStatus)
+	var myVotes []oapi.PollVote
+
+	if voted {
+		myVotes = []oapi.PollVote{
+			{
+				OptionId: poll.Poll.PollUUID,
+				Votes:    1,
+			},
+		}
+	} else {
+		myVotes = nil
+	}
 
 	return oapi.Poll{
 		Id:                poll.Poll.PollUUID,
@@ -41,7 +53,7 @@ func ConvertSimplePollToDTO(
 		Category:          oapi.Category(poll.Poll.Category),
 		StartAt:           poll.Poll.StartAt,
 		ExpireAt:          expireAt,
-		MyVotes:           nil, // 简单模式不返回
+		MyVotes:           myVotes, // 简单模式返回dummy
 		VotesPerUser:      votesPerUser,
 		VotesPerOption:    votesPerOption,
 		Options:           nil, // 简单模式不返回选项
