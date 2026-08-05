@@ -278,7 +278,7 @@ func NewApp() *App {
 		},
 
 		Server: ServerConfig{
-			Host:         getEnv("SERVER_HOST", "0.0.0.0"),
+			Host:         getEnv("SERVER_HOST", ""),
 			Port:         getEnv("PORT", "8080"),
 			ReadTimeout:  getEnvAsDuration("SERVER_READ_TIMEOUT", "30s"),
 			WriteTimeout: getEnvAsDuration("SERVER_WRITE_TIMEOUT", "30s"),
