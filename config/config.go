@@ -126,6 +126,7 @@ func (app *App) initializeDatabase() (*sql.DB, error) {
 			app.Database.Password,
 			app.Database.Name,
 		)
+		app.Logger.Warn("Using individual database parameters", zap.String("dsn", dsn))
 	}
 
 	app.Logger.Debug("Connecting to database...")
