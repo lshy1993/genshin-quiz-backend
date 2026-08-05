@@ -265,7 +265,7 @@ func NewApp() *App {
 			Port:            getEnv("DATABASE_PORT", "5432"),
 			User:            getEnv("DATABASE_USER", "user"),
 			Password:        getEnv("DATABASE_PASSWORD", "password"),
-			Name:            getEnv("DATABASE_NAME", "genshin_quiz"),
+			Name:            getEnv("DATABASE_NAME", "genshinquiz"),
 			MaxOpenConns:    getEnvAsInt("DATABASE_MAX_OPEN_CONNS", 25),
 			MaxIdleConns:    getEnvAsInt("DATABASE_MAX_IDLE_CONNS", 25),
 			ConnMaxLifetime: getEnvAsDuration("DATABASE_CONN_MAX_LIFETIME", "5m"),

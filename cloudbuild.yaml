@@ -54,7 +54,7 @@ steps:
         "--allow-unauthenticated",
         "--add-cloudsql-instances=project-9f1e9b8a-2bd5-43d2-a59:asia-northeast1:genshinquiz-db",
         "--set-env-vars",
-        "ENVIRONMENT=production,APP_DOMAIN=$_APP_DOMAIN,DATABASE_HOST=$_DATABASE_HOST,DATABASE_PORT=$_DATABASE_PORT,DATABASE_NAME=$_DATABASE_NAME",
+        "ENVIRONMENT=production,APP_DOMAIN=$_APP_DOMAIN,DATABASE_NAME=genshinquiz",
         "--set-secrets",
         "DATABASE_URL=DATABASE_URL:latest,JWT_SECRET=JWT_SECRET:latest,SENTRY_DSN=SENTRY_DSN:latest,RESEND_KEY=RESEND_KEY:latest",
       ]
