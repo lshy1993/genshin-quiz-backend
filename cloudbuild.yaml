@@ -53,10 +53,8 @@ steps:
         "managed",
         "--allow-unauthenticated",
         "--add-cloudsql-instances=$_CLOUD_SQL_CONNECTION_NAME",
-        "--port",
-        "8080",
         "--set-env-vars",
-        "PORT=8080,ENVIRONMENT=production,APP_DOMAIN=$_APP_DOMAIN,DATABASE_HOST=$_DATABASE_HOST,DATABASE_PORT=$_DATABASE_PORT,DATABASE_NAME=$_DATABASE_NAME",
+        "ENVIRONMENT=production,APP_DOMAIN=$_APP_DOMAIN,DATABASE_HOST=$_DATABASE_HOST,DATABASE_PORT=$_DATABASE_PORT,DATABASE_NAME=$_DATABASE_NAME",
         "--set-secrets",
         "DATABASE_URL=DATABASE_URL:latest,JWT_SECRET=JWT_SECRET:latest,SENTRY_DSN=SENTRY_DSN:latest,RESEND_KEY=RESEND_KEY:latest",
       ]
