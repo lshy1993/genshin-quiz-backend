@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  genshinquiz-backend:
+    container_name: genshinquiz-backend
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # 将数据库主机名指向你公共的 postgres-1 容器
+      - DATABASE_URL=postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres-1:5432/genshinquiz?sslmode=disable
+    # 如果需要在每次启动容器时自动运行数据库迁移，可以通过 entrypoint 先执行 goose，再启动主服务
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "Running database migrations..."
+        /bin/goose -dir /app/migrations postgres "$DATABASE_URL" up
+        echo "Starting server..."
+        exec /bin/server
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      retries: 3
+      timeout: 10s
+      start_period: 15s
+    networks:
+      - moelink-net
+
+networks:
+  moelink-net:
+    external: true
