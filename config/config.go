@@ -126,10 +126,10 @@ func (app *App) initializeDatabase() (*sql.DB, error) {
 			app.Database.Password,
 			app.Database.Name,
 		)
-		app.Logger.Warn("Using individual database parameters", zap.String("dsn", dsn))
+		app.Logger.Warn("Using individual database parameters")
 	}
 
-	app.Logger.Debug("Connecting to database...")
+	app.Logger.Info("Connecting to database...", zap.String("dsn", dsn))
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
