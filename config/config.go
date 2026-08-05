@@ -36,7 +36,6 @@ type App struct {
 }
 
 type AppConfig struct {
-	Port        string
 	DatabaseURL string
 	JWTSecret   string
 	Environment enum.Environment
@@ -203,17 +202,17 @@ func (app *App) initializeResend() *resend.Client {
 }
 
 func (app *App) getFromAddress() string {
-	if app.Config.Environment == enum.DEV || app.Config.Domain == "localhost" {
+	if app.Config.Environment == enum.DEV {
 		// 开发环境下使用 Resend 官方测试地址
-		return "YourApp Dev <onboarding@resend.dev>"
+		return "Moelink Dev <onboarding@resend.dev>"
 	}
 
 	// Staging / Production 使用真实域名
-	return fmt.Sprintf("YourApp <noreply@%s>", app.Config.Domain)
+	return fmt.Sprintf("Moelink <noreply@%s>", app.Config.Domain)
 }
 
 func (app *App) getToAddress(to string) string {
-	if app.Config.Environment == enum.DEV || app.Config.Domain == "localhost" {
+	if app.Config.Environment == enum.DEV {
 		return "lshy1993@live.com"
 	}
 	return to
@@ -249,7 +248,6 @@ func (app *App) SendEmail(to, subject, htmlBody string) error {
 func NewApp() *App {
 	app := &App{
 		Config: AppConfig{
-			Port: getEnv("PORT", "8080"),
 			DatabaseURL: getEnv(
 				"DATABASE_URL",
 				"postgres://user:password@localhost/genshin_quiz?sslmode=disable",

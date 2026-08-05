@@ -52,7 +52,7 @@ steps:
         "--platform",
         "managed",
         "--allow-unauthenticated",
-        "--add-cloudsql-instances=$_CLOUD_SQL_CONNECTION_NAME",
+        "--add-cloudsql-instances=project-9f1e9b8a-2bd5-43d2-a59:asia-northeast1:genshinquiz-db",
         "--set-env-vars",
         "ENVIRONMENT=production,APP_DOMAIN=$_APP_DOMAIN,DATABASE_HOST=$_DATABASE_HOST,DATABASE_PORT=$_DATABASE_PORT,DATABASE_NAME=$_DATABASE_NAME",
         "--set-secrets",
