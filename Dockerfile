@@ -32,7 +32,11 @@ COPY --from=build-server /bin/server /bin/server
 COPY --from=build-server /bin/goose /bin/goose
 
 # 拷贝迁移 SQL 脚本（确保 ./migrations 文件夹在 Dockerfile 同级目录下）
-COPY ./migrations ./migrations 
+COPY ./migrations ./migrations
+
+# 拷贝入口脚本并设置可执行权限
+COPY ./entry-point.sh /app/entry-point.sh
+RUN chmod +x /app/entry-point.sh
 
 EXPOSE 8080
-ENTRYPOINT [ "server" ]
+ENTRYPOINT ["/app/entry-point.sh"]

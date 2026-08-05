@@ -10,6 +10,7 @@ services:
     environment:
       # 将数据库主机名指向你公共的 postgres-1 容器
       - DATABASE_URL=postgres://postgres:postgres@postgres-1:5432/genshinquiz?sslmode=disable
+      - ENVIRONMENT=production
     entrypoint:
       - /bin/sh
       - -c
