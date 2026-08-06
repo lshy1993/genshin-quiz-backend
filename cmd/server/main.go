@@ -23,21 +23,18 @@ func main() {
 	}
 
 	env := enum.Environment(envStr)
-
 	var envFile string
 	switch env {
 	case enum.DEV:
 		envFile = ".env.dev"
 	case enum.TEST:
 		envFile = ".env.test"
-	case enum.PROD:
-		envFile = ".env.prod"
-	default:
-		envFile = ".env.dev"
 	}
-	// Load variables from the specified file
-	if err := godotenv.Load(envFile); err != nil {
-		log.Printf("Warning: Error loading %s file: %v", envFile, err)
+
+	if envFile != "" {
+		if err := godotenv.Load(envFile); err != nil {
+			log.Printf("Warning: Error loading %s file: %v", envFile, err)
+		}
 	}
 
 	// Initialize configuration
