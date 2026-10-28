@@ -29,11 +29,11 @@ func GetUserByEmail(
 
 	var user []model.Users
 	err := stmt.QueryContext(ctx, db, &user)
-	if len(user) == 0 {
-		return nil, common.ErrUserNotFound
-	}
 	if err != nil {
 		return nil, errors.WrapPrefix(err, "get user base by email failed", 0)
+	}
+	if len(user) == 0 {
+		return nil, common.ErrUserNotFound
 	}
 
 	return &user[0], nil
