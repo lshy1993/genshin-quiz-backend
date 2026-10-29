@@ -63,6 +63,15 @@ func NewServer(app *config.App) *Server {
 		})
 	})
 
+	h := handler.NewHandler(app)
+
+	r.Get("/auth/check", h.EmailCheck)
+
+	r.Group(func(r chi.Router) {
+		r.Use(mw.RequiredJWTAuth(app.Config.JWTSecret, app.DB))
+		r.Post("/auth/profile", h.ProfileUpdate)
+	})
+
 	// Setup API routes - 使用条件认证中间件，根据路径决定是否需要认证
 	r.Group(func(r chi.Router) {
 		// JWT 认证中间件
@@ -74,7 +83,7 @@ func NewServer(app *config.App) *Server {
 			ResponseErrorHandlerFunc: mw.HandleResponseErrorWithLog(app),
 		}
 		strictHandler := oapi.NewStrictHandlerWithOptions(
-			handler.NewHandler(app),
+			h,
 			[]oapi.StrictMiddlewareFunc{},
 			serverOptions,
 		)
