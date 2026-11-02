@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -23,7 +24,22 @@ type Server struct {
 	serverAddr string
 }
 
+// Mode controls which routes this process serves.
+// ModeAll keeps the original single-process behaviour; ModeAuth and ModeQuiz
+// let the same codebase run as two independent services behind the gateway.
+type Mode string
+
+const (
+	ModeAll  Mode = "all"
+	ModeAuth Mode = "auth"
+	ModeQuiz Mode = "quiz"
+)
+
 func NewServer(app *config.App) *Server {
+	return NewServerWithMode(app, ModeAll)
+}
+
+func NewServerWithMode(app *config.App, mode Mode) *Server {
 	// Setup router
 	r := chi.NewRouter()
 
@@ -44,6 +60,13 @@ func NewServer(app *config.App) *Server {
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
+
+	// Route isolation: when running as auth-service or quiz-service, requests
+	// outside the process's responsibility fail fast instead of being handled
+	// by the other domain's handlers.
+	if mode != ModeAll {
+		r.Use(routeModeFilter(mode))
+	}
 
 	// Health check endpoint - 必须在 OpenAPI 路由之前定义，避免被覆盖
 	r.Route("/health", func(r chi.Router) {
@@ -95,6 +118,26 @@ func NewServer(app *config.App) *Server {
 	return &Server{
 		router:     r,
 		serverAddr: fmt.Sprintf("%s:%s", app.Server.Host, app.Server.Port),
+	}
+}
+
+func routeModeFilter(mode Mode) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			path := r.URL.Path
+			isHealth := path == "/health" || path == "/health/"
+			isAuth := path == "/auth" || strings.HasPrefix(path, "/auth/")
+
+			if mode == ModeAuth && !isAuth && !isHealth {
+				http.NotFound(w, r)
+				return
+			}
+			if mode == ModeQuiz && isAuth {
+				http.NotFound(w, r)
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
 	}
 }
 

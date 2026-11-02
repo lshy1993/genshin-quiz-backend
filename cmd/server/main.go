@@ -45,8 +45,15 @@ func main() {
 	// Set up defer immediately after logger is created
 	defer logger.Sync()
 
+	// SERVICE_MODE=auth/quiz/all 用于同一代码库拆分独立进程；
+	// 未设置时保持原有单进程行为。
+	mode := webserver.Mode(os.Getenv("SERVICE_MODE"))
+	if mode == "" {
+		mode = webserver.ModeAll
+	}
+
 	// Initialize server
-	server := webserver.NewServer(app)
+	server := webserver.NewServerWithMode(app, mode)
 	// Start server in a goroutine
 	server.Start()
 }
