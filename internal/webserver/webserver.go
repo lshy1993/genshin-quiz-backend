@@ -66,6 +66,8 @@ func NewServer(app *config.App) *Server {
 	h := handler.NewHandler(app)
 
 	r.Get("/auth/check", h.EmailCheck)
+	r.Get("/auth/oauth/{provider}", h.OAuthStart)
+	r.Get("/auth/{provider}/callback", h.OAuthCallback)
 
 	r.Group(func(r chi.Router) {
 		r.Use(mw.RequiredJWTAuth(app.Config.JWTSecret, app.DB))

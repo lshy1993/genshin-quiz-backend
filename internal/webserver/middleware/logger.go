@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
@@ -47,6 +48,13 @@ func getMethodColor(method string) string {
 
 const resetColor = "\033[0m"
 
+func safeLogURL(r *http.Request) string {
+	if strings.Contains(r.URL.Path, "/auth/oauth/") || strings.HasPrefix(r.URL.Path, "/auth/") {
+		return r.URL.Path
+	}
+	return r.URL.String()
+}
+
 // formatHTTPRequest 创建带颜色的HTTP请求日志消息.
 func formatHTTPRequest(method, url string, status int, duration time.Duration) string {
 	methodColor := getMethodColor(method)
@@ -71,13 +79,14 @@ func Logger(logger *zap.Logger) func(next http.Handler) http.Handler {
 			defer func() {
 				duration := time.Since(start)
 				status := ww.Status()
+				safeURL := safeLogURL(r)
 
 				// 使用带颜色的自定义格式
-				message := formatHTTPRequest(r.Method, r.URL.String(), status, duration)
+				message := formatHTTPRequest(r.Method, safeURL, status, duration)
 
 				logger.Info(message,
 					zap.String("method", r.Method),
-					zap.String("url", r.URL.String()),
+					zap.String("url", safeURL),
 					zap.Int("status", status),
 					zap.String("remote_addr", r.RemoteAddr),
 					zap.String("user_agent", r.UserAgent()),
@@ -101,7 +110,7 @@ func ErrorLogger(logger *zap.Logger) func(next http.Handler) http.Handler {
 					logger.Error("Panic recovered",
 						zap.Any("error", err),
 						zap.String("method", r.Method),
-						zap.String("url", r.URL.String()),
+						zap.String("url", safeLogURL(r)),
 						zap.String("request_id", middleware.GetReqID(r.Context())),
 					)
 					http.Error(w, "Internal server error", http.StatusInternalServerError)
