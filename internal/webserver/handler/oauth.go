@@ -23,9 +23,29 @@ import (
 
 const oauthStateCookiePrefix = "oauth_state_"
 
+const (
+	oauthModeLink       = "link"
+	oauthLinkPurpose    = "oauth_link"
+	oauthLinkTokenTTL   = 5 * time.Minute
+	maxIdentityBodySize = 1 << 14
+)
+
 type oauthState struct {
 	Nonce     string `json:"nonce"`
 	ReturnURL string `json:"return_url"`
+	ExpiresAt int64  `json:"expires_at"`
+	Mode      string `json:"mode,omitempty"`
+}
+
+// oauthLinkToken 是绑定模式回调后签发的短期凭证，只证明"某个第三方身份已通过验证"，
+// 真正绑定时必须由已登录用户携带自己的 Bearer 令牌提交，因此无法被他人诱导绑定到其他账号。
+type oauthLinkToken struct {
+	Purpose   string `json:"purpose"`
+	Provider  string `json:"provider"`
+	Subject   string `json:"subject"`
+	Email     string `json:"email"`
+	Name      string `json:"name"`
+	AvatarURL string `json:"avatar_url"`
 	ExpiresAt int64  `json:"expires_at"`
 }
 
@@ -98,6 +118,12 @@ func (h *Handler) OAuthStart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	mode := r.URL.Query().Get("mode")
+	if mode != "" && mode != oauthModeLink {
+		http.Error(w, "Invalid OAuth mode", http.StatusBadRequest)
+		return
+	}
+
 	nonceBytes := make([]byte, 32)
 	if _, err := rand.Read(nonceBytes); err != nil {
 		http.Error(w, "Unable to initialize OAuth", http.StatusInternalServerError)
@@ -105,7 +131,7 @@ func (h *Handler) OAuthStart(w http.ResponseWriter, r *http.Request) {
 	}
 	nonce := base64.RawURLEncoding.EncodeToString(nonceBytes)
 	state, err := signOAuthState(h.app.Config.JWTSecret, oauthState{
-		Nonce: nonce, ReturnURL: returnURL, ExpiresAt: time.Now().Add(5 * time.Minute).Unix(),
+		Nonce: nonce, ReturnURL: returnURL, ExpiresAt: time.Now().Add(5 * time.Minute).Unix(), Mode: mode,
 	})
 	if err != nil {
 		http.Error(w, "Unable to initialize OAuth", http.StatusInternalServerError)
@@ -182,15 +208,29 @@ func (h *Handler) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	identity.Provider = enum.LoginProvider(provider)
-	response, err := user_services.LoginWithOAuth(ctx, h.app, identity)
+	if state.Mode == oauthModeLink {
+		linkToken, signErr := signPayload(h.app.Config.JWTSecret, oauthLinkToken{
+			Purpose: oauthLinkPurpose, Provider: provider, Subject: identity.Subject,
+			Email: identity.Email, Name: identity.Name, AvatarURL: identity.AvatarURL,
+			ExpiresAt: time.Now().Add(oauthLinkTokenTTL).Unix(),
+		})
+		if signErr != nil {
+			h.redirectOAuthError(w, state.ReturnURL, "account_failed")
+			return
+		}
+		http.Redirect(w, r, state.ReturnURL+"#oauth_link_token="+url.QueryEscape(linkToken)+
+			"&oauth_provider="+url.QueryEscape(provider), http.StatusFound)
+		return
+	}
+	_, err = user_services.LoginWithOAuth(ctx, h.app, identity)
 	if err != nil {
 		h.app.Logger.Warn("OAuth account login failed", zap.String("provider", provider), zap.Error(err))
 		h.redirectOAuthError(w, state.ReturnURL, "account_failed")
 		return
 	}
 
-	redirectURL := state.ReturnURL + "#oauth_token=" + url.QueryEscape(response.Token) +
-		"&oauth_provider=" + url.QueryEscape(provider)
+	// 登录凭证已通过 HttpOnly 会话 Cookie 下发，URL 里不再携带 token
+	redirectURL := state.ReturnURL + "#oauth_login=success&oauth_provider=" + url.QueryEscape(provider)
 	http.Redirect(w, r, redirectURL, http.StatusFound)
 }
 
@@ -244,7 +284,11 @@ func allowedOAuthOrigins() []string {
 }
 
 func signOAuthState(secret string, state oauthState) (string, error) {
-	payload, err := json.Marshal(state)
+	return signPayload(secret, state)
+}
+
+func signPayload(secret string, value any) (string, error) {
+	payload, err := json.Marshal(value)
 	if err != nil {
 		return "", err
 	}
@@ -258,33 +302,49 @@ func signOAuthState(secret string, state oauthState) (string, error) {
 }
 
 func verifyOAuthState(secret, token string) (*oauthState, error) {
-	parts := strings.Split(token, ".")
-	if len(parts) != 2 {
-		return nil, fmt.Errorf("invalid state")
-	}
-	provided, err := base64.RawURLEncoding.DecodeString(parts[1])
-	if err != nil {
-		return nil, fmt.Errorf("invalid state signature")
-	}
-	mac := hmac.New(sha256.New, []byte(secret))
-	if _, err := mac.Write([]byte(parts[0])); err != nil {
-		return nil, err
-	}
-	if !hmac.Equal(provided, mac.Sum(nil)) {
-		return nil, fmt.Errorf("invalid state signature")
-	}
-	payload, err := base64.RawURLEncoding.DecodeString(parts[0])
-	if err != nil {
-		return nil, err
-	}
 	var state oauthState
-	if err = json.Unmarshal(payload, &state); err != nil {
+	if err := verifyPayload(secret, token, &state); err != nil {
 		return nil, err
 	}
 	if _, ok := validatedOAuthReturnURL(state.ReturnURL); !ok {
 		return nil, fmt.Errorf("invalid return URL")
 	}
 	return &state, nil
+}
+
+func verifyPayload(secret, token string, out any) error {
+	parts := strings.Split(token, ".")
+	if len(parts) != 2 {
+		return fmt.Errorf("invalid token")
+	}
+	provided, err := base64.RawURLEncoding.DecodeString(parts[1])
+	if err != nil {
+		return fmt.Errorf("invalid token signature")
+	}
+	mac := hmac.New(sha256.New, []byte(secret))
+	if _, err := mac.Write([]byte(parts[0])); err != nil {
+		return err
+	}
+	if !hmac.Equal(provided, mac.Sum(nil)) {
+		return fmt.Errorf("invalid token signature")
+	}
+	payload, err := base64.RawURLEncoding.DecodeString(parts[0])
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(payload, out)
+}
+
+func verifyOAuthLinkToken(secret, token string) (*oauthLinkToken, error) {
+	var link oauthLinkToken
+	if err := verifyPayload(secret, token, &link); err != nil {
+		return nil, err
+	}
+	if link.Purpose != oauthLinkPurpose || link.ExpiresAt < time.Now().Unix() ||
+		(link.Provider != "google" && link.Provider != "github") || link.Subject == "" {
+		return nil, fmt.Errorf("invalid link token")
+	}
+	return &link, nil
 }
 
 func (h *Handler) redirectOAuthError(w http.ResponseWriter, returnURL, code string) {

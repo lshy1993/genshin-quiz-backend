@@ -78,3 +78,35 @@ func TestOAuthGoogleCallbackURL(t *testing.T) {
 		t.Fatalf("Google callback URL = %q", provider.callbackURL)
 	}
 }
+
+func TestOAuthLinkTokenRoundTripAndRejection(t *testing.T) {
+	valid := oauthLinkToken{
+		Purpose: oauthLinkPurpose, Provider: "github", Subject: "42",
+		ExpiresAt: time.Now().Add(time.Minute).Unix(),
+	}
+	token, err := signPayload("test-secret", valid)
+	if err != nil {
+		t.Fatal(err)
+	}
+	decoded, err := verifyOAuthLinkToken("test-secret", token)
+	if err != nil || decoded.Subject != "42" || decoded.Provider != "github" {
+		t.Fatalf("decoded = %#v, err = %v", decoded, err)
+	}
+	if _, err := verifyOAuthLinkToken("other-secret", token); err == nil {
+		t.Fatal("expected wrong secret to be rejected")
+	}
+
+	expired := valid
+	expired.ExpiresAt = time.Now().Add(-time.Minute).Unix()
+	token, _ = signPayload("test-secret", expired)
+	if _, err := verifyOAuthLinkToken("test-secret", token); err == nil {
+		t.Fatal("expected expired token to be rejected")
+	}
+
+	wrongPurpose := valid
+	wrongPurpose.Purpose = "other"
+	token, _ = signPayload("test-secret", wrongPurpose)
+	if _, err := verifyOAuthLinkToken("test-secret", token); err == nil {
+		t.Fatal("expected wrong purpose to be rejected")
+	}
+}

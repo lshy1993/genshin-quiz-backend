@@ -11,6 +11,20 @@ type contextKey string
 
 const RealIPKey contextKey = "real_ip"
 const UserAgentKey contextKey = "user_agent"
+const responseWriterKey contextKey = "response_writer"
+
+// WithResponseWriter 把响应写入器放进 context，使 service 层可以下发会话 Cookie。
+func WithResponseWriter(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), responseWriterKey, w)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func ResponseWriterFromContext(ctx context.Context) (http.ResponseWriter, bool) {
+	w, ok := ctx.Value(responseWriterKey).(http.ResponseWriter)
+	return w, ok
+}
 
 // SecureRealIP 返回一个安全的 IP 提取中间件.
 func SecureRealIP(next http.Handler) http.Handler {

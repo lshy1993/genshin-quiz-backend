@@ -8,6 +8,7 @@ import (
 	"genshin-quiz/internal/dao/transformer"
 	"genshin-quiz/internal/enum"
 	user_repo "genshin-quiz/internal/repository/user"
+	"genshin-quiz/internal/services/session"
 	"genshin-quiz/internal/webserver/middleware"
 
 	"genshin-quiz/internal/common"
@@ -61,7 +62,6 @@ func LoginUser(
 	return realLogin(
 		ctx,
 		app.DB,
-		app.Config.JWTSecret,
 		"password",
 		&authInfo.Users,
 		userProfile,
@@ -73,7 +73,6 @@ func LoginUser(
 func realLogin(
 	ctx context.Context,
 	db qrm.DB,
-	secret string,
 	loginType enum.LoginProvider, // "password", "google"
 	user *model.Users,
 	profile *model.UserProfiles,
@@ -81,9 +80,13 @@ func realLogin(
 	stats *model.UserStats,
 ) (*oapi.AuthResponse, error) {
 	// 生成 JWT
-	tokenString, err := middleware.GenerateJWT(user.ID, user.Email, secret)
+	tokenString, err := middleware.GenerateJWT(user.ID, user.Email)
 	if err != nil {
 		return nil, errors.WrapPrefix(err, "GenerateJWT failed", 0)
+	}
+	// 创建登录会话并下发 HttpOnly Cookie；浏览器之后用它换取短期 access token
+	if err := session.Start(ctx, db, user.ID); err != nil {
+		return nil, err
 	}
 	// 从 Context 提取 IP 和 User-Agent
 	ip, _ := ctx.Value(middleware.RealIPKey).(string)

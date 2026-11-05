@@ -30,6 +30,13 @@ func NewUnauthorizedError(message string) *APIError {
 	}
 }
 
+func NewConflictError(message string) *APIError {
+	return &APIError{
+		Code:    http.StatusConflict,
+		Message: message,
+	}
+}
+
 func NewNotFoundError(message string) *APIError {
 	return &APIError{
 		Code:    http.StatusNotFound,

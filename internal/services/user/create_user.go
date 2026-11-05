@@ -76,7 +76,6 @@ func RegisterUser(
 	response, err := realLogin(
 		ctx,
 		tx,
-		app.Config.JWTSecret,
 		"password",
 		res,
 		profile,

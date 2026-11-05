@@ -137,7 +137,7 @@ func LoginWithOAuth(ctx context.Context, app *config.App, identity OAuthIdentity
 		if loadErr != nil {
 			return nil, loadErr
 		}
-		response, loginErr := realLogin(ctx, tx, app.Config.JWTSecret, identity.Provider, user, profile, privacies, stats)
+		response, loginErr := realLogin(ctx, tx, identity.Provider, user, profile, privacies, stats)
 		if loginErr != nil {
 			return nil, loginErr
 		}
@@ -154,6 +154,12 @@ func LoginWithOAuth(ctx context.Context, app *config.App, identity OAuthIdentity
 	if user.Status != 0 || user.DeletedAt != nil {
 		return nil, fmt.Errorf("account is unavailable")
 	}
+	// 用户还没有头像时，用第三方头像补上；已有头像（含自行上传）不覆盖
+	if (user.AvatarURL == nil || *user.AvatarURL == "") && strings.HasPrefix(identity.AvatarURL, "https://") {
+		if updated, updateErr := user_repo.UpdateUser(ctx, app.DB, userID, dao.UpdateUserParams{AvatarURL: &identity.AvatarURL}); updateErr == nil {
+			user = updated
+		}
+	}
 	profile, err := user_repo.GetUserProfileByID(ctx, app.DB, userID)
 	if err != nil {
 		return nil, err
@@ -166,5 +172,5 @@ func LoginWithOAuth(ctx context.Context, app *config.App, identity OAuthIdentity
 	if err != nil {
 		return nil, err
 	}
-	return realLogin(ctx, app.DB, app.Config.JWTSecret, identity.Provider, user, profile, privacies, stats)
+	return realLogin(ctx, app.DB, identity.Provider, user, profile, privacies, stats)
 }

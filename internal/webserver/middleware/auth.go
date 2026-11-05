@@ -3,14 +3,13 @@ package middleware
 import (
 	"context"
 	"errors"
+	"genshin-quiz/internal/authkeys"
 	"genshin-quiz/internal/common"
 	user_repo "genshin-quiz/internal/repository/user"
 	"genshin-quiz/internal/util"
 	"net/http"
 	"strings"
-	"time"
 
-	"github.com/go-chi/jwtauth/v5"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -24,13 +23,10 @@ type UserClaims struct {
 type userContextKey struct{}
 
 func JWTAuth(
-	jwtSecret string,
 	db qrm.DB,
 	requireToken bool,
 	requireAdmin bool,
 ) func(http.Handler) http.Handler {
-	tokenAuth := jwtauth.New("HS256", []byte(jwtSecret), nil)
-
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// 检查是否有token
@@ -48,7 +44,7 @@ func JWTAuth(
 			}
 
 			// 提供了token，则需要验证
-			userClaims, err := parseAndValidateToken(r, tokenAuth, db, requireAdmin)
+			userClaims, err := parseAndValidateToken(r, db, requireAdmin)
 			if err != nil {
 				// token无效 - 不管是强制还是可选认证都应该报错
 				handleAuthError(w, err)
@@ -64,7 +60,6 @@ func JWTAuth(
 
 func parseAndValidateToken(
 	r *http.Request,
-	tokenAuth *jwtauth.JWTAuth,
 	db qrm.DB,
 	requireAdmin bool,
 ) (*UserClaims, error) {
@@ -75,25 +70,15 @@ func parseAndValidateToken(
 		return nil, common.ErrInvalidTokenFormat
 	}
 
-	// Parse and validate token (包括过期检查)
-	token, err := tokenAuth.Decode(tokenString)
-	if err != nil || token == nil {
-		return nil, common.ErrInvalidToken
-	}
-
-	// Get claims from token
-	var userIDFloat float64
-	if err := token.Get("user_id", &userIDFloat); err != nil {
-		return nil, common.ErrInvalidToken
-	}
-
-	var email string
-	if err := token.Get("email", &email); err != nil {
+	// 校验 ES256 签名、签发方与过期时间；公钥来自 auth-service
+	claims, err := authkeys.Verify(tokenString)
+	// 发给第三方应用的受限 token（带 client_id）不能访问自家接口
+	if err != nil || claims.ClientID != "" {
 		return nil, common.ErrInvalidToken
 	}
 
 	// 检查用户是否仍然存在于数据库中，并获取用户信息包括角色
-	userInfo, err := user_repo.GetUserInfoByID(r.Context(), db, int64(userIDFloat))
+	userInfo, err := user_repo.GetUserInfoByID(r.Context(), db, claims.UserID)
 	if err != nil {
 		if errors.Is(err, common.ErrUserNotFound) {
 			return nil, common.ErrUserNotFound
@@ -106,8 +91,8 @@ func parseAndValidateToken(
 	}
 
 	return &UserClaims{
-		UserID: int64(userIDFloat),
-		Email:  email,
+		UserID: claims.UserID,
+		Email:  claims.Email,
 	}, nil
 }
 
@@ -148,32 +133,27 @@ func GetUserFromContextOnly(ctx context.Context) (*UserClaims, bool) {
 	return &user, ok
 }
 
-func GenerateJWT(userID int64, email, secret string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
-		"email":   email,
-		"exp":     time.Now().Add(24 * time.Hour).Unix(),
-	})
-
-	return token.SignedString([]byte(secret))
+// GenerateJWT 签发 access token，只能在持有私钥的 auth-service 进程中调用。
+func GenerateJWT(userID int64, email string) (string, error) {
+	return authkeys.Sign(userID, email, authkeys.AccessTokenTTL())
 }
 
 // RequiredJWTAuth 强制JWT认证中间件.
-func RequiredJWTAuth(jwtSecret string, db qrm.DB) func(http.Handler) http.Handler {
-	return JWTAuth(jwtSecret, db, true, false)
+func RequiredJWTAuth(db qrm.DB) func(http.Handler) http.Handler {
+	return JWTAuth(db, true, false)
 }
 
 // RequiredAdminJWTAuth 强制管理员JWT认证中间件.
-func RequiredAdminJWTAuth(jwtSecret string, db qrm.DB) func(http.Handler) http.Handler {
-	return JWTAuth(jwtSecret, db, true, true)
+func RequiredAdminJWTAuth(db qrm.DB) func(http.Handler) http.Handler {
+	return JWTAuth(db, true, true)
 }
 
 // OptionalJWTAuth 可选JWT认证中间件.
-func OptionalJWTAuth(jwtSecret string, db qrm.DB) func(http.Handler) http.Handler {
-	return JWTAuth(jwtSecret, db, false, false)
+func OptionalJWTAuth(db qrm.DB) func(http.Handler) http.Handler {
+	return JWTAuth(db, false, false)
 }
 
-func ConditionalJWTAuth(jwtSecret string, db qrm.DB) func(http.Handler) http.Handler {
+func ConditionalJWTAuth(db qrm.DB) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			path := r.URL.Path
@@ -182,12 +162,12 @@ func ConditionalJWTAuth(jwtSecret string, db qrm.DB) func(http.Handler) http.Han
 			// 检查是否是公开端点
 			if isPublicEndpoint(path, method) {
 				// 公开端点，使用可选认证（不强制要求token，但如果有token会解析）
-				OptionalJWTAuth(jwtSecret, db)(next).ServeHTTP(w, r)
+				OptionalJWTAuth(db)(next).ServeHTTP(w, r)
 				return
 			}
 
 			// 需要认证的端点，使用强制认证流程
-			RequiredJWTAuth(jwtSecret, db)(next).ServeHTTP(w, r)
+			RequiredJWTAuth(db)(next).ServeHTTP(w, r)
 		})
 	}
 }
