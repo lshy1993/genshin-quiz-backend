@@ -256,6 +256,18 @@ tasks:
     cmds:
       - go run ./cmd/server/main.go
 
+  seed-admin:
+    desc: 'Create/promote an admin by email: task seed-admin EMAIL=you@example.com [PASSWORD=...] [NICKNAME=...] [RESET_PASSWORD=true]'
+    silent: false
+    requires:
+      vars: [EMAIL]
+    vars:
+      PASSWORD: ''
+      NICKNAME: ''
+      RESET_PASSWORD: 'false'
+    cmds:
+      - go run ./cmd/seed-admin/main.go -email "{{.EMAIL}}" -password "{{.PASSWORD}}" -nickname "{{.NICKNAME}}" -reset-password={{.RESET_PASSWORD}}
+
   run-fresh:
     desc: 'Run the server and worker with a fresh database'
     silent: true
