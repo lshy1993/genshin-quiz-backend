@@ -271,7 +271,7 @@ func validatedOAuthReturnURL(raw string) (string, bool) {
 func allowedOAuthOrigins() []string {
 	raw := os.Getenv("OAUTH_ALLOWED_REDIRECT_ORIGINS")
 	if raw == "" {
-		raw = "https://moelink.site,https://www.moelink.site,https://quiz.moelink.site,http://localhost:3000,http://localhost:5173"
+		raw = "https://moelink.site,https://www.moelink.site,https://quiz.moelink.site,http://localhost:3000,http://localhost:5173,http://localhost:8000,https://api.moelink.site"
 	}
 	var origins []string
 	for _, item := range strings.Split(raw, ",") {
